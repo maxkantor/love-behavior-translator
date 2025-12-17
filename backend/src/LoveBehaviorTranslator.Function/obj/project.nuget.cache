@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "dgSpecHash": "qnHdTltX9w8=",
+  "success": true,
+  "projectFilePath": "C:\\Apps\\LoveBehaviorTranslator\\backend\\src\\LoveBehaviorTranslator.Function\\LoveBehaviorTranslator.Function.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\mykan\\.nuget\\packages\\amazon.lambda.apigatewayevents\\2.7.3\\amazon.lambda.apigatewayevents.2.7.3.nupkg.sha512",
+    "C:\\Users\\mykan\\.nuget\\packages\\amazon.lambda.core\\2.5.0\\amazon.lambda.core.2.5.0.nupkg.sha512",
+    "C:\\Users\\mykan\\.nuget\\packages\\amazon.lambda.serialization.systemtextjson\\2.4.0\\amazon.lambda.serialization.systemtextjson.2.4.0.nupkg.sha512",
+    "C:\\Users\\mykan\\.nuget\\packages\\awssdk.core\\3.7.400\\awssdk.core.3.7.400.nupkg.sha512",
+    "C:\\Users\\mykan\\.nuget\\packages\\awssdk.dynamodbv2\\3.7.400\\awssdk.dynamodbv2.3.7.400.nupkg.sha512",
+    "C:\\Users\\mykan\\.nuget\\packages\\awssdk.s3\\3.7.400\\awssdk.s3.3.7.400.nupkg.sha512",
+    "C:\\Users\\mykan\\.nuget\\packages\\awssdk.secretsmanager\\3.7.400\\awssdk.secretsmanager.3.7.400.nupkg.sha512",
+    "C:\\Users\\mykan\\.nuget\\packages\\awssdk.simpleemail\\3.7.400\\awssdk.simpleemail.3.7.400.nupkg.sha512"
+  ],
+  "logs": []
+}

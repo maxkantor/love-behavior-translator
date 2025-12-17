@@ -1,0 +1,12 @@
+C:\Apps\LoveBehaviorTranslator\backend\dist\publish\LoveBehaviorTranslator.Function.dll
+C:\Apps\LoveBehaviorTranslator\backend\dist\publish\LoveBehaviorTranslator.Function.deps.json
+C:\Apps\LoveBehaviorTranslator\backend\dist\publish\LoveBehaviorTranslator.Function.runtimeconfig.json
+C:\Apps\LoveBehaviorTranslator\backend\dist\publish\LoveBehaviorTranslator.Function.pdb
+C:\Apps\LoveBehaviorTranslator\backend\dist\publish\Amazon.Lambda.APIGatewayEvents.dll
+C:\Apps\LoveBehaviorTranslator\backend\dist\publish\Amazon.Lambda.Core.dll
+C:\Apps\LoveBehaviorTranslator\backend\dist\publish\Amazon.Lambda.Serialization.SystemTextJson.dll
+C:\Apps\LoveBehaviorTranslator\backend\dist\publish\AWSSDK.Core.dll
+C:\Apps\LoveBehaviorTranslator\backend\dist\publish\AWSSDK.DynamoDBv2.dll
+C:\Apps\LoveBehaviorTranslator\backend\dist\publish\AWSSDK.S3.dll
+C:\Apps\LoveBehaviorTranslator\backend\dist\publish\AWSSDK.SecretsManager.dll
+C:\Apps\LoveBehaviorTranslator\backend\dist\publish\AWSSDK.SimpleEmail.dll

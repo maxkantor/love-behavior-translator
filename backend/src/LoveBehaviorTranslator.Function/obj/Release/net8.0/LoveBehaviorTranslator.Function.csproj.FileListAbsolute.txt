@@ -1,0 +1,14 @@
+C:\Apps\LoveBehaviorTranslator\backend\src\LoveBehaviorTranslator.Function\obj\Release\net8.0\LoveBehaviorTranslator.Function.csproj.AssemblyReference.cache
+C:\Apps\LoveBehaviorTranslator\backend\src\LoveBehaviorTranslator.Function\obj\Release\net8.0\LoveBehaviorTranslator.Function.GeneratedMSBuildEditorConfig.editorconfig
+C:\Apps\LoveBehaviorTranslator\backend\src\LoveBehaviorTranslator.Function\obj\Release\net8.0\LoveBehaviorTranslator.Function.AssemblyInfoInputs.cache
+C:\Apps\LoveBehaviorTranslator\backend\src\LoveBehaviorTranslator.Function\obj\Release\net8.0\LoveBehaviorTranslator.Function.AssemblyInfo.cs
+C:\Apps\LoveBehaviorTranslator\backend\src\LoveBehaviorTranslator.Function\obj\Release\net8.0\LoveBehaviorTranslator.Function.csproj.CoreCompileInputs.cache
+C:\Apps\LoveBehaviorTranslator\backend\src\LoveBehaviorTranslator.Function\bin\Release\net8.0\LoveBehaviorTranslator.Function.deps.json
+C:\Apps\LoveBehaviorTranslator\backend\src\LoveBehaviorTranslator.Function\bin\Release\net8.0\LoveBehaviorTranslator.Function.runtimeconfig.json
+C:\Apps\LoveBehaviorTranslator\backend\src\LoveBehaviorTranslator.Function\bin\Release\net8.0\LoveBehaviorTranslator.Function.dll
+C:\Apps\LoveBehaviorTranslator\backend\src\LoveBehaviorTranslator.Function\bin\Release\net8.0\LoveBehaviorTranslator.Function.pdb
+C:\Apps\LoveBehaviorTranslator\backend\src\LoveBehaviorTranslator.Function\obj\Release\net8.0\LoveBehaviorTranslator.Function.dll
+C:\Apps\LoveBehaviorTranslator\backend\src\LoveBehaviorTranslator.Function\obj\Release\net8.0\refint\LoveBehaviorTranslator.Function.dll
+C:\Apps\LoveBehaviorTranslator\backend\src\LoveBehaviorTranslator.Function\obj\Release\net8.0\LoveBehaviorTranslator.Function.pdb
+C:\Apps\LoveBehaviorTranslator\backend\src\LoveBehaviorTranslator.Function\obj\Release\net8.0\LoveBehaviorTranslator.Function.genruntimeconfig.cache
+C:\Apps\LoveBehaviorTranslator\backend\src\LoveBehaviorTranslator.Function\obj\Release\net8.0\ref\LoveBehaviorTranslator.Function.dll
