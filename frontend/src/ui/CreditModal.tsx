@@ -38,7 +38,7 @@ export function CreditModal({ isOpen, onClose, currentCredits }: CreditModalProp
 
   function handlePurchase(pack: typeof creditPacks[0]) {
     // TODO: Integrate with Stripe
-    alert(`Stripe integration coming soon! This would purchase ${pack.credits} credits for $${pack.price}`);
+    alert(`Stripe integration coming soon! This would unlock ${pack.credits} deep relationship readings for $${pack.price}`);
     onClose();
   }
 
@@ -46,9 +46,9 @@ export function CreditModal({ isOpen, onClose, currentCredits }: CreditModalProp
     <div className="modal-overlay" onClick={onClose}>
       <div className="credit-modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="credit-modal-header">
-          <h1>Buy Credits</h1>
+          <h1>Unlock Clarity</h1>
           <p className="credit-subtitle">
-            Purchase credits to continue analyzing relationship behaviors after your free searches are used up!
+            People usually come here when something feels off.
           </p>
         </div>
 
@@ -56,28 +56,28 @@ export function CreditModal({ isOpen, onClose, currentCredits }: CreditModalProp
           <div className="benefit-card">
             <div className="benefit-icon">🎁</div>
             <div className="benefit-text">
-              <strong>5 Free Searches</strong>
-              <span>Start with 5 free translations - no credit card required.</span>
+              <strong>5 Free Relationship Insights</strong>
+              <span>Start with 5 free deep readings - no credit card required.</span>
             </div>
           </div>
           <div className="benefit-card">
             <div className="benefit-icon">🐷</div>
             <div className="benefit-text">
-              <strong>Credits Never Expire</strong>
-              <span>Use your credits whenever you need them.</span>
+              <strong>Insights Never Expire</strong>
+              <span>Use your relationship insights whenever you need clarity.</span>
             </div>
           </div>
           <div className="benefit-card">
             <div className="benefit-icon">👑</div>
             <div className="benefit-text">
-              <strong>Same Quality Analysis</strong>
-              <span>All translations use the same advanced AI analysis.</span>
+              <strong>Same Deep Analysis</strong>
+              <span>All readings use the same advanced AI trained on relationship patterns.</span>
             </div>
           </div>
         </div>
 
         <div className="packs-section">
-          <h2 className="packs-title">Choose Your Credit Pack</h2>
+          <h2 className="packs-title">Choose Your Relationship Insight Pack</h2>
           <div className="packs-grid">
             {creditPacks.map((pack) => (
               <div key={pack.name} className={`pack-card ${pack.popular ? 'popular-pack' : ''}`}>
@@ -95,10 +95,10 @@ export function CreditModal({ isOpen, onClose, currentCredits }: CreditModalProp
                 <div className="pack-credits-box">
                   <span className="coin-icon">🪙</span>
                   <span className="coin-icon">🪙</span>
-                  <span className="credits-amount">{pack.credits} Credits</span>
+                  <span className="credits-amount">{pack.credits} Deep Readings</span>
                 </div>
                 <p className="pack-description">{pack.description}</p>
-                <div className="pack-per-credit">${pack.perCredit.toFixed(3)} per credit</div>
+                <div className="pack-per-credit">${pack.perCredit.toFixed(3)} per reading</div>
                 <button
                   className={`pack-button ${pack.popular ? 'popular-button' : ''}`}
                   onClick={() => handlePurchase(pack)}

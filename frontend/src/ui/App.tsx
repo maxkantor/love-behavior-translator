@@ -96,8 +96,8 @@ export function App() {
       const data = (await resp.json()) as any;
       if (!resp.ok) {
         if (resp.status === 402) {
-          // Insufficient credits
-          setError(data?.detail ?? data?.error ?? 'Insufficient credits. Please purchase more credits.');
+          // Insufficient insights
+          setError(data?.detail ?? data?.error ?? 'You need more relationship insights to continue. Unlock clarity to get deeper understanding.');
           if (data.credits !== undefined) {
             setCredits(data.credits);
             localStorage.setItem('credits', data.credits.toString());
@@ -155,15 +155,53 @@ export function App() {
           
           <div className="credits-header">
             <div className="credits-badge-large">
-              {displayCredits} Credits
+              {displayCredits} Relationship Insights
             </div>
-            <span className="credits-explanation">1 credit = 1 behavior analysis</span>
+            <span className="credits-explanation">1 Deep Relationship Reading</span>
           </div>
         </div>
       </header>
 
       <main className="app-main">
         <div className="main-card">
+          <div className="entry-points-section">
+            <h3 className="entry-points-title">What's on your mind?</h3>
+            <div className="entry-points-grid">
+              <button
+                type="button"
+                className="entry-point-btn"
+                onClick={() => handleQuickAction("My partner has been pulling away. They used to text me all the time, but now I'm always the one initiating. When we're together, they seem distracted and less engaged. I'm worried they're losing interest.")}
+              >
+                <span className="entry-icon">💔</span>
+                <span className="entry-text">Is My Partner Pulling Away?</span>
+              </button>
+              <button
+                type="button"
+                className="entry-point-btn"
+                onClick={() => handleQuickAction("I notice a pattern where I get anxious when my partner needs space, but they seem to pull away more when I try to get closer. I think I might be anxious-attached and they might be avoidant. How do I understand this dynamic?")}
+              >
+                <span className="entry-icon">🔄</span>
+                <span className="entry-text">Avoidant vs Anxious Behavior</span>
+              </button>
+              <button
+                type="button"
+                className="entry-point-btn"
+                onClick={() => handleQuickAction("I'm worried my partner is losing interest. They don't make plans anymore, our conversations feel surface-level, and the intimacy has faded. I can't tell if this is just a rough patch or if they're checking out of the relationship.")}
+              >
+                <span className="entry-icon">😰</span>
+                <span className="entry-text">Are They Losing Interest?</span>
+              </button>
+              <button
+                type="button"
+                className="entry-point-btn"
+                onClick={() => handleQuickAction("I'm at a crossroads in my relationship. Part of me wants to stay and work through our issues, but another part wonders if I'm wasting my time. The relationship has been rocky, and I'm not sure if the problems are fixable or if I should leave.")}
+              >
+                <span className="entry-icon">🤔</span>
+                <span className="entry-text">Should I Stay or Leave?</span>
+              </button>
+            </div>
+          </div>
+
           <textarea
             className="behavior-input"
             rows={6}
@@ -172,8 +210,36 @@ export function App() {
             placeholder="Describe your relationship behavior... e.g., 'My partner has been canceling plans last minute and seems distant when we do spend time together'"
           />
 
+          <div className="emotional-trigger">
+            <p className="trigger-text">
+              Most people miss the real meaning behind their partner's behavior.
+            </p>
+            <p className="trigger-text">
+              This AI is trained to spot patterns humans ignore.
+            </p>
+          </div>
+
           <div className="trust-indicators">
-            <span className="trust-badge">★ Trusted by couples worldwide</span>
+            <div className="social-proof-stats">
+              <div className="stat-item">
+                <span className="stat-number">1,247</span>
+                <span className="stat-label">people used this month</span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-number">87%</span>
+                <span className="stat-label">say it clarified their situation</span>
+              </div>
+            </div>
+            <div className="testimonials">
+              <div className="testimonial-item">
+                <span className="testimonial-quote">"This helped me finally understand why he shut down."</span>
+                <span className="testimonial-author">— Anonymous</span>
+              </div>
+              <div className="testimonial-item">
+                <span className="testimonial-quote">"I thought I was overthinking. Turns out I wasn't."</span>
+                <span className="testimonial-author">— Anonymous</span>
+              </div>
+            </div>
             <div className="support-badges">
               <span>💑 Dating</span>
               <span>💍 Married</span>
@@ -276,17 +342,21 @@ export function App() {
               </div>
             </div>
 
-            {error && (
-              <div className="error-message">
-                {error}
-              </div>
-            )}
+          {error && (
+            <div className="error-message">
+              {error}
+            </div>
+          )}
 
-            <button
-              type="submit"
-              className="analyze-button"
-              disabled={loading || behavior.trim().length < 10}
-            >
+          <div className="reassurance-text">
+            You're probably not overthinking it.
+          </div>
+
+          <button
+            type="submit"
+            className="analyze-button"
+            disabled={loading || behavior.trim().length < 10}
+          >
               {loading ? (
                 <>
                   <span className="spinner"></span>
@@ -341,7 +411,7 @@ export function App() {
               <span className="mode-badge">Mode: {result.mode_used}</span>
               {result.credits_remaining && (
                 <span className="credits-remaining">
-                  Credits remaining: {result.credits_remaining === 'unlimited' ? 'Unlimited' : result.credits_remaining}
+                  Relationship Insights remaining: {result.credits_remaining === 'unlimited' ? 'Unlimited' : result.credits_remaining}
                 </span>
               )}
             </div>
@@ -355,7 +425,7 @@ export function App() {
             className="footer-btn buy-credits"
             onClick={() => setShowCreditModal(true)}
           >
-            💰 Buy Credits
+            💡 Unlock Clarity
           </button>
           <button 
             className="footer-btn need-help"

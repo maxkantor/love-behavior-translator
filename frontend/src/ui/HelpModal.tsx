@@ -24,8 +24,8 @@ export function HelpModal({ isOpen, onClose }: HelpModalProps) {
       answer: "We offer four analysis styles: Gentle (compassionate and supportive), Analytical (fact-based and structured), Brutally Honest (direct and unfiltered), and Light & Funny (uplifting with humor)."
     },
     {
-      question: "How do credits work?",
-      answer: "Each behavior analysis costs 1 credit. New users receive 5 free credits to get started. You can purchase additional credits anytime. Credits never expire."
+      question: "How do Relationship Insights work?",
+      answer: "Each deep relationship reading costs 1 Relationship Insight. New users receive 5 free insights to get started. You can unlock additional insights anytime. Your insights never expire."
     },
     {
       question: "Is this professional therapy?",
@@ -33,7 +33,7 @@ export function HelpModal({ isOpen, onClose }: HelpModalProps) {
     },
     {
       question: "Can I get a refund?",
-      answer: "If you're not satisfied with your analysis, please contact support. We offer refunds for unused credits within 30 days of purchase."
+      answer: "If you're not satisfied with your analysis, please contact support. We offer refunds for unused relationship insights within 30 days of purchase."
     },
     {
       question: "How do I contact support?",
