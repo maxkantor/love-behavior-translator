@@ -163,17 +163,43 @@ export function App() {
       </header>
 
       <main className="app-main-wrapper">
-        {/* Decorative images */}
-        <img 
-          src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop&crop=face" 
-          alt="Decorative" 
-          className="decorative-image-left"
-        />
-        <img 
-          src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face" 
-          alt="Decorative" 
-          className="decorative-image-right"
-        />
+        {/* Decorative images - Left side (women) */}
+        <div className="decorative-images-left">
+          <img 
+            src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop&crop=face" 
+            alt="Decorative" 
+            className="decorative-image"
+          />
+          <img 
+            src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=400&fit=crop&crop=face" 
+            alt="Decorative" 
+            className="decorative-image"
+          />
+          <img 
+            src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=400&h=400&fit=crop&crop=face" 
+            alt="Decorative" 
+            className="decorative-image"
+          />
+        </div>
+        
+        {/* Decorative images - Right side (men) */}
+        <div className="decorative-images-right">
+          <img 
+            src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face" 
+            alt="Decorative" 
+            className="decorative-image"
+          />
+          <img 
+            src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face" 
+            alt="Decorative" 
+            className="decorative-image"
+          />
+          <img 
+            src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=400&fit=crop&crop=face" 
+            alt="Decorative" 
+            className="decorative-image"
+          />
+        </div>
         
         {/* Left Sidebar - on purple background */}
         <div className="main-sidebar main-sidebar-left">
