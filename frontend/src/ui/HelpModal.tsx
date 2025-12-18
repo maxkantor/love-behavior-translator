@@ -14,6 +14,33 @@ export function HelpModal({ isOpen, onClose }: HelpModalProps) {
 
   if (!isOpen) return null;
 
+  const faqs = [
+    {
+      question: "How does the AI analysis work?",
+      answer: "Our AI analyzes the relationship behavior you describe and provides evidence-based insights, emotional understanding, practical advice, and gentle reassurance. It's designed to help you understand patterns and communicate better."
+    },
+    {
+      question: "What analysis styles are available?",
+      answer: "We offer four analysis styles: Gentle (compassionate and supportive), Analytical (fact-based and structured), Brutally Honest (direct and unfiltered), and Light & Funny (uplifting with humor)."
+    },
+    {
+      question: "How do credits work?",
+      answer: "Each behavior analysis costs 1 credit. New users receive 5 free credits to get started. You can purchase additional credits anytime. Credits never expire."
+    },
+    {
+      question: "Is this professional therapy?",
+      answer: "No. This app provides general relationship insights and is not professional therapy or counseling. For serious relationship issues, please consult a licensed therapist or counselor."
+    },
+    {
+      question: "Can I get a refund?",
+      answer: "If you're not satisfied with your analysis, please contact support. We offer refunds for unused credits within 30 days of purchase."
+    },
+    {
+      question: "How do I contact support?",
+      answer: "You can reach our support team by filling out the contact form below or emailing support@lovebehaviortranslator.com. We typically respond within 24 hours for premium users and 48 hours for free users."
+    }
+  ];
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setIsSubmitting(true);
@@ -46,96 +73,115 @@ export function HelpModal({ isOpen, onClose }: HelpModalProps) {
       <div className="support-modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="support-modal-header">
           <div className="headset-icon">🎧</div>
-          <h1>Contact Support</h1>
+          <h1>Need Help?</h1>
         </div>
 
-        <form className="support-form" onSubmit={handleSubmit}>
-          <div className="form-field">
-            <label>
-              <span className="field-icon">✉</span>
-              Email <span className="required">*</span>
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="your@email.com"
-              required
-              className="support-input"
-              disabled={isSubmitting}
-            />
-          </div>
-
-          <div className="form-field">
-            <label>
-              Subject <span className="required">*</span>
-            </label>
-            <input
-              type="text"
-              value={subject}
-              onChange={(e) => setSubject(e.target.value)}
-              placeholder="What's this about?"
-              required
-              className="support-input"
-              disabled={isSubmitting}
-            />
-          </div>
-
-          <div className="form-field">
-            <label>
-              Message <span className="required">*</span>
-            </label>
-            <textarea
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              placeholder="Describe your question or issue..."
-              rows={6}
-              required
-              className="support-textarea"
-              disabled={isSubmitting}
-            />
-          </div>
-
-          {submitStatus === 'success' && (
-            <div className="submit-success">
-              ✓ Message sent successfully! We'll get back to you soon.
+        <div className="help-content-wrapper">
+          {/* FAQ Section */}
+          <section className="faq-section">
+            <h2 className="section-title">Frequently Asked Questions</h2>
+            <div className="faq-list">
+              {faqs.map((faq, index) => (
+                <div key={index} className="faq-item">
+                  <div className="faq-question">{faq.question}</div>
+                  <div className="faq-answer">{faq.answer}</div>
+                </div>
+              ))}
             </div>
-          )}
+          </section>
 
-          {submitStatus === 'error' && (
-            <div className="submit-error">
-              ✗ Failed to send message. Please try again.
+          {/* Contact Form Section */}
+          <section className="contact-section">
+            <h2 className="section-title">Contact Support</h2>
+            <form className="support-form" onSubmit={handleSubmit}>
+              <div className="form-field">
+                <label>
+                  <span className="field-icon">✉</span>
+                  Email <span className="required">*</span>
+                </label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="your@email.com"
+                  required
+                  className="support-input"
+                  disabled={isSubmitting}
+                />
+              </div>
+
+              <div className="form-field">
+                <label>
+                  Subject <span className="required">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={subject}
+                  onChange={(e) => setSubject(e.target.value)}
+                  placeholder="What's this about?"
+                  required
+                  className="support-input"
+                  disabled={isSubmitting}
+                />
+              </div>
+
+              <div className="form-field">
+                <label>
+                  Message <span className="required">*</span>
+                </label>
+                <textarea
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  placeholder="Describe your question or issue..."
+                  rows={6}
+                  required
+                  className="support-textarea"
+                  disabled={isSubmitting}
+                />
+              </div>
+
+              {submitStatus === 'success' && (
+                <div className="submit-success">
+                  ✓ Message sent successfully! We'll get back to you soon.
+                </div>
+              )}
+
+              {submitStatus === 'error' && (
+                <div className="submit-error">
+                  ✗ Failed to send message. Please try again.
+                </div>
+              )}
+
+              <button 
+                type="submit" 
+                className="send-message-button"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? (
+                  <>
+                    <span className="spinner-small"></span>
+                    Sending...
+                  </>
+                ) : (
+                  <>
+                    <span className="envelope-icon">✉</span>
+                    Send Message
+                  </>
+                )}
+              </button>
+            </form>
+
+            <div className="response-times-box">
+              <div className="response-times-title">Response Times:</div>
+              <div className="response-time-item">
+                <span className="premium-icon">👑</span>
+                <strong>Premium:</strong> Within 24 hours
+              </div>
+              <div className="response-time-item">
+                <strong>Free:</strong> Within 48 hours
+              </div>
             </div>
-          )}
-
-          <button 
-            type="submit" 
-            className="send-message-button"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? (
-              <>
-                <span className="spinner-small"></span>
-                Sending...
-              </>
-            ) : (
-              <>
-                <span className="envelope-icon">✉</span>
-                Send Message
-              </>
-            )}
-          </button>
-        </form>
-
-        <div className="response-times-box">
-          <div className="response-times-title">Response Times:</div>
-          <div className="response-time-item">
-            <span className="premium-icon">👑</span>
-            <strong>Premium:</strong> Within 24 hours
-          </div>
-          <div className="response-time-item">
-            <strong>Free:</strong> Within 48 hours
-          </div>
+          </section>
         </div>
 
         <button className="back-button support-back" onClick={onClose}>
