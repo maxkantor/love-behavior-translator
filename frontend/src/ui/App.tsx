@@ -149,15 +149,19 @@ export function App() {
         <div className="header-content">
           <h1>
             <span className="heart-icon">💕</span>
-            AI Love Behavior Translator
+            Understand What's Really Happening in Your Relationship
           </h1>
-          <p className="tagline">Get AI-powered relationship insights and actionable advice for your love life.</p>
+          <p className="tagline">You're probably not imagining it. Get clarity on your partner's behavior in minutes.</p>
           
           <div className="credits-header">
-            <div className="credits-badge-large">
-              {displayCredits} Relationship Insights
+            <div className="free-analysis-badge">
+              <span className="free-badge-text">Start with 5 Free Analyses</span>
+              <span className="free-badge-subtext">No credit card required</span>
             </div>
-            <span className="credits-explanation">1 Deep Relationship Reading</span>
+            <div className="credits-display">
+              <span className="credits-count">{displayCredits} Relationship Insights</span>
+              <span className="credits-explanation">1 Deep Relationship Reading</span>
+            </div>
           </div>
         </div>
       </header>
@@ -253,35 +257,33 @@ export function App() {
               </div>
             </div>
 
-            <textarea
-              className="behavior-input"
-              rows={3}
-              value={behavior}
-              onChange={(e) => setBehavior(e.target.value)}
-              placeholder="Describe your relationship behavior... e.g., 'My partner has been canceling plans last minute and seems distant when we do spend time together'"
-            />
-
-            <div className="emotional-trigger">
-              <p className="trigger-text">
-                Most people miss the real meaning behind their partner's behavior.
-              </p>
-              <p className="trigger-text">
-                This AI is trained to spot patterns humans ignore.
-              </p>
+            <div className="textarea-wrapper">
+              <label htmlFor="behavior-input" className="textarea-label">
+                What's happening in your relationship?
+              </label>
+              <textarea
+                id="behavior-input"
+                className="behavior-input"
+                rows={4}
+                value={behavior}
+                onChange={(e) => setBehavior(e.target.value)}
+                placeholder="Share what you've noticed... For example: 'My partner used to text me throughout the day, but now I'm always the one reaching out. When we're together, they seem distracted and less engaged. I'm worried they're pulling away.'"
+              />
+              <p className="textarea-hint">Be as detailed as you're comfortable with. This helps us understand the full picture.</p>
             </div>
 
-            <div className="trust-indicators">
-              <div className="social-proof-stats">
+            <div className="trust-section">
+              <div className="trust-stats-group">
                 <div className="stat-item">
                   <span className="stat-number">1,247</span>
-                  <span className="stat-label">people used this month</span>
+                  <span className="stat-label">people found clarity this month</span>
                 </div>
                 <div className="stat-item">
                   <span className="stat-number">87%</span>
-                  <span className="stat-label">say it clarified their situation</span>
+                  <span className="stat-label">say it helped them understand</span>
                 </div>
               </div>
-              <div className="testimonials">
+              <div className="testimonials-group">
                 <div className="testimonial-item">
                   <span className="testimonial-quote">"This helped me finally understand why he shut down."</span>
                   <span className="testimonial-author">— Anonymous</span>
@@ -290,11 +292,6 @@ export function App() {
                   <span className="testimonial-quote">"I thought I was overthinking. Turns out I wasn't."</span>
                   <span className="testimonial-author">— Anonymous</span>
                 </div>
-              </div>
-              <div className="support-badges">
-                <span>💑 Dating</span>
-                <span>💍 Married</span>
-                <span>💕 All relationships</span>
               </div>
             </div>
 
@@ -399,27 +396,26 @@ export function App() {
               </div>
             )}
 
-            <div className="reassurance-text">
-              You're probably not overthinking it.
-            </div>
-
-            <button
-              type="submit"
-              className="analyze-button"
-              disabled={loading || behavior.trim().length < 10}
-            >
+            <div className="cta-section">
+              <button
+                type="submit"
+                className="analyze-button"
+                disabled={loading || behavior.trim().length < 10}
+              >
                 {loading ? (
                   <>
                     <span className="spinner"></span>
-                    Analyzing...
+                    <span>Analyzing your situation...</span>
                   </>
                 ) : (
                   <>
                     <span className="heart-icon-small">💕</span>
-                    Analyze My Relationship Behavior
+                    <span>Get Clarity Now</span>
                   </>
                 )}
               </button>
+              <p className="cta-microcopy">Takes less than 60 seconds. No judgment. Just clarity.</p>
+            </div>
             </form>
 
             <div className="how-it-works">
