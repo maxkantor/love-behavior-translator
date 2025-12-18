@@ -163,220 +163,272 @@ export function App() {
       </header>
 
       <main className="app-main">
-        <div className="main-card">
-          <div className="entry-points-section">
-            <h3 className="entry-points-title">What's on your mind?</h3>
-            <div className="entry-points-grid">
-              <button
-                type="button"
-                className="entry-point-btn"
-                onClick={() => handleQuickAction("My partner has been pulling away. They used to text me all the time, but now I'm always the one initiating. When we're together, they seem distracted and less engaged. I'm worried they're losing interest.")}
-              >
-                <span className="entry-icon">💔</span>
-                <span className="entry-text">Is My Partner Pulling Away?</span>
-              </button>
-              <button
-                type="button"
-                className="entry-point-btn"
-                onClick={() => handleQuickAction("I notice a pattern where I get anxious when my partner needs space, but they seem to pull away more when I try to get closer. I think I might be anxious-attached and they might be avoidant. How do I understand this dynamic?")}
-              >
-                <span className="entry-icon">🔄</span>
-                <span className="entry-text">Avoidant vs Anxious Behavior</span>
-              </button>
-              <button
-                type="button"
-                className="entry-point-btn"
-                onClick={() => handleQuickAction("I'm worried my partner is losing interest. They don't make plans anymore, our conversations feel surface-level, and the intimacy has faded. I can't tell if this is just a rough patch or if they're checking out of the relationship.")}
-              >
-                <span className="entry-icon">😰</span>
-                <span className="entry-text">Are They Losing Interest?</span>
-              </button>
-              <button
-                type="button"
-                className="entry-point-btn"
-                onClick={() => handleQuickAction("I'm at a crossroads in my relationship. Part of me wants to stay and work through our issues, but another part wonders if I'm wasting my time. The relationship has been rocky, and I'm not sure if the problems are fixable or if I should leave.")}
-              >
-                <span className="entry-icon">🤔</span>
-                <span className="entry-text">Should I Stay or Leave?</span>
-              </button>
+        <div className="main-card-layout">
+          {/* Left Sidebar */}
+          <div className="main-sidebar main-sidebar-left">
+            <div className="sidebar-section">
+              <h3 className="sidebar-title">Start with 5 Free Analysis</h3>
+              <p className="sidebar-text">
+                Get 5 free deep relationship readings to understand what's really happening in your relationship. No credit card required.
+              </p>
+            </div>
+
+            <div className="sidebar-section">
+              <h3 className="sidebar-title">Popular Relationship Questions</h3>
+              <ul className="sidebar-links-list">
+                <li><button type="button" onClick={() => handleQuickAction("My partner has been pulling away. They used to text me all the time, but now I'm always the one initiating.")}>Is my partner pulling away?</button></li>
+                <li><button type="button" onClick={() => handleQuickAction("I notice a pattern where I get anxious when my partner needs space, but they seem to pull away more when I try to get closer.")}>Avoidant vs anxious attachment</button></li>
+                <li><button type="button" onClick={() => handleQuickAction("I'm worried my partner is losing interest. They don't make plans anymore and our conversations feel surface-level.")}>Are they losing interest?</button></li>
+                <li><button type="button" onClick={() => handleQuickAction("I'm at a crossroads in my relationship. Part of me wants to stay and work through our issues, but another part wonders if I'm wasting my time.")}>Should I stay or leave?</button></li>
+              </ul>
             </div>
           </div>
 
-          <textarea
-            className="behavior-input"
-            rows={3}
-            value={behavior}
-            onChange={(e) => setBehavior(e.target.value)}
-            placeholder="Describe your relationship behavior... e.g., 'My partner has been canceling plans last minute and seems distant when we do spend time together'"
-          />
-
-          <div className="emotional-trigger">
-            <p className="trigger-text">
-              Most people miss the real meaning behind their partner's behavior.
-            </p>
-            <p className="trigger-text">
-              This AI is trained to spot patterns humans ignore.
-            </p>
-          </div>
-
-          <div className="trust-indicators">
-            <div className="social-proof-stats">
-              <div className="stat-item">
-                <span className="stat-number">1,247</span>
-                <span className="stat-label">people used this month</span>
-              </div>
-              <div className="stat-item">
-                <span className="stat-number">87%</span>
-                <span className="stat-label">say it clarified their situation</span>
-              </div>
-            </div>
-            <div className="testimonials">
-              <div className="testimonial-item">
-                <span className="testimonial-quote">"This helped me finally understand why he shut down."</span>
-                <span className="testimonial-author">— Anonymous</span>
-              </div>
-              <div className="testimonial-item">
-                <span className="testimonial-quote">"I thought I was overthinking. Turns out I wasn't."</span>
-                <span className="testimonial-author">— Anonymous</span>
-              </div>
-            </div>
-            <div className="support-badges">
-              <span>💑 Dating</span>
-              <span>💍 Married</span>
-              <span>💕 All relationships</span>
-            </div>
-          </div>
-
-          <div className="quick-actions">
-            <span className="quick-actions-label">Quick actions:</span>
-            <div className="quick-action-buttons">
-              <button
-                type="button"
-                className="quick-action-btn"
-                onClick={() => handleQuickAction("My partner has been canceling plans last minute")}
-              >
-                💔 Canceling plans
-              </button>
-              <button
-                type="button"
-                className="quick-action-btn"
-                onClick={() => handleQuickAction("My partner seems distant and avoids deep conversations")}
-              >
-                😔 Feeling distant
-              </button>
-              <button
-                type="button"
-                className="quick-action-btn"
-                onClick={() => handleQuickAction("My partner gets defensive when I try to discuss our relationship")}
-              >
-                🛡️ Defensive behavior
-              </button>
-              <button
-                type="button"
-                className="quick-action-btn"
-                onClick={() => handleQuickAction("My partner never initiates contact or makes plans")}
-              >
-                📱 No initiation
-              </button>
-            </div>
-          </div>
-
-          <form onSubmit={onSubmit} className="analysis-form">
-            <div className="form-row">
-              <div className="form-group">
-                <label>Relationship type</label>
-                <select
-                  className="form-input"
-                  value={relationshipType}
-                  onChange={(e) => setRelationshipType(e.target.value as any)}
+          {/* Center Form */}
+          <div className="main-content-center">
+            <div className="entry-points-section">
+              <h3 className="entry-points-title">What's on your mind?</h3>
+              <div className="entry-points-grid">
+                <button
+                  type="button"
+                  className="entry-point-btn"
+                  onClick={() => handleQuickAction("My partner has been pulling away. They used to text me all the time, but now I'm always the one initiating. When we're together, they seem distracted and less engaged. I'm worried they're losing interest.")}
                 >
-                  <option value="">Optional</option>
-                  <option value="dating">Dating</option>
-                  <option value="married">Married</option>
-                  <option value="situationship">Situationship</option>
-                  <option value="friendship">Friendship</option>
-                  <option value="other">Other</option>
-                </select>
-              </div>
-
-              <div className="form-group">
-                <label>Relationship length</label>
-                <input
-                  type="text"
-                  className="form-input"
-                  value={relationshipLength}
-                  onChange={(e) => setRelationshipLength(e.target.value)}
-                  placeholder="e.g., 3 months, 2 years"
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Your emotional state</label>
-                <select
-                  className="form-input"
-                  value={emotionalState}
-                  onChange={(e) => setEmotionalState(e.target.value as any)}
+                  <span className="entry-icon">💔</span>
+                  <span className="entry-text">Is My Partner Pulling Away?</span>
+                </button>
+                <button
+                  type="button"
+                  className="entry-point-btn"
+                  onClick={() => handleQuickAction("I notice a pattern where I get anxious when my partner needs space, but they seem to pull away more when I try to get closer. I think I might be anxious-attached and they might be avoidant. How do I understand this dynamic?")}
                 >
-                  <option value="">Optional</option>
-                  <option value="anxious">Anxious</option>
-                  <option value="confused">Confused</option>
-                  <option value="hurt">Hurt</option>
-                  <option value="hopeful">Hopeful</option>
-                  <option value="neutral">Neutral</option>
-                  <option value="frustrated">Frustrated</option>
-                </select>
-              </div>
-
-              <div className="form-group">
-                <label>Analysis style</label>
-                <select
-                  className="form-input"
-                  value={mode}
-                  onChange={(e) => setMode(e.target.value as AnalysisMode)}
+                  <span className="entry-icon">🔄</span>
+                  <span className="entry-text">Avoidant vs Anxious Behavior</span>
+                </button>
+                <button
+                  type="button"
+                  className="entry-point-btn"
+                  onClick={() => handleQuickAction("I'm worried my partner is losing interest. They don't make plans anymore, our conversations feel surface-level, and the intimacy has faded. I can't tell if this is just a rough patch or if they're checking out of the relationship.")}
                 >
-                  <option value="gentle">Gentle</option>
-                  <option value="analytical">Analytical</option>
-                  <option value="brutally_honest">Brutally Honest</option>
-                  <option value="light_funny">Light & Funny</option>
-                </select>
+                  <span className="entry-icon">😰</span>
+                  <span className="entry-text">Are They Losing Interest?</span>
+                </button>
+                <button
+                  type="button"
+                  className="entry-point-btn"
+                  onClick={() => handleQuickAction("I'm at a crossroads in my relationship. Part of me wants to stay and work through our issues, but another part wonders if I'm wasting my time. The relationship has been rocky, and I'm not sure if the problems are fixable or if I should leave.")}
+                >
+                  <span className="entry-icon">🤔</span>
+                  <span className="entry-text">Should I Stay or Leave?</span>
+                </button>
               </div>
             </div>
 
-          {error && (
-            <div className="error-message">
-              {error}
-            </div>
-          )}
+            <textarea
+              className="behavior-input"
+              rows={3}
+              value={behavior}
+              onChange={(e) => setBehavior(e.target.value)}
+              placeholder="Describe your relationship behavior... e.g., 'My partner has been canceling plans last minute and seems distant when we do spend time together'"
+            />
 
-          <div className="reassurance-text">
-            You're probably not overthinking it.
+            <div className="emotional-trigger">
+              <p className="trigger-text">
+                Most people miss the real meaning behind their partner's behavior.
+              </p>
+              <p className="trigger-text">
+                This AI is trained to spot patterns humans ignore.
+              </p>
+            </div>
+
+            <div className="trust-indicators">
+              <div className="social-proof-stats">
+                <div className="stat-item">
+                  <span className="stat-number">1,247</span>
+                  <span className="stat-label">people used this month</span>
+                </div>
+                <div className="stat-item">
+                  <span className="stat-number">87%</span>
+                  <span className="stat-label">say it clarified their situation</span>
+                </div>
+              </div>
+              <div className="testimonials">
+                <div className="testimonial-item">
+                  <span className="testimonial-quote">"This helped me finally understand why he shut down."</span>
+                  <span className="testimonial-author">— Anonymous</span>
+                </div>
+                <div className="testimonial-item">
+                  <span className="testimonial-quote">"I thought I was overthinking. Turns out I wasn't."</span>
+                  <span className="testimonial-author">— Anonymous</span>
+                </div>
+              </div>
+              <div className="support-badges">
+                <span>💑 Dating</span>
+                <span>💍 Married</span>
+                <span>💕 All relationships</span>
+              </div>
+            </div>
+
+            <div className="quick-actions">
+              <span className="quick-actions-label">Quick actions:</span>
+              <div className="quick-action-buttons">
+                <button
+                  type="button"
+                  className="quick-action-btn"
+                  onClick={() => handleQuickAction("My partner has been canceling plans last minute")}
+                >
+                  💔 Canceling plans
+                </button>
+                <button
+                  type="button"
+                  className="quick-action-btn"
+                  onClick={() => handleQuickAction("My partner seems distant and avoids deep conversations")}
+                >
+                  😔 Feeling distant
+                </button>
+                <button
+                  type="button"
+                  className="quick-action-btn"
+                  onClick={() => handleQuickAction("My partner gets defensive when I try to discuss our relationship")}
+                >
+                  🛡️ Defensive behavior
+                </button>
+                <button
+                  type="button"
+                  className="quick-action-btn"
+                  onClick={() => handleQuickAction("My partner never initiates contact or makes plans")}
+                >
+                  📱 No initiation
+                </button>
+              </div>
+            </div>
+
+            <form onSubmit={onSubmit} className="analysis-form">
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Relationship type</label>
+                  <select
+                    className="form-input"
+                    value={relationshipType}
+                    onChange={(e) => setRelationshipType(e.target.value as any)}
+                  >
+                    <option value="">Optional</option>
+                    <option value="dating">Dating</option>
+                    <option value="married">Married</option>
+                    <option value="situationship">Situationship</option>
+                    <option value="friendship">Friendship</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label>Relationship length</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    value={relationshipLength}
+                    onChange={(e) => setRelationshipLength(e.target.value)}
+                    placeholder="e.g., 3 months, 2 years"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Your emotional state</label>
+                  <select
+                    className="form-input"
+                    value={emotionalState}
+                    onChange={(e) => setEmotionalState(e.target.value as any)}
+                  >
+                    <option value="">Optional</option>
+                    <option value="anxious">Anxious</option>
+                    <option value="confused">Confused</option>
+                    <option value="hurt">Hurt</option>
+                    <option value="hopeful">Hopeful</option>
+                    <option value="neutral">Neutral</option>
+                    <option value="frustrated">Frustrated</option>
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label>Analysis style</label>
+                  <select
+                    className="form-input"
+                    value={mode}
+                    onChange={(e) => setMode(e.target.value as AnalysisMode)}
+                  >
+                    <option value="gentle">Gentle</option>
+                    <option value="analytical">Analytical</option>
+                    <option value="brutally_honest">Brutally Honest</option>
+                    <option value="light_funny">Light & Funny</option>
+                  </select>
+                </div>
+              </div>
+
+            {error && (
+              <div className="error-message">
+                {error}
+              </div>
+            )}
+
+            <div className="reassurance-text">
+              You're probably not overthinking it.
+            </div>
+
+            <button
+              type="submit"
+              className="analyze-button"
+              disabled={loading || behavior.trim().length < 10}
+            >
+                {loading ? (
+                  <>
+                    <span className="spinner"></span>
+                    Analyzing...
+                  </>
+                ) : (
+                  <>
+                    <span className="heart-icon-small">💕</span>
+                    Analyze My Relationship Behavior
+                  </>
+                )}
+              </button>
+            </form>
+
+            <div className="how-it-works">
+              <h3>How This Works</h3>
+              <p>
+                Our AI analyzes your relationship behavior patterns and provides evidence-based insights, not literal translation. 
+                You'll receive likely causes, emotional insights, practical advice, and guidance on when to consult a relationship counselor.
+              </p>
+            </div>
           </div>
 
-          <button
-            type="submit"
-            className="analyze-button"
-            disabled={loading || behavior.trim().length < 10}
-          >
-              {loading ? (
-                <>
-                  <span className="spinner"></span>
-                  Analyzing...
-                </>
-              ) : (
-                <>
-                  <span className="heart-icon-small">💕</span>
-                  Analyze My Relationship Behavior
-                </>
-              )}
-            </button>
-          </form>
-
-          <div className="how-it-works">
-            <h3>How This Works</h3>
-            <p>
-              Our AI analyzes your relationship behavior patterns and provides evidence-based insights, not literal translation. 
-              You'll receive likely causes, emotional insights, practical advice, and guidance on when to consult a relationship counselor.
-            </p>
+          {/* Right Sidebar */}
+          <div className="main-sidebar main-sidebar-right">
+            <div className="sidebar-section">
+              <h3 className="sidebar-title">What This AI Can & Can't Do</h3>
+              <div className="can-cannot">
+                <div className="can-item">
+                  <span className="check-icon-green">✓</span>
+                  <span>Spot relationship patterns you might miss</span>
+                </div>
+                <div className="can-item">
+                  <span className="check-icon-green">✓</span>
+                  <span>Provide emotional insights and validation</span>
+                </div>
+                <div className="can-item">
+                  <span className="check-icon-green">✓</span>
+                  <span>Offer practical communication advice</span>
+                </div>
+                <div className="cannot-item">
+                  <span className="x-icon">✗</span>
+                  <span>Replace professional therapy or counseling</span>
+                </div>
+                <div className="cannot-item">
+                  <span className="x-icon">✗</span>
+                  <span>Diagnose mental health conditions</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -420,55 +472,6 @@ export function App() {
       </main>
 
       <footer className="app-footer">
-        <div className="footer-content">
-          <div className="footer-left">
-            <div className="footer-section">
-              <h3 className="footer-title">Start with 5 Free Analysis</h3>
-              <p className="footer-text">
-                Get 5 free deep relationship readings to understand what's really happening in your relationship. No credit card required.
-              </p>
-            </div>
-
-            <div className="footer-section">
-              <h3 className="footer-title">Popular Relationship Questions</h3>
-              <ul className="footer-links-list">
-                <li><button type="button" onClick={() => handleQuickAction("My partner has been pulling away. They used to text me all the time, but now I'm always the one initiating.")}>Is my partner pulling away?</button></li>
-                <li><button type="button" onClick={() => handleQuickAction("I notice a pattern where I get anxious when my partner needs space, but they seem to pull away more when I try to get closer.")}>Avoidant vs anxious attachment</button></li>
-                <li><button type="button" onClick={() => handleQuickAction("I'm worried my partner is losing interest. They don't make plans anymore and our conversations feel surface-level.")}>Are they losing interest?</button></li>
-                <li><button type="button" onClick={() => handleQuickAction("I'm at a crossroads in my relationship. Part of me wants to stay and work through our issues, but another part wonders if I'm wasting my time.")}>Should I stay or leave?</button></li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="footer-right">
-            <div className="footer-section">
-              <h3 className="footer-title">What This AI Can & Can't Do</h3>
-              <div className="can-cannot">
-                <div className="can-item">
-                  <span className="check-icon-green">✓</span>
-                  <span>Spot relationship patterns you might miss</span>
-                </div>
-                <div className="can-item">
-                  <span className="check-icon-green">✓</span>
-                  <span>Provide emotional insights and validation</span>
-                </div>
-                <div className="can-item">
-                  <span className="check-icon-green">✓</span>
-                  <span>Offer practical communication advice</span>
-                </div>
-                <div className="cannot-item">
-                  <span className="x-icon">✗</span>
-                  <span>Replace professional therapy or counseling</span>
-                </div>
-                <div className="cannot-item">
-                  <span className="x-icon">✗</span>
-                  <span>Diagnose mental health conditions</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
         <div className="footer-bottom">
           <div className="footer-buttons">
             <button 

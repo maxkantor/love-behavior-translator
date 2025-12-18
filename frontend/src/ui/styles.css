@@ -129,8 +129,81 @@ body {
   flex: 1;
   overflow: hidden;
   min-height: 0;
+}
+
+.main-card-layout {
+  display: grid;
+  grid-template-columns: 250px 1fr 250px;
+  gap: 16px;
+  height: 100%;
+  overflow: hidden;
+}
+
+.main-sidebar {
   display: flex;
   flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.main-content-center {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  min-width: 0;
+}
+
+.sidebar-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sidebar-title {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text);
+}
+
+.sidebar-text {
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--muted);
+  margin: 0;
+}
+
+.sidebar-links-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sidebar-links-list li {
+  margin: 0;
+}
+
+.sidebar-links-list button {
+  background: none;
+  border: none;
+  color: var(--text);
+  font-size: 0.85rem;
+  text-align: left;
+  cursor: pointer;
+  padding: 4px 0;
+  transition: color 0.3s;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+}
+
+.sidebar-links-list button:hover {
+  color: var(--pink);
+  text-decoration-color: var(--pink);
 }
 
 .entry-points-section {
@@ -641,17 +714,17 @@ body {
 .can-cannot {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
 .can-item,
 .cannot-item {
   display: flex;
   align-items: flex-start;
-  gap: 8px;
-  font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.9);
-  line-height: 1.5;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--text);
+  line-height: 1.4;
 }
 
 .check-icon-green {
@@ -743,6 +816,11 @@ body {
     max-width: 100%;
   }
   
+  .main-card-layout {
+    grid-template-columns: 200px 1fr 200px;
+    gap: 12px;
+  }
+  
   .form-row {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -765,6 +843,23 @@ body {
   .result-card {
     padding: 12px;
     margin: 8px;
+  }
+  
+  .main-card-layout {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .main-sidebar {
+    order: 3;
+  }
+  
+  .main-content-center {
+    order: 1;
+  }
+  
+  .main-sidebar-right {
+    order: 2;
   }
 
   .form-row {
