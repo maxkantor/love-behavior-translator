@@ -163,6 +163,18 @@ export function App() {
       </header>
 
       <main className="app-main-wrapper">
+        {/* Decorative images */}
+        <img 
+          src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop&crop=face" 
+          alt="Decorative" 
+          className="decorative-image-left"
+        />
+        <img 
+          src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face" 
+          alt="Decorative" 
+          className="decorative-image-right"
+        />
+        
         {/* Left Sidebar - on purple background */}
         <div className="main-sidebar main-sidebar-left">
           <div className="sidebar-section">

@@ -119,33 +119,61 @@ body {
 /* Main content wrapper - purple background */
 .app-main-wrapper {
   display: grid;
-  grid-template-columns: 280px 1fr 280px;
-  gap: 20px;
-  padding: 0 20px;
-  max-width: 1600px;
+  grid-template-columns: 200px 1fr 200px;
+  gap: 24px;
+  padding: 0 24px;
+  max-width: 1800px;
   margin: 0 auto;
   flex: 1;
   overflow: hidden;
   min-height: 0;
   align-items: start;
+  position: relative;
+}
+
+/* Decorative images on sides */
+.decorative-image-left,
+.decorative-image-right {
+  position: absolute;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.decorative-image-left {
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.decorative-image-right {
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 /* Main white card */
 .app-main {
   background: var(--white);
-  border-radius: 20px;
-  padding: 24px;
+  border-radius: 24px;
+  padding: 32px;
   box-shadow: var(--shadow);
   position: relative;
   overflow-y: auto;
-  min-height: calc(100vh - 200px);
-  max-height: calc(100vh - 200px);
+  min-height: calc(100vh - 180px);
+  max-height: calc(100vh - 180px);
+  z-index: 2;
 }
 
 .main-content-center {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
 }
 
 .main-sidebar {
@@ -153,8 +181,9 @@ body {
   flex-direction: column;
   gap: 20px;
   overflow-y: auto;
-  max-height: calc(100vh - 200px);
+  max-height: calc(100vh - 180px);
   color: white;
+  z-index: 1;
 }
 
 .sidebar-section {
@@ -225,22 +254,22 @@ body {
 .entry-points-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 6px;
+  gap: 12px;
 }
 
 .entry-point-btn {
   background: white;
   border: 2px solid var(--pink);
-  border-radius: 8px;
-  padding: 8px 6px;
+  border-radius: 12px;
+  padding: 16px 12px;
   cursor: pointer;
   transition: all 0.3s;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 3px;
+  gap: 8px;
   text-align: center;
-  min-height: 60px;
+  min-height: 100px;
   justify-content: center;
 }
 
@@ -263,17 +292,16 @@ body {
 
 .behavior-input {
   width: 100%;
-  min-height: 60px;
-  max-height: 100px;
-  padding: 8px;
+  min-height: 120px;
+  padding: 16px;
   border: 3px solid var(--pink);
-  border-radius: 8px;
-  font-size: 0.9rem;
+  border-radius: 12px;
+  font-size: 1rem;
   font-family: inherit;
-  resize: none;
-  margin-bottom: 8px;
+  resize: vertical;
+  margin-bottom: 12px;
   transition: border-color 0.3s;
-  overflow-y: auto;
+  line-height: 1.6;
 }
 
 .behavior-input:focus {
@@ -430,8 +458,8 @@ body {
 .form-row {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-  margin-bottom: 8px;
+  gap: 16px;
+  margin-bottom: 16px;
 }
 
 .form-group {
@@ -447,10 +475,10 @@ body {
 }
 
 .form-input {
-  padding: 10px 12px;
+  padding: 12px 16px;
   border: 2px solid var(--border);
-  border-radius: 8px;
-  font-size: 0.95rem;
+  border-radius: 10px;
+  font-size: 1rem;
   font-family: inherit;
   transition: border-color 0.3s;
 }
@@ -488,18 +516,18 @@ body {
   background: var(--teal);
   color: white;
   border: none;
-  padding: 10px 16px;
-  border-radius: 8px;
-  font-size: 0.95rem;
+  padding: 18px 24px;
+  border-radius: 12px;
+  font-size: 1.1rem;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.3s;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 10px;
   box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-  margin-top: 8px;
+  margin-top: 16px;
 }
 
 .analyze-button:hover:not(:disabled) {
@@ -815,9 +843,15 @@ body {
 /* Responsive */
 @media (max-width: 1200px) {
   .app-main-wrapper {
-    grid-template-columns: 220px 1fr 220px;
+    grid-template-columns: 180px 1fr 180px;
     gap: 16px;
     padding: 0 16px;
+  }
+  
+  .decorative-image-left,
+  .decorative-image-right {
+    width: 140px;
+    height: 140px;
   }
   
   .form-row {
@@ -844,8 +878,13 @@ body {
     padding: 0 12px;
   }
   
+  .decorative-image-left,
+  .decorative-image-right {
+    display: none;
+  }
+  
   .app-main {
-    padding: 16px;
+    padding: 20px;
     min-height: auto;
     max-height: none;
   }
