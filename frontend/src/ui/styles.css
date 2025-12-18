@@ -1199,25 +1199,25 @@ body {
   border-radius: 16px;
   max-width: 900px;
   width: 100%;
-  max-height: 90vh;
+  max-height: 85vh;
   overflow-y: auto;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   animation: slideUp 0.3s ease-out;
-  padding: 40px;
+  padding: 30px;
 }
 
 .support-modal-header {
   text-align: center;
-  margin-bottom: 30px;
+  margin-bottom: 24px;
 }
 
 .headset-icon {
-  font-size: 3rem;
-  margin-bottom: 12px;
+  font-size: 2.5rem;
+  margin-bottom: 8px;
 }
 
 .support-modal-header h1 {
-  font-size: 2rem;
+  font-size: 1.8rem;
   font-weight: 700;
   color: var(--text);
   margin: 0;
@@ -1226,8 +1226,8 @@ body {
 .help-content-wrapper {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 40px;
-  margin-bottom: 30px;
+  gap: 30px;
+  margin-bottom: 24px;
 }
 
 .faq-section,
@@ -1237,19 +1237,19 @@ body {
 }
 
 .section-title {
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   font-weight: 700;
   color: var(--text);
-  margin-bottom: 20px;
-  padding-bottom: 12px;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
   border-bottom: 2px solid var(--border);
 }
 
 .faq-list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  max-height: 500px;
+  gap: 12px;
+  max-height: 400px;
   overflow-y: auto;
   padding-right: 8px;
 }
@@ -1257,7 +1257,7 @@ body {
 .faq-item {
   border: 1px solid var(--border);
   border-radius: 8px;
-  padding: 16px;
+  padding: 12px;
   transition: all 0.3s;
 }
 
@@ -1269,22 +1269,22 @@ body {
 .faq-question {
   font-weight: 700;
   color: var(--text);
-  margin-bottom: 8px;
-  font-size: 1.05rem;
+  margin-bottom: 6px;
+  font-size: 1rem;
 }
 
 .faq-answer {
   color: var(--muted);
-  line-height: 1.6;
-  font-size: 0.95rem;
+  line-height: 1.5;
+  font-size: 0.9rem;
 }
 
 .support-form {
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 }
 
 .form-field {
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .form-field label {
@@ -1326,7 +1326,7 @@ body {
 
 .support-textarea {
   resize: vertical;
-  min-height: 120px;
+  min-height: 100px;
 }
 
 .send-message-button {
@@ -1359,24 +1359,25 @@ body {
 
 .response-times-box {
   background: #d1fae5;
-  padding: 20px;
+  padding: 16px;
   border-radius: 10px;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 }
 
 .response-times-title {
   font-weight: 700;
   color: var(--text);
-  margin-bottom: 12px;
-  font-size: 1.05rem;
+  margin-bottom: 10px;
+  font-size: 1rem;
 }
 
 .response-time-item {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   color: var(--text);
+  font-size: 0.95rem;
 }
 
 .response-time-item:last-child {
@@ -1390,6 +1391,7 @@ body {
 .support-back {
   width: 100%;
   justify-content: center;
+  margin-top: 0;
 }
 
 .heart-icon-back {
