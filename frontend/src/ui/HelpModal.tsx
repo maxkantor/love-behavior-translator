@@ -9,17 +9,36 @@ export function HelpModal({ isOpen, onClose }: HelpModalProps) {
   const [email, setEmail] = useState('');
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
   if (!isOpen) return null;
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    // TODO: Send to backend support endpoint
-    alert('Support message sent! (Backend integration coming soon)');
-    setEmail('');
-    setSubject('');
-    setMessage('');
-    onClose();
+    setIsSubmitting(true);
+    setSubmitStatus('idle');
+
+    try {
+      // TODO: Send to backend support endpoint
+      // For now, simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      setSubmitStatus('success');
+      setEmail('');
+      setSubject('');
+      setMessage('');
+      
+      // Reset status after 3 seconds
+      setTimeout(() => {
+        setSubmitStatus('idle');
+        onClose();
+      }, 3000);
+    } catch (error) {
+      setSubmitStatus('error');
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -43,6 +62,7 @@ export function HelpModal({ isOpen, onClose }: HelpModalProps) {
               placeholder="your@email.com"
               required
               className="support-input"
+              disabled={isSubmitting}
             />
           </div>
 
@@ -57,6 +77,7 @@ export function HelpModal({ isOpen, onClose }: HelpModalProps) {
               placeholder="What's this about?"
               required
               className="support-input"
+              disabled={isSubmitting}
             />
           </div>
 
@@ -71,12 +92,38 @@ export function HelpModal({ isOpen, onClose }: HelpModalProps) {
               rows={6}
               required
               className="support-textarea"
+              disabled={isSubmitting}
             />
           </div>
 
-          <button type="submit" className="send-message-button">
-            <span className="envelope-icon">✉</span>
-            Send Message
+          {submitStatus === 'success' && (
+            <div className="submit-success">
+              ✓ Message sent successfully! We'll get back to you soon.
+            </div>
+          )}
+
+          {submitStatus === 'error' && (
+            <div className="submit-error">
+              ✗ Failed to send message. Please try again.
+            </div>
+          )}
+
+          <button 
+            type="submit" 
+            className="send-message-button"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? (
+              <>
+                <span className="spinner-small"></span>
+                Sending...
+              </>
+            ) : (
+              <>
+                <span className="envelope-icon">✉</span>
+                Send Message
+              </>
+            )}
           </button>
         </form>
 
