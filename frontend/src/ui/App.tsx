@@ -204,7 +204,7 @@ export function App() {
 
           <textarea
             className="behavior-input"
-            rows={6}
+            rows={3}
             value={behavior}
             onChange={(e) => setBehavior(e.target.value)}
             placeholder="Describe your relationship behavior... e.g., 'My partner has been canceling plans last minute and seems distant when we do spend time together'"
