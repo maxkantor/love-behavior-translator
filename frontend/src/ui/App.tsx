@@ -1,6 +1,8 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { useCredits } from './CreditContext';
 import { Link } from 'react-router-dom';
+import { CreditModal } from './CreditModal';
+import { HelpModal } from './HelpModal';
 
 type AnalysisMode = 'gentle' | 'analytical' | 'brutally_honest' | 'light_funny';
 type RelationshipType = 'dating' | 'married' | 'situationship' | 'friendship' | 'other';
@@ -43,6 +45,8 @@ export function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<AnalyzeResponse | null>(null);
+  const [showCreditModal, setShowCreditModal] = useState(false);
+  const [showHelpModal, setShowHelpModal] = useState(false);
 
   const remaining = 2000 - behavior.length;
 
@@ -347,8 +351,18 @@ export function App() {
 
       <footer className="app-footer">
         <div className="footer-buttons">
-          <button className="footer-btn buy-credits">💰 Buy Credits</button>
-          <button className="footer-btn need-help">❓ Need Help?</button>
+          <button 
+            className="footer-btn buy-credits"
+            onClick={() => setShowCreditModal(true)}
+          >
+            💰 Buy Credits
+          </button>
+          <button 
+            className="footer-btn need-help"
+            onClick={() => setShowHelpModal(true)}
+          >
+            ❓ Need Help?
+          </button>
         </div>
         <div className="footer-links">
           <Link to="/admin/login" className="admin-link-footer">Admin</Link>
@@ -359,6 +373,17 @@ export function App() {
           This app provides general relationship insights and is not professional therapy or counseling.
         </p>
       </footer>
+
+      <CreditModal
+        isOpen={showCreditModal}
+        onClose={() => setShowCreditModal(false)}
+        currentCredits={credits}
+      />
+
+      <HelpModal
+        isOpen={showHelpModal}
+        onClose={() => setShowHelpModal(false)}
+      />
     </div>
   );
 }
