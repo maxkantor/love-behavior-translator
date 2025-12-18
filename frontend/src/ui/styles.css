@@ -116,43 +116,45 @@ body {
   opacity: 0.9;
 }
 
-/* Main content */
-.app-main {
-  background: var(--white);
-  border-radius: 16px;
-  padding: 12px;
-  margin: 8px auto;
-  max-width: 1400px;
-  width: 100%;
-  box-shadow: var(--shadow);
-  position: relative;
+/* Main content wrapper - purple background */
+.app-main-wrapper {
+  display: grid;
+  grid-template-columns: 280px 1fr 280px;
+  gap: 20px;
+  padding: 0 20px;
+  max-width: 1600px;
+  margin: 0 auto;
   flex: 1;
   overflow: hidden;
   min-height: 0;
+  align-items: start;
 }
 
-.main-card-layout {
-  display: grid;
-  grid-template-columns: 250px 1fr 250px;
-  gap: 16px;
-  height: 100%;
-  overflow: hidden;
-}
-
-.main-sidebar {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+/* Main white card */
+.app-main {
+  background: var(--white);
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: var(--shadow);
+  position: relative;
   overflow-y: auto;
-  padding-right: 8px;
+  min-height: calc(100vh - 200px);
+  max-height: calc(100vh - 200px);
 }
 
 .main-content-center {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
+}
+
+.main-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
   overflow-y: auto;
-  min-width: 0;
+  max-height: calc(100vh - 200px);
+  color: white;
 }
 
 .sidebar-section {
@@ -162,16 +164,16 @@ body {
 }
 
 .sidebar-title {
-  font-size: 1rem;
+  font-size: 1.1rem;
   font-weight: 700;
-  margin: 0;
-  color: var(--text);
+  margin: 0 0 8px 0;
+  color: white;
 }
 
 .sidebar-text {
-  font-size: 0.85rem;
-  line-height: 1.5;
-  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.9);
   margin: 0;
 }
 
@@ -191,19 +193,19 @@ body {
 .sidebar-links-list button {
   background: none;
   border: none;
-  color: var(--text);
-  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.9rem;
   text-align: left;
   cursor: pointer;
-  padding: 4px 0;
-  transition: color 0.3s;
+  padding: 6px 0;
+  transition: all 0.3s;
   text-decoration: underline;
   text-decoration-color: transparent;
 }
 
 .sidebar-links-list button:hover {
-  color: var(--pink);
-  text-decoration-color: var(--pink);
+  color: white;
+  text-decoration-color: white;
 }
 
 .entry-points-section {
@@ -721,10 +723,10 @@ body {
 .cannot-item {
   display: flex;
   align-items: flex-start;
-  gap: 6px;
-  font-size: 0.85rem;
-  color: var(--text);
-  line-height: 1.4;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.5;
 }
 
 .check-icon-green {
@@ -812,13 +814,10 @@ body {
 
 /* Responsive */
 @media (max-width: 1200px) {
-  .app-main {
-    max-width: 100%;
-  }
-  
-  .main-card-layout {
-    grid-template-columns: 200px 1fr 200px;
-    gap: 12px;
+  .app-main-wrapper {
+    grid-template-columns: 220px 1fr 220px;
+    gap: 16px;
+    padding: 0 16px;
   }
   
   .form-row {
@@ -839,19 +838,21 @@ body {
     font-size: 2rem;
   }
 
-  .app-main,
-  .result-card {
-    padding: 12px;
-    margin: 8px;
-  }
-  
-  .main-card-layout {
+  .app-main-wrapper {
     grid-template-columns: 1fr;
     gap: 16px;
+    padding: 0 12px;
+  }
+  
+  .app-main {
+    padding: 16px;
+    min-height: auto;
+    max-height: none;
   }
   
   .main-sidebar {
     order: 3;
+    max-height: none;
   }
   
   .main-content-center {

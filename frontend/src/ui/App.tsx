@@ -162,29 +162,29 @@ export function App() {
         </div>
       </header>
 
-      <main className="app-main">
-        <div className="main-card-layout">
-          {/* Left Sidebar */}
-          <div className="main-sidebar main-sidebar-left">
-            <div className="sidebar-section">
-              <h3 className="sidebar-title">Start with 5 Free Analysis</h3>
-              <p className="sidebar-text">
-                Get 5 free deep relationship readings to understand what's really happening in your relationship. No credit card required.
-              </p>
-            </div>
-
-            <div className="sidebar-section">
-              <h3 className="sidebar-title">Popular Relationship Questions</h3>
-              <ul className="sidebar-links-list">
-                <li><button type="button" onClick={() => handleQuickAction("My partner has been pulling away. They used to text me all the time, but now I'm always the one initiating.")}>Is my partner pulling away?</button></li>
-                <li><button type="button" onClick={() => handleQuickAction("I notice a pattern where I get anxious when my partner needs space, but they seem to pull away more when I try to get closer.")}>Avoidant vs anxious attachment</button></li>
-                <li><button type="button" onClick={() => handleQuickAction("I'm worried my partner is losing interest. They don't make plans anymore and our conversations feel surface-level.")}>Are they losing interest?</button></li>
-                <li><button type="button" onClick={() => handleQuickAction("I'm at a crossroads in my relationship. Part of me wants to stay and work through our issues, but another part wonders if I'm wasting my time.")}>Should I stay or leave?</button></li>
-              </ul>
-            </div>
+      <main className="app-main-wrapper">
+        {/* Left Sidebar - on purple background */}
+        <div className="main-sidebar main-sidebar-left">
+          <div className="sidebar-section">
+            <h3 className="sidebar-title">Start with 5 Free Analysis</h3>
+            <p className="sidebar-text">
+              Get 5 free deep relationship readings to understand what's really happening in your relationship. No credit card required.
+            </p>
           </div>
 
-          {/* Center Form */}
+          <div className="sidebar-section">
+            <h3 className="sidebar-title">Popular Relationship Questions</h3>
+            <ul className="sidebar-links-list">
+              <li><button type="button" onClick={() => handleQuickAction("My partner has been pulling away. They used to text me all the time, but now I'm always the one initiating.")}>Is my partner pulling away?</button></li>
+              <li><button type="button" onClick={() => handleQuickAction("I notice a pattern where I get anxious when my partner needs space, but they seem to pull away more when I try to get closer.")}>Avoidant vs anxious attachment</button></li>
+              <li><button type="button" onClick={() => handleQuickAction("I'm worried my partner is losing interest. They don't make plans anymore and our conversations feel surface-level.")}>Are they losing interest?</button></li>
+              <li><button type="button" onClick={() => handleQuickAction("I'm at a crossroads in my relationship. Part of me wants to stay and work through our issues, but another part wonders if I'm wasting my time.")}>Should I stay or leave?</button></li>
+            </ul>
+          </div>
+        </div>
+
+        {/* Center White Form */}
+        <div className="app-main">
           <div className="main-content-center">
             <div className="entry-points-section">
               <h3 className="entry-points-title">What's on your mind?</h3>
@@ -401,37 +401,37 @@ export function App() {
               </p>
             </div>
           </div>
+        </div>
 
-          {/* Right Sidebar */}
-          <div className="main-sidebar main-sidebar-right">
-            <div className="sidebar-section">
-              <h3 className="sidebar-title">What This AI Can & Can't Do</h3>
-              <div className="can-cannot">
-                <div className="can-item">
-                  <span className="check-icon-green">✓</span>
-                  <span>Spot relationship patterns you might miss</span>
-                </div>
-                <div className="can-item">
-                  <span className="check-icon-green">✓</span>
-                  <span>Provide emotional insights and validation</span>
-                </div>
-                <div className="can-item">
-                  <span className="check-icon-green">✓</span>
-                  <span>Offer practical communication advice</span>
-                </div>
-                <div className="cannot-item">
-                  <span className="x-icon">✗</span>
-                  <span>Replace professional therapy or counseling</span>
-                </div>
-                <div className="cannot-item">
-                  <span className="x-icon">✗</span>
-                  <span>Diagnose mental health conditions</span>
-                </div>
+        {/* Right Sidebar - on purple background */}
+        <div className="main-sidebar main-sidebar-right">
+          <div className="sidebar-section">
+            <h3 className="sidebar-title">What This AI Can & Can't Do</h3>
+            <div className="can-cannot">
+              <div className="can-item">
+                <span className="check-icon-green">✓</span>
+                <span>Spot relationship patterns you might miss</span>
+              </div>
+              <div className="can-item">
+                <span className="check-icon-green">✓</span>
+                <span>Provide emotional insights and validation</span>
+              </div>
+              <div className="can-item">
+                <span className="check-icon-green">✓</span>
+                <span>Offer practical communication advice</span>
+              </div>
+              <div className="cannot-item">
+                <span className="x-icon">✗</span>
+                <span>Replace professional therapy or counseling</span>
+              </div>
+              <div className="cannot-item">
+                <span className="x-icon">✗</span>
+                <span>Diagnose mental health conditions</span>
               </div>
             </div>
           </div>
         </div>
-
+        
         {result && (
           <div className="result-card">
             <div className="result-header">
