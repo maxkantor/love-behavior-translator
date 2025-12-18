@@ -62,8 +62,31 @@ public sealed class Function
     {
         try
         {
-            var path = (request.Path ?? "").TrimEnd('/').ToLowerInvariant();
+            // Get path - handle proxy resources by using request path directly
+            var rawPath = request.Path ?? "";
+            // For proxy resources, path might include the full path
+            var path = rawPath.TrimEnd('/').ToLowerInvariant();
             var method = (request.HttpMethod ?? "GET").ToUpperInvariant();
+            
+            // Log for debugging (remove in production)
+            context.Logger.LogInformation($"Request: {method} {path}");
+
+            // Handle CORS preflight (OPTIONS) requests
+            if (method == "OPTIONS")
+            {
+                return new APIGatewayProxyResponse
+                {
+                    StatusCode = 200,
+                    Headers = new Dictionary<string, string>
+                    {
+                        ["Access-Control-Allow-Origin"] = "*",
+                        ["Access-Control-Allow-Headers"] = "Content-Type,Authorization,x-user-id",
+                        ["Access-Control-Allow-Methods"] = "OPTIONS,GET,POST,PUT",
+                        ["Access-Control-Max-Age"] = "3600"
+                    },
+                    Body = ""
+                };
+            }
 
             // Health check
             if (method == "GET" && (path.EndsWith("/health") || path == "/health"))
@@ -79,10 +102,11 @@ public sealed class Function
                 if (!AdminSystem.VerifyAdminToken(request, _secrets))
                     return JsonResponse(401, new { error = "Unauthorized" });
 
-                if (method == "GET" && (path.EndsWith("/admin/users") || path == "/admin/users"))
+                // Handle admin routes - check exact matches first
+                if (method == "GET" && path == "/admin/users")
                     return await HandleAdminGetUsers(context);
 
-                if (method == "GET" && (path.EndsWith("/admin/dashboard") || path == "/admin/dashboard"))
+                if (method == "GET" && path == "/admin/dashboard")
                     return await HandleAdminDashboard(context);
 
                 if (method == "PUT" && path.Contains("/admin/users/") && path.EndsWith("/credits"))
@@ -93,6 +117,9 @@ public sealed class Function
 
                 if (method == "PUT" && (path.EndsWith("/admin/me/credits") || path == "/admin/me/credits"))
                     return await HandleAdminSetMyCredits(request, context);
+
+                // If we're in /admin but no route matched, return 404
+                return JsonResponse(404, new { error = "Admin endpoint not found" });
             }
 
             // Analyze endpoint
@@ -208,8 +235,23 @@ public sealed class Function
 
     private async Task<APIGatewayProxyResponse> HandleAdminDashboard(ILambdaContext context)
     {
-        var summary = await AdminSystem.GetDashboardSummary(_ddb, context.Logger);
-        return JsonResponse(200, summary);
+        try
+        {
+            var summary = await AdminSystem.GetDashboardSummary(_ddb, context.Logger);
+            return JsonResponse(200, summary);
+        }
+        catch (Exception ex)
+        {
+            context.Logger.LogError($"Error getting dashboard: {ex}");
+            // Return empty dashboard on error instead of failing
+            return JsonResponse(200, new Dictionary<string, object>
+            {
+                ["todaysTranslations"] = 0,
+                ["todaysPurchases"] = 0,
+                ["activeTokens"] = 0,
+                ["freeSearchLimit"] = 5
+            });
+        }
     }
 
     private async Task<APIGatewayProxyResponse> HandleAdminSetUserCredits(APIGatewayProxyRequest request, ILambdaContext context)
@@ -492,7 +534,7 @@ Reassurance:
             {
                 ["Content-Type"] = "application/json",
                 ["Access-Control-Allow-Origin"] = "*",
-                ["Access-Control-Allow-Headers"] = "Content-Type,Authorization",
+                ["Access-Control-Allow-Headers"] = "Content-Type,Authorization,x-user-id",
                 ["Access-Control-Allow-Methods"] = "OPTIONS,GET,POST"
             },
             Body = JsonSerializer.Serialize(body, Json)

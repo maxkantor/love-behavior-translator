@@ -58,11 +58,15 @@ export function AdminDashboard() {
       if (usersResp.ok) {
         const usersData = await usersResp.json();
         setUsers(usersData.users || []);
+      } else {
+        console.error('Failed to load users:', usersResp.status, await usersResp.text());
       }
 
       if (dashboardResp.ok) {
         const dashboardData = await dashboardResp.json();
         setDashboard(dashboardData);
+      } else {
+        console.error('Failed to load dashboard:', dashboardResp.status, await dashboardResp.text());
       }
     } catch (err) {
       console.error('Error loading data:', err);

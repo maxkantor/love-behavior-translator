@@ -127,6 +127,16 @@ Should return `True`.
 > - Rate limit counters (per IP, per minute)
 > - Request logs (after a retention period)
 
+### 2.2 Create Users Table (For Credit System)
+
+1. AWS Console → **DynamoDB** → **Tables** → **Create table**
+2. **Table name**: `LoveBehaviorTranslatorUsers`
+3. **Partition key**: `userId` (String)
+4. **Table settings**: **On-demand** (or provisioned if preferred)
+5. Click **Create table**
+
+> **Note:** This table stores user credit balances and usage statistics for the credit-based monetization system.
+
 ---
 
 ## Step 3: Create S3 Bucket
@@ -200,7 +210,8 @@ Only needed if you want the "email me this analysis" feature.
         "dynamodb:PutItem",
         "dynamodb:UpdateItem",
         "dynamodb:GetItem",
-        "dynamodb:Query"
+        "dynamodb:Query",
+        "dynamodb:Scan"
       ],
       "Resource": "*"
     },
@@ -331,17 +342,56 @@ LoveBehaviorTranslator.Function::LoveBehaviorTranslator.Function.Function::Funct
 8. **Lambda Function**: `LoveBehaviorTranslatorFunction`
 9. Click **Save** → **OK** (when prompted to grant permissions)
 
-### 7.4 Enable CORS
+### 7.3.1 Create `/admin` Proxy Resource (For Admin Routes)
 
-For each resource (`/`, `/health`, `/analyze`):
+1. **Resources** → **Create resource**
+2. **Resource name**: `admin`
+3. **Resource path**: `/admin`
+4. Click **Create resource**
+5. With `/admin` selected → **Create resource** again
+6. **Resource name**: `proxy`
+7. **Resource path**: `{proxy+}`
+8. ✅ Check **Configure as proxy resource**
+9. Click **Create resource**
+10. Select `/admin/{proxy+}` → **Create method** → `ANY`
+11. **Integration type**: **Lambda Function**
+12. ✅ Check **Use Lambda Proxy integration**
+13. **Lambda Function**: `LoveBehaviorTranslatorFunction`
+14. Click **Save** → **OK** (when prompted to grant permissions)
+
+**Note:** This catch-all proxy will route all `/admin/*` requests (including `/admin/login`, `/admin/users`, etc.) to Lambda, which handles routing internally.
+
+### 7.4 Configure CORS
+
+**IMPORTANT:** The Lambda function handles CORS automatically, so you have two options:
+
+#### Option A: Let Lambda Handle CORS (Recommended)
+
+1. **Do NOT enable CORS in API Gateway** - the Lambda function returns CORS headers automatically
+2. If OPTIONS methods were auto-created, you can delete them (Lambda handles OPTIONS requests)
+3. Skip to Step 7.5
+
+#### Option B: Enable CORS in API Gateway
+
+If you prefer API Gateway to handle CORS:
+
+For each resource (`/`, `/health`, `/analyze`, `/admin/*`):
 
 1. Select the resource in the left pane
 2. Click **Actions** → **Enable CORS**
 3. Configure:
    - **Access-Control-Allow-Origin**: `*` (tighten later to your Amplify domain)
-   - **Access-Control-Allow-Methods**: `GET,POST,OPTIONS`
-   - **Access-Control-Allow-Headers**: `Content-Type,Authorization`
+   - **Access-Control-Allow-Methods**: `GET,POST,PUT,OPTIONS`
+   - **Access-Control-Allow-Headers**: `Content-Type,Authorization,x-user-id`
 4. Click **Enable CORS and replace existing CORS headers**
+5. **After enabling CORS, you must manually update each OPTIONS method:**
+   - Click on the `OPTIONS` method under each resource
+   - Go to **Method Response**
+   - Under **200**, edit **Response Headers**
+   - Ensure `Access-Control-Allow-Headers` includes `x-user-id`
+   - Go to **Integration Response**
+   - Under **200**, edit **Header Mappings**
+   - Set `Access-Control-Allow-Headers` to: `'Content-Type,Authorization,x-user-id'`
 
 ### 7.5 Deploy API
 

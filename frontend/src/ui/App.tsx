@@ -67,14 +67,6 @@ export function App() {
       setError('Please describe the behavior in at least 10 characters.');
       return;
     }
-    if (trimmed.length > 2000) {
-      setError('Please keep the description to 2000 characters or less.');
-      return;
-    }
-    if (!apiBaseUrl) {
-      setError('Missing API configuration. Set VITE_API_BASE_URL in Amplify environment variables.');
-      return;
-    }
 
     const payload: AnalyzeRequest = {
       behavior_description: trimmed,
@@ -82,9 +74,9 @@ export function App() {
     };
 
     if (relationshipType) payload.relationship_type = relationshipType;
-    if (relationshipLength.trim()) payload.relationship_length = relationshipLength.trim();
+    if (relationshipLength) payload.relationship_length = relationshipLength;
     if (emotionalState) payload.emotional_state = emotionalState;
-    if (emailTo.trim()) payload.email_to = emailTo.trim();
+    if (emailTo) payload.email_to = emailTo;
 
     setLoading(true);
     try {
@@ -139,163 +131,234 @@ export function App() {
     setEmailTo('');
   }
 
+  function handleQuickAction(text: string) {
+    setBehavior(text);
+  }
+
   const displayCredits = credits === null ? '...' : credits === -1 ? 'Unlimited' : credits.toString();
 
   return (
-    <div className="page">
-      <div className="shell">
-        <header className="header">
-          <div className="header-top">
-            <h1>Love Behavior Translator</h1>
-            <div className="credits-display">
-              <span className="credits-badge">
-                {displayCredits} Credits
-              </span>
-              <span className="credits-hint">1 credit = 1 behavior analysis</span>
+    <div className="app-container">
+      <div className="background-pattern"></div>
+      
+      <header className="app-header">
+        <div className="header-content">
+          <h1>
+            <span className="heart-icon">💕</span>
+            AI Love Behavior Translator
+          </h1>
+          <p className="tagline">Get AI-powered relationship insights and actionable advice for your love life.</p>
+          
+          <div className="credits-header">
+            <div className="credits-badge-large">
+              {displayCredits} Credits
+            </div>
+            <span className="credits-explanation">1 credit = 1 behavior analysis</span>
+          </div>
+        </div>
+      </header>
+
+      <main className="app-main">
+        <div className="main-card">
+          <textarea
+            className="behavior-input"
+            rows={6}
+            value={behavior}
+            onChange={(e) => setBehavior(e.target.value)}
+            placeholder="Describe your relationship behavior... e.g., 'My partner has been canceling plans last minute and seems distant when we do spend time together'"
+          />
+
+          <div className="trust-indicators">
+            <span className="trust-badge">★ Trusted by couples worldwide</span>
+            <div className="support-badges">
+              <span>💑 Dating</span>
+              <span>💍 Married</span>
+              <span>💕 All relationships</span>
             </div>
           </div>
-          <p className="sub">
-            Compassionate relationship insights based on the behavior you describe.
-          </p>
-          <div className="admin-link">
-            <Link to="/admin/login">Admin</Link>
-          </div>
-        </header>
 
-        <div className="disclaimer">
-          <strong>Disclaimer:</strong> This app provides general relationship insights and is not
-          professional therapy or counseling.
+          <div className="quick-actions">
+            <span className="quick-actions-label">Quick actions:</span>
+            <div className="quick-action-buttons">
+              <button
+                type="button"
+                className="quick-action-btn"
+                onClick={() => handleQuickAction("My partner has been canceling plans last minute")}
+              >
+                💔 Canceling plans
+              </button>
+              <button
+                type="button"
+                className="quick-action-btn"
+                onClick={() => handleQuickAction("My partner seems distant and avoids deep conversations")}
+              >
+                😔 Feeling distant
+              </button>
+              <button
+                type="button"
+                className="quick-action-btn"
+                onClick={() => handleQuickAction("My partner gets defensive when I try to discuss our relationship")}
+              >
+                🛡️ Defensive behavior
+              </button>
+              <button
+                type="button"
+                className="quick-action-btn"
+                onClick={() => handleQuickAction("My partner never initiates contact or makes plans")}
+              >
+                📱 No initiation
+              </button>
+            </div>
+          </div>
+
+          <form onSubmit={onSubmit} className="analysis-form">
+            <div className="form-row">
+              <div className="form-group">
+                <label>Relationship type</label>
+                <select
+                  className="form-input"
+                  value={relationshipType}
+                  onChange={(e) => setRelationshipType(e.target.value as any)}
+                >
+                  <option value="">Optional</option>
+                  <option value="dating">Dating</option>
+                  <option value="married">Married</option>
+                  <option value="situationship">Situationship</option>
+                  <option value="friendship">Friendship</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label>Relationship length</label>
+                <input
+                  type="text"
+                  className="form-input"
+                  value={relationshipLength}
+                  onChange={(e) => setRelationshipLength(e.target.value)}
+                  placeholder="e.g., 3 months, 2 years"
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Your emotional state</label>
+                <select
+                  className="form-input"
+                  value={emotionalState}
+                  onChange={(e) => setEmotionalState(e.target.value as any)}
+                >
+                  <option value="">Optional</option>
+                  <option value="anxious">Anxious</option>
+                  <option value="confused">Confused</option>
+                  <option value="hurt">Hurt</option>
+                  <option value="hopeful">Hopeful</option>
+                  <option value="neutral">Neutral</option>
+                  <option value="frustrated">Frustrated</option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label>Analysis style</label>
+                <select
+                  className="form-input"
+                  value={mode}
+                  onChange={(e) => setMode(e.target.value as AnalysisMode)}
+                >
+                  <option value="gentle">Gentle</option>
+                  <option value="analytical">Analytical</option>
+                  <option value="brutally_honest">Brutally Honest</option>
+                  <option value="light_funny">Light & Funny</option>
+                </select>
+              </div>
+            </div>
+
+            {error && (
+              <div className="error-message">
+                {error}
+              </div>
+            )}
+
+            <button
+              type="submit"
+              className="analyze-button"
+              disabled={loading || behavior.trim().length < 10}
+            >
+              {loading ? (
+                <>
+                  <span className="spinner"></span>
+                  Analyzing...
+                </>
+              ) : (
+                <>
+                  <span className="heart-icon-small">💕</span>
+                  Analyze My Relationship Behavior
+                </>
+              )}
+            </button>
+          </form>
+
+          <div className="how-it-works">
+            <h3>How This Works</h3>
+            <p>
+              Our AI analyzes your relationship behavior patterns and provides evidence-based insights, not literal translation. 
+              You'll receive likely causes, emotional insights, practical advice, and guidance on when to consult a relationship counselor.
+            </p>
+          </div>
         </div>
 
-        <main className="main">
-          {!result ? (
-            <form className="card" onSubmit={onSubmit}>
-              <label className="label">
-                Describe the behavior you’d like to understand <span className="req">*</span>
-              </label>
-              <textarea
-                className="textarea"
-                rows={7}
-                value={behavior}
-                onChange={(e) => setBehavior(e.target.value)}
-                placeholder="Example: My partner has been canceling plans last minute and seems distant when we do spend time together..."
-              />
-              <div className={`hint ${remaining < 0 ? 'bad' : ''}`}>
-                {behavior.length} / 2000 characters
-              </div>
-
-              <div className="grid2">
-                <div>
-                  <label className="label">Relationship type</label>
-                  <select
-                    className="input"
-                    value={relationshipType}
-                    onChange={(e) => setRelationshipType(e.target.value as any)}
-                  >
-                    <option value="">Optional</option>
-                    <option value="dating">Dating</option>
-                    <option value="married">Married</option>
-                    <option value="situationship">Situationship</option>
-                    <option value="friendship">Friendship</option>
-                    <option value="other">Other</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="label">Relationship length</label>
-                  <input
-                    className="input"
-                    value={relationshipLength}
-                    onChange={(e) => setRelationshipLength(e.target.value)}
-                    placeholder="e.g., 3 months, 2 years"
-                  />
-                </div>
-              </div>
-
-              <div className="grid2">
-                <div>
-                  <label className="label">Your emotional state</label>
-                  <select
-                    className="input"
-                    value={emotionalState}
-                    onChange={(e) => setEmotionalState(e.target.value as any)}
-                  >
-                    <option value="">Optional</option>
-                    <option value="anxious">Anxious</option>
-                    <option value="confused">Confused</option>
-                    <option value="hurt">Hurt</option>
-                    <option value="hopeful">Hopeful</option>
-                    <option value="neutral">Neutral</option>
-                    <option value="frustrated">Frustrated</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="label">Analysis style</label>
-                  <select className="input" value={mode} onChange={(e) => setMode(e.target.value as any)}>
-                    <option value="gentle">Gentle</option>
-                    <option value="analytical">Analytical</option>
-                    <option value="brutally_honest">Brutally honest</option>
-                    <option value="light_funny">Light & funny</option>
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label className="label">Email me the result (optional)</label>
-                <input
-                  className="input"
-                  value={emailTo}
-                  onChange={(e) => setEmailTo(e.target.value)}
-                  placeholder="name@example.com"
-                />
-                <div className="hint">
-                  Requires SES verified sender in your AWS account/region.
-                </div>
-              </div>
-
-              {error ? <div className="error">{error}</div> : null}
-
-              <button className={`button ${loading ? 'loading' : ''}`} disabled={loading}>
-                {loading ? 'Analyzing…' : 'Analyze behavior'}
-              </button>
-
-              <div className="hint">
-                API: {apiBaseUrl ? apiBaseUrl : '(not configured)'}
-              </div>
-            </form>
-          ) : (
-            <div className="card">
-              <div className="resultHeader">
-                <h2>Results</h2>
-                <span className="pill">{result.mode_used}</span>
-              </div>
-
-              <Section title="Analysis" text={result.analysis} />
-              <Section title="Emotional Insight" text={result.emotional_insight} />
-              <Section title="Practical Next Steps" text={result.practical_advice} />
-              <Section title="Gentle Reassurance" text={result.reassurance} />
-
-              <button className="button secondary" onClick={onNew}>
-                New analysis
-              </button>
+        {result && (
+          <div className="result-card">
+            <div className="result-header">
+              <h2>Analysis Results</h2>
+              <button onClick={onNew} className="new-analysis-btn">New Analysis</button>
             </div>
-          )}
-        </main>
+            
+            <div className="result-section">
+              <h3>Analysis</h3>
+              <p>{result.analysis}</p>
+            </div>
 
-        <footer className="footer">
-          <span>Built for clarity, calm communication, and self-respect.</span>
-        </footer>
-      </div>
+            <div className="result-section">
+              <h3>Emotional Insight</h3>
+              <p>{result.emotional_insight}</p>
+            </div>
+
+            <div className="result-section">
+              <h3>Practical Advice</h3>
+              <p>{result.practical_advice}</p>
+            </div>
+
+            <div className="result-section">
+              <h3>Reassurance</h3>
+              <p>{result.reassurance}</p>
+            </div>
+
+            <div className="result-footer">
+              <span className="mode-badge">Mode: {result.mode_used}</span>
+              {result.credits_remaining && (
+                <span className="credits-remaining">
+                  Credits remaining: {result.credits_remaining === 'unlimited' ? 'Unlimited' : result.credits_remaining}
+                </span>
+              )}
+            </div>
+          </div>
+        )}
+      </main>
+
+      <footer className="app-footer">
+        <div className="footer-buttons">
+          <button className="footer-btn buy-credits">💰 Buy Credits</button>
+          <button className="footer-btn need-help">❓ Need Help?</button>
+        </div>
+        <div className="footer-links">
+          <Link to="/admin/login" className="admin-link-footer">Admin</Link>
+        </div>
+        <p className="copyright">© 2025 Love Behavior Translator. All rights reserved.</p>
+        <p className="made-with">Made with ❤️ for couples</p>
+        <p className="disclaimer-text">
+          This app provides general relationship insights and is not professional therapy or counseling.
+        </p>
+      </footer>
     </div>
   );
 }
-
-function Section(props: { title: string; text: string }) {
-  return (
-    <section className="section">
-      <h3>{props.title}</h3>
-      <p>{props.text}</p>
-    </section>
-  );
-}
-
-
