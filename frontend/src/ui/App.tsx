@@ -167,7 +167,7 @@ export function App() {
       </header>
 
       <main className="app-main-wrapper">
-        {/* Decorative images - Left side only (mix of attractive people) */}
+        {/* Decorative images - Left side (female images only) */}
         <div className="decorative-images-left">
           <img 
             src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop&crop=face" 
@@ -184,6 +184,10 @@ export function App() {
             alt="Decorative" 
             className="decorative-image"
           />
+        </div>
+        
+        {/* Decorative images - Right side (male images only) */}
+        <div className="decorative-images-right">
           <img 
             src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face" 
             alt="Decorative" 
@@ -191,6 +195,11 @@ export function App() {
           />
           <img 
             src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face" 
+            alt="Decorative" 
+            className="decorative-image"
+          />
+          <img 
+            src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=400&fit=crop&crop=face" 
             alt="Decorative" 
             className="decorative-image"
           />
@@ -270,29 +279,6 @@ export function App() {
                 placeholder="Share what you've noticed... For example: 'My partner used to text me throughout the day, but now I'm always the one reaching out. When we're together, they seem distracted and less engaged. I'm worried they're pulling away.'"
               />
               <p className="textarea-hint">Be as detailed as you're comfortable with. This helps us understand the full picture.</p>
-            </div>
-
-            <div className="trust-section">
-              <div className="trust-stats-group">
-                <div className="stat-item">
-                  <span className="stat-number">1,247</span>
-                  <span className="stat-label">people found clarity this month</span>
-                </div>
-                <div className="stat-item">
-                  <span className="stat-number">87%</span>
-                  <span className="stat-label">say it helped them understand</span>
-                </div>
-              </div>
-              <div className="testimonials-group">
-                <div className="testimonial-item">
-                  <span className="testimonial-quote">"This helped me finally understand why he shut down."</span>
-                  <span className="testimonial-author">— Anonymous</span>
-                </div>
-                <div className="testimonial-item">
-                  <span className="testimonial-quote">"I thought I was overthinking. Turns out I wasn't."</span>
-                  <span className="testimonial-author">— Anonymous</span>
-                </div>
-              </div>
             </div>
 
             <div className="quick-actions">
@@ -452,6 +438,29 @@ export function App() {
               <div className="cannot-item">
                 <span className="x-icon">✗</span>
                 <span>Diagnose mental health conditions</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="sidebar-section trust-section-sidebar">
+            <div className="trust-stats-group">
+              <div className="stat-item">
+                <span className="stat-number">1,247</span>
+                <span className="stat-label">people found clarity this month</span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-number">87%</span>
+                <span className="stat-label">say it helped them understand</span>
+              </div>
+            </div>
+            <div className="testimonials-group">
+              <div className="testimonial-item">
+                <span className="testimonial-quote">"This helped me finally understand why he shut down."</span>
+                <span className="testimonial-author">— Anonymous</span>
+              </div>
+              <div className="testimonial-item">
+                <span className="testimonial-quote">"I thought I was overthinking. Turns out I wasn't."</span>
+                <span className="testimonial-author">— Anonymous</span>
               </div>
             </div>
           </div>
