@@ -163,7 +163,7 @@ export function App() {
       </header>
 
       <main className="app-main-wrapper">
-        {/* Decorative images - Left side (women) */}
+        {/* Decorative images - Left side only (mix of attractive people) */}
         <div className="decorative-images-left">
           <img 
             src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop&crop=face" 
@@ -180,10 +180,6 @@ export function App() {
             alt="Decorative" 
             className="decorative-image"
           />
-        </div>
-        
-        {/* Decorative images - Right side (men) */}
-        <div className="decorative-images-right">
           <img 
             src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face" 
             alt="Decorative" 
@@ -191,11 +187,6 @@ export function App() {
           />
           <img 
             src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face" 
-            alt="Decorative" 
-            className="decorative-image"
-          />
-          <img 
-            src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=400&fit=crop&crop=face" 
             alt="Decorative" 
             className="decorative-image"
           />
