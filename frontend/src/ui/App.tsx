@@ -1,4 +1,6 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
+import { useCredits } from './CreditContext';
+import { Link } from 'react-router-dom';
 
 type AnalysisMode = 'gentle' | 'analytical' | 'brutally_honest' | 'light_funny';
 type RelationshipType = 'dating' | 'married' | 'situationship' | 'friendship' | 'other';
@@ -19,6 +21,7 @@ type AnalyzeResponse = {
   practical_advice: string;
   reassurance: string;
   mode_used: string;
+  credits_remaining?: string | number;
 };
 
 function getApiBaseUrl(): string {
@@ -29,6 +32,7 @@ function getApiBaseUrl(): string {
 
 export function App() {
   const apiBaseUrl = useMemo(() => getApiBaseUrl(), []);
+  const { credits, setCredits, userId } = useCredits();
   const [behavior, setBehavior] = useState('');
   const [relationshipType, setRelationshipType] = useState<RelationshipType | ''>('');
   const [relationshipLength, setRelationshipLength] = useState('');
@@ -41,6 +45,17 @@ export function App() {
   const [result, setResult] = useState<AnalyzeResponse | null>(null);
 
   const remaining = 2000 - behavior.length;
+
+  // Update credits from localStorage on mount
+  useEffect(() => {
+    const stored = localStorage.getItem('credits');
+    if (stored) {
+      const parsed = parseInt(stored, 10);
+      if (!isNaN(parsed)) {
+        setCredits(parsed);
+      }
+    }
+  }, [setCredits]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -75,16 +90,37 @@ export function App() {
     try {
       const resp = await fetch(`${apiBaseUrl}/analyze`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'x-user-id': userId,
+        },
         body: JSON.stringify(payload),
       });
 
       const data = (await resp.json()) as any;
       if (!resp.ok) {
-        setError(data?.detail ?? data?.error ?? 'Request failed.');
+        if (resp.status === 402) {
+          // Insufficient credits
+          setError(data?.detail ?? data?.error ?? 'Insufficient credits. Please purchase more credits.');
+          if (data.credits !== undefined) {
+            setCredits(data.credits);
+            localStorage.setItem('credits', data.credits.toString());
+          }
+        } else {
+          setError(data?.detail ?? data?.error ?? 'Request failed.');
+        }
         return;
       }
       setResult(data as AnalyzeResponse);
+      
+      // Update credits from response
+      if (data.credits_remaining !== undefined) {
+        const remaining = data.credits_remaining === 'unlimited' ? -1 : parseInt(data.credits_remaining.toString(), 10);
+        if (!isNaN(remaining)) {
+          setCredits(remaining);
+          localStorage.setItem('credits', remaining.toString());
+        }
+      }
     } catch (err: any) {
       setError(err?.message ?? 'Network error.');
     } finally {
@@ -103,14 +139,27 @@ export function App() {
     setEmailTo('');
   }
 
+  const displayCredits = credits === null ? '...' : credits === -1 ? 'Unlimited' : credits.toString();
+
   return (
     <div className="page">
       <div className="shell">
         <header className="header">
-          <h1>Love Behavior Translator</h1>
+          <div className="header-top">
+            <h1>Love Behavior Translator</h1>
+            <div className="credits-display">
+              <span className="credits-badge">
+                {displayCredits} Credits
+              </span>
+              <span className="credits-hint">1 credit = 1 behavior analysis</span>
+            </div>
+          </div>
           <p className="sub">
             Compassionate relationship insights based on the behavior you describe.
           </p>
+          <div className="admin-link">
+            <Link to="/admin/login">Admin</Link>
+          </div>
         </header>
 
         <div className="disclaimer">
@@ -205,7 +254,7 @@ export function App() {
 
               {error ? <div className="error">{error}</div> : null}
 
-              <button className="button" disabled={loading}>
+              <button className={`button ${loading ? 'loading' : ''}`} disabled={loading}>
                 {loading ? 'Analyzing…' : 'Analyze behavior'}
               </button>
 

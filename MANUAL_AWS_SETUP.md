@@ -1,177 +1,193 @@
-# Manual AWS Console Setup (No CDK/CLI)
+# Manual AWS Console Setup Guide
 
-This guide walks you through setting up **Love Behavior Translator** entirely from the **AWS Console**, using:
+Complete step-by-step instructions for setting up **Love Behavior Translator** entirely from the **AWS Console** (no CDK/CLI required).
 
-- **React frontend** hosted on **AWS Amplify**
-- **.NET 8 Lambda** backend
-- **API Gateway (REST API / v1)**
-- **DynamoDB** (rate limiting + request logs with TTL)
-- **Secrets Manager** (OpenAI API key)
-- **S3** (analysis artifacts)
-- **SES** (optional “email me results”)
+## Architecture Overview
 
-All resources should be created in **one AWS region** (pick one and stick to it).
+This application uses:
+
+- **React frontend** → AWS Amplify Hosting
+- **.NET 8 Lambda** → Backend API handler
+- **API Gateway (REST API v1)** → HTTP endpoints
+- **DynamoDB** → Rate limiting + request logs (with TTL)
+- **Secrets Manager** → Secure storage for OpenAI API key
+- **S3** → Analysis artifacts storage
+- **SES** → Optional email delivery
+- **Route 53** → Domain management and DNS
+
+> **Important**: Create all resources in **one AWS region** and stick to it throughout this guide.
 
 ---
 
 ## Prerequisites
 
-- An AWS account with permission to create: IAM roles/policies, Lambda, API Gateway, DynamoDB, S3, Secrets Manager, Amplify, SES.
-- An **OpenAI API key**
-- Local tooling (still required to build the Lambda zip):
-  - **.NET 8 SDK**
-  - Windows PowerShell (or equivalent)
+Before starting, ensure you have:
+
+- ✅ AWS account with permissions to create: IAM, Lambda, API Gateway, DynamoDB, S3, Secrets Manager, Amplify, SES, Route 53, ACM
+- ✅ **OpenAI API key** (starts with `sk-...`)
+- ✅ **.NET 8 SDK** installed locally (required to build Lambda zip)
+- ✅ **Git** installed and configured
+- ✅ **GitHub repository** created (or existing repo URL)
 
 ---
 
-## 0) Build the Lambda deployment zip (local)
+## Step 0: Build the Lambda Deployment Package
 
-Even with console-only AWS setup, you must upload a Lambda zip. Build it from repo root:
+You must build the Lambda zip file locally before uploading it to AWS.
+
+### Quick Build (Recommended)
+
+From the repository root directory:
 
 ```powershell
 .\backend\build.ps1
 ```
 
-This produces:
+This should produce: `backend\dist\function.zip`
 
-- `backend\dist\function.zip`
+### Troubleshooting
 
-You will upload this file in the Lambda Console later.
+#### Issue: PowerShell execution policy error
 
-### 0.1 Troubleshooting: if you don’t have the zip yet
-
-#### A) Install .NET 8 SDK
-
-- Download and install **.NET 8 SDK** (not just runtime), then reopen your terminal.
-
-Verify:
-
-```powershell
-dotnet --info
-```
-
-You should see a `.NET SDKs installed` entry for `8.x`.
-
-#### B) Allow running the build script (PowerShell execution policy)
-
-If PowerShell blocks `build.ps1`, run PowerShell **as your user** and do:
+If you see an error about execution policy:
 
 ```powershell
 Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
 ```
 
-Then rerun:
+Then rerun `.\backend\build.ps1`
+
+#### Issue: .NET 8 SDK not found
+
+1. Download and install **.NET 8 SDK** (not just runtime)
+2. Close and reopen your terminal
+3. Verify installation:
 
 ```powershell
-.\backend\build.ps1
+dotnet --info
 ```
 
-#### C) Manual build commands (if you prefer not to use build.ps1)
+You should see `.NET SDKs installed` with version `8.x.x`
 
-From repo root:
+#### Issue: Build script doesn't work
+
+Run the build commands manually:
 
 ```powershell
+# From repository root
 dotnet restore .\backend\LoveBehaviorTranslator.sln
 dotnet publish .\backend\src\LoveBehaviorTranslator.Function\LoveBehaviorTranslator.Function.csproj -c Release -o .\backend\dist\publish
 Compress-Archive -Path .\backend\dist\publish\* -DestinationPath .\backend\dist\function.zip -Force
 ```
 
-After this, confirm the file exists:
+Verify the zip exists:
 
 ```powershell
 Test-Path .\backend\dist\function.zip
 ```
 
+Should return `True`.
+
 ---
 
-## 1) Store the OpenAI API key in Secrets Manager
+## Step 1: Store OpenAI API Key in Secrets Manager
 
 1. AWS Console → **Secrets Manager**
 2. Click **Store a new secret**
-3. **Secret type**: “Other type of secret”
-4. Store either:
-   - **Plaintext**: paste your `sk-...` key, **or**
+3. **Secret type**: Select **"Other type of secret"**
+4. Choose one of these formats:
+   - **Plaintext**: Paste your `sk-...` key directly
    - **Key/value JSON**:
      - Key: `OPENAI_API_KEY`
      - Value: `sk-...`
 5. **Secret name**: `love-behavior-translator/openai-api-key`
-6. Create the secret
-7. Open the secret → copy its **ARN** (you’ll use it for Lambda env var `OPENAI_SECRET_ARN`)
+6. Click **Next** → **Next** → **Store**
+7. After creation, open the secret and **copy its ARN** (you'll need this for Lambda environment variables)
 
 ---
 
-## 2) Create DynamoDB table (rate limit + logs + TTL)
+## Step 2: Create DynamoDB Table
 
 1. AWS Console → **DynamoDB** → **Tables** → **Create table**
-2. Table name: `LoveBehaviorTranslator`
-3. Partition key: `pk` (**String**)
-4. Sort key: `sk` (**String**)
-5. Capacity mode: **On-demand**
-6. Create table
-7. After creation, open the table → enable **TTL**
-   - Find **Time to live (TTL)** (in “Additional settings” or “Table details” depending on console UI)
-   - Enable TTL attribute: `ttl`
+2. **Table name**: `LoveBehaviorTranslator`
+3. **Partition key**: `pk` (type: **String**)
+4. **Sort key**: `sk` (type: **String**)
+5. **Table settings**: **On-demand** capacity mode
+6. Click **Create table**
 
-> This app uses DynamoDB TTL for:
-> - per-IP per-minute counters (short-lived)
-> - request logs (longer-lived)
+### Enable TTL (Time to Live)
+
+1. Open the `LoveBehaviorTranslator` table
+2. Go to **Additional settings** (or **Table details**)
+3. Find **Time to live (TTL)**
+4. Enable TTL attribute: `ttl`
+5. Save
+
+> **Why TTL?** This app uses DynamoDB TTL to automatically expire:
+> - Rate limit counters (per IP, per minute)
+> - Request logs (after a retention period)
 
 ---
 
-## 3) Create S3 bucket (analysis artifacts)
+## Step 3: Create S3 Bucket
 
 1. AWS Console → **S3** → **Create bucket**
-2. Bucket name: must be **globally unique** and follow S3 naming rules (no `<` `>` brackets).
-   - Valid examples:
+2. **Bucket name**: Must be **globally unique** (no angle brackets `<` `>` allowed)
+   - Examples:
      - `love-behavior-translator-artifacts-2025`
-     - `love-behavior-translator-artifacts-mycompany`
-     - `love-behavior-translator-artifacts-3f9a2c1d`
-3. Keep **Block all public access** = ON
-4. Encryption: default (**SSE-S3**) is fine
-5. Create bucket
+     - `love-behavior-translator-artifacts-maxkantor`
+     - `love-behavior-translator-artifacts-abc123xyz`
+3. **AWS Region**: Same region as your other resources
+4. **Block Public Access**: Keep **ON** (default)
+5. **Encryption**: Default (**SSE-S3**) is fine
+6. Click **Create bucket**
 
-Optional retention:
+### Optional: Set Lifecycle Rule
 
-6. Bucket → **Management** → **Lifecycle rules** → create rule to expire objects after **30 days**
+To automatically delete old artifacts:
 
----
-
-## 4) (Optional) Configure SES for “email me this analysis”
-
-If you will use `email_to`, you must set up SES.
-
-1. AWS Console → **Amazon SES**
-2. Confirm you’re in the same region as your Lambda
-3. **Identities** → **Create identity**
-4. Choose:
-   - **Email address** (fastest) or
-   - **Domain** (best long-term)
-5. Verify the identity (follow the emailed link / DNS steps)
-6. Note the verified sender email address — you’ll set it as Lambda env var `SES_FROM_EMAIL`
-
-SES sandbox note:
-
-- If your account is in **SES Sandbox**, you can only email **verified recipient addresses** until you request production access.
+1. Open your bucket → **Management** → **Lifecycle rules**
+2. **Create lifecycle rule**
+3. Name: `delete-old-artifacts`
+4. **Expire current versions of objects**: `30` days
+5. Create rule
 
 ---
 
-## 5) Create an IAM role for the Lambda function
+## Step 4: (Optional) Configure SES for Email
 
-### 5.1 Create the role
+Only needed if you want the "email me this analysis" feature.
+
+1. AWS Console → **Amazon SES** (same region as Lambda)
+2. **Identities** → **Create identity**
+3. Choose:
+   - **Email address** (fastest for testing)
+   - **Domain** (better for production)
+4. Follow verification steps (check email or add DNS records)
+5. **Note the verified sender email** — you'll use this as Lambda env var `SES_FROM_EMAIL`
+
+> **SES Sandbox**: If your account is in SES Sandbox, you can only email **verified recipient addresses** until you request production access.
+
+---
+
+## Step 5: Create IAM Role for Lambda
+
+### 5.1 Create the Role
 
 1. AWS Console → **IAM** → **Roles** → **Create role**
-2. Trusted entity: **AWS service**
-3. Use case: **Lambda**
-4. Attach managed policy:
+2. **Trusted entity type**: **AWS service**
+3. **Use case**: **Lambda**
+4. **Permissions**: Attach managed policy:
    - `AWSLambdaBasicExecutionRole`
-5. Role name: `LoveBehaviorTranslatorLambdaRole`
-6. Create role
+5. **Role name**: `LoveBehaviorTranslatorLambdaRole`
+6. Click **Create role**
 
-### 5.2 Add inline permissions (DynamoDB + S3 + Secrets + SES)
+### 5.2 Add Inline Policy
 
-1. IAM → Roles → open `LoveBehaviorTranslatorLambdaRole`
+1. Open `LoveBehaviorTranslatorLambdaRole`
 2. **Add permissions** → **Create inline policy**
-3. Choose **JSON** tab, paste:
+3. Click **JSON** tab
+4. Paste this policy:
 
 ```json
 {
@@ -218,288 +234,442 @@ SES sandbox note:
 }
 ```
 
-4. Policy name: `LoveBehaviorTranslatorInline`
-5. Create policy
+5. **Policy name**: `LoveBehaviorTranslatorInline`
+6. Click **Create policy**
 
-> You can later tighten `Resource` from `*` to specific ARNs for the table, bucket, and secret.
+> **Security Note**: Later, you can tighten `Resource: "*"` to specific ARNs for better security.
 
 ---
 
-## 6) Create the Lambda function and upload the zip
+## Step 6: Create Lambda Function
 
-### 6.1 Create function
+### 6.1 Create Function
 
 1. AWS Console → **Lambda** → **Create function**
-2. “Author from scratch”
-3. Function name: `LoveBehaviorTranslatorFunction`
-4. Runtime: **.NET 8**
-5. Architecture: `x86_64`
-6. Permissions: **Use an existing role** → `LoveBehaviorTranslatorLambdaRole`
-7. Create function
+2. **Author from scratch**
+3. **Function name**: `LoveBehaviorTranslatorFunction`
+4. **Runtime**: **.NET 8**
+5. **Architecture**: `x86_64`
+6. **Permissions**: **Use an existing role** → Select `LoveBehaviorTranslatorLambdaRole`
+7. Click **Create function**
 
-### 6.2 Upload deployment package
+### 6.2 Upload Deployment Package
 
-1. Lambda → `LoveBehaviorTranslatorFunction` → **Code** tab
-2. “Upload from” → **.zip file**
-3. Upload `backend\dist\function.zip`
+1. In the function → **Code** tab
+2. **Upload from** → **.zip file**
+3. Click **Upload** and select `backend\dist\function.zip`
+4. Wait for upload to complete
 
-### 6.3 Set handler
+### 6.3 Set Handler
 
-1. Lambda → **Configuration** → **Runtime settings** → **Edit**
-2. Set **Handler**:
+1. **Configuration** → **Runtime settings** → **Edit**
+2. **Handler**: Set to:
 
-`LoveBehaviorTranslator.Function::LoveBehaviorTranslator.Function.Function::FunctionHandler`
+```
+LoveBehaviorTranslator.Function::LoveBehaviorTranslator.Function.Function::FunctionHandler
+```
 
-3. Save
+3. Click **Save**
 
-### 6.4 Configure environment variables
+### 6.4 Configure Environment Variables
 
-Lambda → **Configuration** → **Environment variables** → **Edit**:
+1. **Configuration** → **Environment variables** → **Edit**
+2. Add these variables:
 
-- `TABLE_NAME` = `LoveBehaviorTranslator`
-- `ARTIFACTS_BUCKET` = your S3 bucket name
-- `OPENAI_SECRET_ARN` = the secret ARN from Secrets Manager
-- `OPENAI_MODEL` = `gpt-4.1-mini` (or your preferred model)
-- `RATE_LIMIT_PER_MINUTE` = `10`
-- `RATE_LIMIT_BURST` = `5`
-- `SES_FROM_EMAIL` = your verified SES email (optional; leave empty if not using email)
+| Variable Name | Value | Notes |
+|--------------|-------|-------|
+| `TABLE_NAME` | `LoveBehaviorTranslator` | DynamoDB table name |
+| `ARTIFACTS_BUCKET` | `your-bucket-name` | Your S3 bucket name from Step 3 |
+| `OPENAI_SECRET_ARN` | `arn:aws:secretsmanager:...` | ARN from Secrets Manager (Step 1) |
+| `OPENAI_MODEL` | `gpt-4o-mini` | Or your preferred OpenAI model |
+| `RATE_LIMIT_PER_MINUTE` | `10` | Max requests per minute per IP |
+| `RATE_LIMIT_BURST` | `5` | Burst allowance |
+| `SES_FROM_EMAIL` | `your@email.com` | Verified SES email (optional, leave empty if not using) |
 
-Save.
+3. Click **Save**
 
-### 6.5 Configure timeout/memory
+### 6.5 Configure Timeout and Memory
 
-Lambda → **Configuration** → **General configuration** → **Edit**:
-
-- Memory: **1024 MB**
-- Timeout: **29 seconds**
-
-Save.
+1. **Configuration** → **General configuration** → **Edit**
+2. **Memory**: `1024` MB
+3. **Timeout**: `29` seconds
+4. Click **Save**
 
 ---
 
-## 7) Create API Gateway REST API (v1) and integrate Lambda
+## Step 7: Create API Gateway REST API
+
+### 7.1 Create API
 
 1. AWS Console → **API Gateway**
 2. **Create API** → **REST API** (NOT HTTP API)
-3. “New API”
-4. API name: `love-behavior-translator-api`
-5. Create API
+3. **New API**
+4. **API name**: `love-behavior-translator-api`
+5. Click **Create API**
 
-### 7.1 Create `/health` GET
+### 7.2 Create `/health` Endpoint
 
-1. Resources → **Create resource**
-2. Resource name: `health`, path: `/health`
-3. Create
-4. Select `/health` → **Create method** → `GET`
-5. Integration type: **Lambda Function**
-6. Enable **Lambda Proxy integration**
-7. Select Lambda: `LoveBehaviorTranslatorFunction`
-8. Save
+1. **Resources** → **Create resource**
+2. **Resource name**: `health`
+3. **Resource path**: `/health`
+4. Click **Create resource**
+5. Select `/health` → **Create method** → `GET`
+6. **Integration type**: **Lambda Function**
+7. ✅ Check **Use Lambda Proxy integration**
+8. **Lambda Function**: `LoveBehaviorTranslatorFunction`
+9. Click **Save** → **OK** (when prompted to grant permissions)
 
-### 7.2 Create `/analyze` POST
+### 7.3 Create `/analyze` Endpoint
 
-1. Resources → **Create resource**
-2. Resource name: `analyze`, path: `/analyze`
-3. Create
-4. Select `/analyze` → **Create method** → `POST`
-5. Integration: Lambda Proxy → `LoveBehaviorTranslatorFunction`
-6. Save
+1. **Resources** → **Create resource**
+2. **Resource name**: `analyze`
+3. **Resource path**: `/analyze`
+4. Click **Create resource**
+5. Select `/analyze` → **Create method** → `POST`
+6. **Integration type**: **Lambda Function**
+7. ✅ Check **Use Lambda Proxy integration**
+8. **Lambda Function**: `LoveBehaviorTranslatorFunction`
+9. Click **Save** → **OK** (when prompted to grant permissions)
 
-### 7.3 Enable CORS
+### 7.4 Enable CORS
 
-For root and each resource (`/health`, `/analyze`):
+For each resource (`/`, `/health`, `/analyze`):
 
 1. Select the resource in the left pane
-2. Click **Enable CORS**
-3. Set:
-   - Allow Origins: `*` (tighten later to Amplify domain)
-   - Allow Methods: `GET,POST,OPTIONS`
-   - Allow Headers: `Content-Type,Authorization`
-4. Confirm
+2. Click **Actions** → **Enable CORS**
+3. Configure:
+   - **Access-Control-Allow-Origin**: `*` (tighten later to your Amplify domain)
+   - **Access-Control-Allow-Methods**: `GET,POST,OPTIONS`
+   - **Access-Control-Allow-Headers**: `Content-Type,Authorization`
+4. Click **Enable CORS and replace existing CORS headers**
 
-### 7.4 Deploy to a stage
+### 7.5 Deploy API
 
-1. Actions → **Deploy API**
-2. Stage: **New stage**
-3. Stage name: `prod`
-4. Deploy
+1. **Actions** → **Deploy API**
+2. **Deployment stage**: **New stage**
+3. **Stage name**: `prod`
+4. Click **Deploy**
 
-Copy the **Invoke URL** for stage `prod`, e.g.:
+5. **Copy the Invoke URL** (e.g., `https://xxxx.execute-api.us-east-1.amazonaws.com/prod`)
 
-`https://xxxx.execute-api.<region>.amazonaws.com/prod`
+### 7.6 Test the API
 
-Quick test:
+Open the Invoke URL in a browser or use curl:
 
-- `GET {InvokeUrl}/health` should return `{"status":"healthy"}`
+```bash
+curl https://xxxx.execute-api.us-east-1.amazonaws.com/prod/health
+```
+
+Should return: `{"status":"healthy"}`
 
 ---
 
-## 8) Deploy frontend with AWS Amplify (Console)
+## Step 8: Deploy Frontend with AWS Amplify
 
-### 8.1 Push your code to GitHub (required before Amplify)
+### 8.1 Push Code to GitHub
 
-Amplify pulls your code from a Git provider (GitHub). Make sure this repo is committed and pushed.
-
-From repo root:
+Before Amplify can deploy, your code must be in GitHub:
 
 ```powershell
-git status
-git add -A
-git commit -m "Initial AWS serverless app (Amplify + Lambda + API Gateway)"
-git push
-```
-
-If this folder is not a git repo yet:
-
-```powershell
+# From repository root
 git init
 git branch -M main
 git add -A
 git commit -m "Initial commit"
-git remote add origin <YOUR_GITHUB_REPO_URL>
+
+# If you haven't set origin yet:
+git remote add origin https://github.com/maxkantor/love-behavior-translator.git
+
+# Push to GitHub
 git push -u origin main
 ```
 
-### 8.2 Connect Amplify Hosting
+> **Note**: If you need to update the remote URL:
+> ```powershell
+> git remote set-url origin https://github.com/maxkantor/love-behavior-translator.git
+> ```
+
+### 8.2 Connect Amplify to GitHub
 
 1. AWS Console → **AWS Amplify** → **Host web app**
-2. Connect GitHub and select this repo/branch (`main`)
-3. Amplify should detect `amplify.yml`
-4. Add environment variable:
-   - `VITE_API_BASE_URL` = your API Gateway Invoke URL (including `/prod`)
-5. Deploy
+2. **Git provider**: **GitHub**
+3. **Authorize** AWS Amplify to access your GitHub account (if first time)
+4. **Repository**: Select `maxkantor/love-behavior-translator`
+5. **Branch**: `main`
+6. Click **Next**
 
-After deploy, open the Amplify URL and submit an analysis.
+### 8.3 Configure Build Settings
+
+1. Amplify should automatically detect `amplify.yml`
+2. If not, verify the file exists in your repo root
+
+### 8.4 Add Environment Variable
+
+1. **Environment variables** section
+2. Add:
+   - **Key**: `VITE_API_BASE_URL`
+   - **Value**: Your API Gateway Invoke URL (including `/prod`)
+     - Example: `https://xxxx.execute-api.us-east-1.amazonaws.com/prod`
+3. Click **Next** → **Save and deploy**
+
+### 8.5 Wait for Deployment
+
+Amplify will:
+- Clone your repo
+- Install dependencies
+- Build the React app
+- Deploy to hosting
+
+When complete, you'll see a **live URL** (e.g., `https://main.xxxx.amplifyapp.com`)
+
+### 8.6 Test the Application
+
+1. Open the Amplify URL
+2. Fill out the behavior analysis form
+3. Submit and verify you get AI analysis results
 
 ---
 
-## 9) Route 53 + domain registration + custom domains
+## Step 9: Route 53 + Custom Domain (Optional)
 
-You can put your app on a real domain using Route 53. There are two common patterns:
+### 9.1 Register or Use Existing Domain
 
-- **Recommended**: custom domain for **Amplify** only (e.g. `lovebehaviortranslator.com` and `www.lovebehaviortranslator.com`)
-- **Optional**: custom domain for **API Gateway** too (e.g. `api.lovebehaviortranslator.com`)
+#### Option A: Register Domain in Route 53
 
-### 9.1 Register a domain (Route 53) OR use an existing registrar
+1. AWS Console → **Route 53** → **Registered domains** → **Register domain**
+2. Search for your desired domain
+3. Add to cart and complete purchase
+4. Route 53 will automatically create a hosted zone
 
-#### Option A: Register in Route 53
-
-1. AWS Console → **Route 53**
-2. **Registered domains** → **Register domain**
-3. Search and buy your domain
-4. Complete contact details and purchase
-
-Route 53 will create (or you will create) a **Hosted zone** for it.
-
-#### Option B: Domain already registered elsewhere (GoDaddy, Namecheap, etc.)
-
-You can keep your registrar and just point DNS to Route 53:
+#### Option B: Use Existing Domain (External Registrar)
 
 1. Route 53 → **Hosted zones** → **Create hosted zone**
-2. Domain name: your domain (e.g. `lovebehaviortranslator.com`)
-3. Type: **Public hosted zone**
-4. Create hosted zone
-5. In the hosted zone, copy the **NS (name server)** values
-6. Go to your registrar and replace the domain’s nameservers with the Route 53 NS values
+2. **Domain name**: Your domain (e.g., `lovebehaviortranslator.com`)
+3. **Type**: **Public hosted zone**
+4. Click **Create hosted zone**
+5. Copy the **NS (name server)** records
+6. Go to your domain registrar (GoDaddy, Namecheap, etc.)
+7. Replace the domain's nameservers with the Route 53 NS values
 
-> DNS changes can take some time to propagate (often minutes, sometimes longer).
+> **DNS Propagation**: Changes can take 5 minutes to 48 hours, but usually complete within an hour.
 
-### 9.2 Add a custom domain to Amplify (frontend)
+### 9.2 Add Custom Domain to Amplify
 
-1. AWS Console → **AWS Amplify** → your app → **Domain management**
+1. AWS Amplify → Your app → **Domain management**
 2. Click **Add domain**
-3. Enter your domain (e.g. `lovebehaviortranslator.com`)
-4. Choose which branches to map (usually `main`)
-5. Add subdomains:
+3. Enter your domain (e.g., `lovebehaviortranslator.com`)
+4. **Branch**: Select `main`
+5. **Subdomains**:
    - `lovebehaviortranslator.com` → `main`
    - `www.lovebehaviortranslator.com` → `main`
-6. Amplify will either:
-   - automatically create Route 53 records (if your domain is in Route 53), or
-   - show you DNS records to add manually (if your DNS is elsewhere)
-7. Wait for verification + SSL issuance to complete
+6. Click **Configure domain**
 
-At this point your frontend is served at your custom domain.
+Amplify will:
+- Automatically create Route 53 records (if domain is in Route 53), OR
+- Show you DNS records to add manually (if DNS is elsewhere)
 
-### 9.3 (Optional) Add a custom domain to API Gateway (backend)
+7. Wait for **Domain activation** (SSL certificate provisioning, usually 5-15 minutes)
 
-This gives you a stable API hostname like `api.lovebehaviortranslator.com`.
+Your frontend is now live at your custom domain!
 
-#### Step 1: Request a certificate (ACM)
+### 9.3 (Optional) Add Custom Domain to API Gateway
+
+This gives you a stable API URL like `api.lovebehaviortranslator.com`.
+
+#### Step 1: Request ACM Certificate
 
 1. AWS Console → **AWS Certificate Manager (ACM)** (same region as API Gateway)
-2. **Request a certificate** → Public certificate
-3. Domain name: `api.lovebehaviortranslator.com`
-4. Validation method: **DNS validation**
-5. Request
-6. In ACM, create the suggested DNS validation record in Route 53 (or your DNS provider)
-7. Wait until the certificate status is **Issued**
+2. **Request a certificate** → **Request a public certificate**
+3. **Domain name**: `api.lovebehaviortranslator.com`
+4. **Validation method**: **DNS validation**
+5. Click **Request**
+6. In ACM, expand the certificate → **Create record in Route 53** (or add manually to your DNS)
+7. Wait until certificate status is **Issued**
 
-#### Step 2: Create API Gateway custom domain
+#### Step 2: Create API Gateway Custom Domain
 
-1. AWS Console → **API Gateway**
-2. Left nav → **Custom domain names** → **Create**
-3. Domain name: `api.lovebehaviortranslator.com`
-4. Endpoint type: **Regional**
-5. ACM certificate: select the issued certificate
-6. Create domain name
+1. API Gateway → **Custom domain names** → **Create**
+2. **Domain name**: `api.lovebehaviortranslator.com`
+3. **Endpoint type**: **Regional**
+4. **ACM certificate**: Select your issued certificate
+5. Click **Create domain name**
 
-#### Step 3: Map your API stage to the custom domain
+#### Step 3: Map API to Custom Domain
 
-1. In the custom domain details → **API mappings** → **Create**
-2. API: `love-behavior-translator-api`
-3. Stage: `prod`
-4. Path: leave blank (recommended) so the base URL becomes:
-   - `https://api.lovebehaviortranslator.com/analyze`
-   - `https://api.lovebehaviortranslator.com/health`
-5. Create mapping
+1. In custom domain details → **API mappings** → **Create**
+2. **API**: `love-behavior-translator-api`
+3. **Stage**: `prod`
+4. **Path**: Leave blank (so base URL is `https://api.lovebehaviortranslator.com`)
+5. Click **Save**
 
-#### Step 4: Create Route 53 record for the API domain
+#### Step 4: Create Route 53 Record
 
-1. Route 53 → **Hosted zones** → your domain
+1. Route 53 → **Hosted zones** → Your domain
 2. **Create record**
-3. Record name: `api` (for `api.lovebehaviortranslator.com`)
-4. Record type: **A**
-5. Turn on **Alias**
-6. Alias target: select the API Gateway regional domain shown in “Custom domain names”
-7. Create record
+3. **Record name**: `api`
+4. **Record type**: **A - Routes traffic to an IPv4 address**
+5. ✅ **Alias**: Turn ON
+6. **Alias target**: Select the API Gateway regional domain (shown in custom domain details)
+7. Click **Create records**
 
-#### Step 5: Update Amplify environment variable
+#### Step 5: Update Amplify Environment Variable
 
-If you switch to the API custom domain, update Amplify env var:
+1. Amplify → Your app → **Environment variables**
+2. Edit `VITE_API_BASE_URL`:
+   - Change to: `https://api.lovebehaviortranslator.com`
+3. **Save** → This will trigger a new build
 
-- `VITE_API_BASE_URL = https://api.lovebehaviortranslator.com`
-
-Redeploy Amplify (or trigger a new build) so the frontend uses the new API base URL.
-
----
-
-## 10) Recommended hardening (after it works)
-
-- **CORS**: set allowed origin to your Amplify domain instead of `*`
-- **IAM**: replace `Resource: "*"` with exact ARNs:
-  - DynamoDB table ARN
-  - S3 bucket + `bucket/*`
-  - Secrets Manager secret ARN
-- **WAF** (optional): protect API Gateway from abuse
-- **SES**: move out of sandbox if needed
+Your API is now accessible at `https://api.lovebehaviortranslator.com/analyze`
 
 ---
 
-## API request format
+## Step 10: Security Hardening (Recommended)
 
-**POST** `/analyze` body:
+After everything works, tighten security:
+
+### CORS Configuration
+
+1. API Gateway → Your API → Resources
+2. For each resource, **Enable CORS** again
+3. **Access-Control-Allow-Origin**: Replace `*` with your Amplify domain
+   - Example: `https://lovebehaviortranslator.com`
+
+### IAM Policy Tightening
+
+1. IAM → Roles → `LoveBehaviorTranslatorLambdaRole`
+2. Edit the inline policy
+3. Replace `Resource: "*"` with specific ARNs:
+   - DynamoDB: `arn:aws:dynamodb:<region>:<account>:table/LoveBehaviorTranslator`
+   - S3: `arn:aws:s3:::your-bucket-name` and `arn:aws:s3:::your-bucket-name/*`
+   - Secrets Manager: Your secret ARN
+
+### Additional Security (Optional)
+
+- **WAF**: Add AWS WAF to API Gateway to protect against abuse
+- **SES**: Request production access to send emails to any address
+- **CloudWatch Alarms**: Set up alerts for Lambda errors or high API usage
+
+---
+
+## API Reference
+
+### POST `/analyze`
+
+Analyze relationship behavior and get AI-powered insights.
+
+**Request Body:**
 
 ```json
 {
-  "behavior_description": "My partner has been canceling plans...",
+  "behavior_description": "My partner has been canceling plans last minute...",
   "relationship_type": "dating",
   "relationship_length": "6 months",
   "emotional_state": "anxious",
   "analysis_mode": "gentle",
-  "email_to": "name@example.com"
+  "email_to": "user@example.com"
 }
 ```
 
-Modes supported: `gentle`, `analytical`, `brutally_honest`, `light_funny`.
+**Response:**
 
+```json
+{
+  "analysis": "This behavior might indicate...",
+  "emotional_insight": "Your partner may be feeling...",
+  "practical_advice": "Consider having an open conversation...",
+  "reassurance": "Your feelings are valid..."
+}
+```
 
+**Analysis Modes:**
+- `gentle` - Warm, empathetic tone
+- `analytical` - Structured, logical approach
+- `brutally_honest` - Direct truth-telling
+- `light_funny` - Lighthearted, humorous tone
+
+### GET `/health`
+
+Health check endpoint.
+
+**Response:**
+
+```json
+{
+  "status": "healthy"
+}
+```
+
+---
+
+## Troubleshooting
+
+### Amplify Shows "Welcome" Page (App Not Deployed)
+
+If you see the Amplify welcome page instead of your app:
+
+1. **Check Build Status**:
+   - AWS Amplify Console → Your app → **Build history**
+   - Look for failed builds (red X) or in-progress builds
+   - Click on a build to see detailed logs
+
+2. **Common Build Issues**:
+
+   **Issue: "npm ci" fails**
+   - Ensure `package.json` exists in `frontend/` directory
+   - Check that all dependencies are valid
+   - Look for version conflicts in build logs
+
+   **Issue: "Build output not found"**
+   - Verify `amplify.yml` has correct `baseDirectory: frontend/dist`
+   - Ensure Vite build produces `index.html` in `frontend/dist/`
+   - Check build logs for actual output directory
+
+   **Issue: Environment variable not set**
+   - Amplify → App settings → **Environment variables**
+   - Verify `VITE_API_BASE_URL` is set correctly
+   - Must include full URL with `/prod` (e.g., `https://xxxx.execute-api.us-east-1.amazonaws.com/prod`)
+
+3. **Test Build Locally**:
+   ```powershell
+   cd frontend
+   npm install
+   npm run build
+   ```
+   - Check that `frontend/dist/index.html` exists after build
+   - If local build fails, fix those errors first
+
+4. **Redeploy**:
+   - Amplify → **Redeploy this version** (if build succeeded but app doesn't show)
+   - Or trigger a new build by pushing a commit
+
+### Lambda Function Errors
+
+- Check **CloudWatch Logs** in Lambda console
+- Verify all environment variables are set correctly
+- Ensure IAM role has correct permissions
+
+### API Gateway 500 Errors
+
+- Check Lambda function logs
+- Verify Lambda handler is correct
+- Test Lambda function directly in console
+
+### CORS Errors in Browser
+
+- Verify CORS is enabled on API Gateway resources
+- Check that `VITE_API_BASE_URL` matches your actual API URL
+- Ensure allowed origins include your Amplify domain
+- Check browser console for specific CORS error messages
+
+---
+
+## Next Steps
+
+- Customize the AI prompts in `backend/src/LoveBehaviorTranslator.Function/PromptFactory.cs`
+- Add more analysis modes or features
+- Set up monitoring and alerts in CloudWatch
+- Configure custom error pages in Amplify
+
+---
+
+**Need Help?** Check the main `README.md` for architecture details and code structure.

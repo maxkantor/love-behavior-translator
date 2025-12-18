@@ -65,9 +65,37 @@ public sealed class Function
             var path = (request.Path ?? "").TrimEnd('/').ToLowerInvariant();
             var method = (request.HttpMethod ?? "GET").ToUpperInvariant();
 
+            // Health check
             if (method == "GET" && (path.EndsWith("/health") || path == "/health"))
                 return JsonResponse(200, new { status = "healthy" });
 
+            // Admin login (no auth required)
+            if (method == "POST" && (path.EndsWith("/admin/login") || path == "/admin/login"))
+                return await HandleAdminLogin(request, context);
+
+            // Admin routes (require authentication)
+            if (path.StartsWith("/admin"))
+            {
+                if (!AdminSystem.VerifyAdminToken(request, _secrets))
+                    return JsonResponse(401, new { error = "Unauthorized" });
+
+                if (method == "GET" && (path.EndsWith("/admin/users") || path == "/admin/users"))
+                    return await HandleAdminGetUsers(context);
+
+                if (method == "GET" && (path.EndsWith("/admin/dashboard") || path == "/admin/dashboard"))
+                    return await HandleAdminDashboard(context);
+
+                if (method == "PUT" && path.Contains("/admin/users/") && path.EndsWith("/credits"))
+                    return await HandleAdminSetUserCredits(request, context);
+
+                if (method == "POST" && path.Contains("/admin/users/") && path.EndsWith("/credits"))
+                    return await HandleAdminGrantUserCredits(request, context);
+
+                if (method == "PUT" && (path.EndsWith("/admin/me/credits") || path == "/admin/me/credits"))
+                    return await HandleAdminSetMyCredits(request, context);
+            }
+
+            // Analyze endpoint
             if (method == "POST" && (path.EndsWith("/analyze") || path == "/analyze"))
                 return await HandleAnalyze(request, context);
 
@@ -87,6 +115,19 @@ public sealed class Function
     private async Task<APIGatewayProxyResponse> HandleAnalyze(APIGatewayProxyRequest request, ILambdaContext context)
     {
         var ip = GetClientIp(request) ?? "unknown";
+        var userId = CreditSystem.GetUserId(request, ip);
+
+        // Check credits before processing
+        var hasCredits = await CreditSystem.HasCredits(userId, _ddb, context.Logger);
+        if (!hasCredits)
+        {
+            var currentCredits = await CreditSystem.GetUserCredits(userId, _ddb, context.Logger);
+            return JsonResponse(402, new { 
+                error = "Insufficient credits", 
+                detail = $"You have {currentCredits} credits remaining. Please purchase more credits to continue.",
+                credits = currentCredits
+            });
+        }
 
         // Rate limit (DynamoDB-backed)
         var allowed = await RateLimitCheck(ip, context);
@@ -117,6 +158,10 @@ public sealed class Function
         var raw = await CallOpenAi(prompt, openAiKey, context);
         var formatted = PromptFactory.FormatResponse(raw, input.AnalysisMode);
 
+        // Deduct credit after successful analysis
+        await CreditSystem.DeductCredit(userId, _ddb, context.Logger);
+        var remainingCredits = await CreditSystem.GetUserCredits(userId, _ddb, context.Logger);
+
         // Persist artifact to S3 + reference in DynamoDB
         var requestId = Guid.NewGuid().ToString("N");
         var artifactKey = await StoreArtifact(requestId, ip, input, formatted, context);
@@ -128,7 +173,106 @@ public sealed class Function
             await SendEmail(input.EmailTo!, formatted, context);
         }
 
-        return JsonResponse(200, formatted);
+        // Include remaining credits in response
+        return JsonResponse(200, new {
+            analysis = formatted.Analysis,
+            emotional_insight = formatted.EmotionalInsight,
+            practical_advice = formatted.PracticalAdvice,
+            reassurance = formatted.Reassurance,
+            mode_used = formatted.ModeUsed,
+            credits_remaining = remainingCredits == -1 ? "unlimited" : remainingCredits.ToString()
+        });
+    }
+
+    private async Task<APIGatewayProxyResponse> HandleAdminLogin(APIGatewayProxyRequest request, ILambdaContext context)
+    {
+        if (string.IsNullOrWhiteSpace(request.Body))
+            return JsonResponse(400, new { error = "Password required" });
+
+        var body = JsonSerializer.Deserialize<Dictionary<string, string>>(request.Body, Json);
+        if (body == null || !body.ContainsKey("password"))
+            return JsonResponse(400, new { error = "Password required" });
+
+        var token = await AdminSystem.LoginAdmin(body["password"], _secrets, context.Logger);
+        if (token == null)
+            return JsonResponse(401, new { error = "Invalid password" });
+
+        return JsonResponse(200, new { token });
+    }
+
+    private async Task<APIGatewayProxyResponse> HandleAdminGetUsers(ILambdaContext context)
+    {
+        var users = await AdminSystem.GetAllUsers(_ddb, context.Logger);
+        return JsonResponse(200, new { users });
+    }
+
+    private async Task<APIGatewayProxyResponse> HandleAdminDashboard(ILambdaContext context)
+    {
+        var summary = await AdminSystem.GetDashboardSummary(_ddb, context.Logger);
+        return JsonResponse(200, summary);
+    }
+
+    private async Task<APIGatewayProxyResponse> HandleAdminSetUserCredits(APIGatewayProxyRequest request, ILambdaContext context)
+    {
+        var pathParts = request.Path?.Split('/') ?? Array.Empty<string>();
+        var userIdIndex = Array.IndexOf(pathParts, "users");
+        if (userIdIndex < 0 || userIdIndex + 1 >= pathParts.Length)
+            return JsonResponse(400, new { error = "Invalid user ID" });
+
+        var userId = pathParts[userIdIndex + 1];
+
+        if (string.IsNullOrWhiteSpace(request.Body))
+            return JsonResponse(400, new { error = "Credits amount required" });
+
+        var body = JsonSerializer.Deserialize<Dictionary<string, object>>(request.Body, Json);
+        if (body == null || !body.ContainsKey("credits"))
+            return JsonResponse(400, new { error = "Credits amount required" });
+
+        var credits = Convert.ToInt32(body["credits"].ToString());
+        await CreditSystem.SetUserCredits(userId, credits, _ddb, context.Logger);
+
+        return JsonResponse(200, new { message = "Credits updated", userId, credits });
+    }
+
+    private async Task<APIGatewayProxyResponse> HandleAdminGrantUserCredits(APIGatewayProxyRequest request, ILambdaContext context)
+    {
+        var pathParts = request.Path?.Split('/') ?? Array.Empty<string>();
+        var userIdIndex = Array.IndexOf(pathParts, "users");
+        if (userIdIndex < 0 || userIdIndex + 1 >= pathParts.Length)
+            return JsonResponse(400, new { error = "Invalid user ID" });
+
+        var userId = pathParts[userIdIndex + 1];
+
+        if (string.IsNullOrWhiteSpace(request.Body))
+            return JsonResponse(400, new { error = "Credits amount required" });
+
+        var body = JsonSerializer.Deserialize<Dictionary<string, object>>(request.Body, Json);
+        if (body == null || !body.ContainsKey("credits"))
+            return JsonResponse(400, new { error = "Credits amount required" });
+
+        var creditsToAdd = Convert.ToInt32(body["credits"].ToString());
+        await CreditSystem.GrantCredits(userId, creditsToAdd, _ddb, context.Logger);
+
+        var newBalance = await CreditSystem.GetUserCredits(userId, _ddb, context.Logger);
+        return JsonResponse(200, new { message = "Credits granted", userId, creditsAdded = creditsToAdd, newBalance });
+    }
+
+    private async Task<APIGatewayProxyResponse> HandleAdminSetMyCredits(APIGatewayProxyRequest request, ILambdaContext context)
+    {
+        // Admin's userId is hardcoded or from token (for now, use "admin")
+        const string adminUserId = "admin";
+
+        if (string.IsNullOrWhiteSpace(request.Body))
+            return JsonResponse(400, new { error = "Credits amount required" });
+
+        var body = JsonSerializer.Deserialize<Dictionary<string, object>>(request.Body, Json);
+        if (body == null || !body.ContainsKey("credits"))
+            return JsonResponse(400, new { error = "Credits amount required" });
+
+        var credits = Convert.ToInt32(body["credits"].ToString());
+        await CreditSystem.SetUserCredits(adminUserId, credits, _ddb, context.Logger);
+
+        return JsonResponse(200, new { message = "Your credits updated", credits });
     }
 
     private async Task<string> GetOpenAiApiKey()

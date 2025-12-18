@@ -12,3 +12,4 @@ C:\Apps\LoveBehaviorTranslator\backend\src\LoveBehaviorTranslator.Function\obj\R
 C:\Apps\LoveBehaviorTranslator\backend\src\LoveBehaviorTranslator.Function\obj\Release\net8.0\LoveBehaviorTranslator.Function.pdb
 C:\Apps\LoveBehaviorTranslator\backend\src\LoveBehaviorTranslator.Function\obj\Release\net8.0\LoveBehaviorTranslator.Function.genruntimeconfig.cache
 C:\Apps\LoveBehaviorTranslator\backend\src\LoveBehaviorTranslator.Function\obj\Release\net8.0\ref\LoveBehaviorTranslator.Function.dll
+C:\Apps\LoveBehaviorTranslator\backend\src\LoveBehaviorTranslator.Function\obj\Release\net8.0\LoveBehaviorTranslator.Function.sourcelink.json
