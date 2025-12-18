@@ -10,12 +10,30 @@ export function CreditModal({ isOpen, onClose, currentCredits }: CreditModalProp
   if (!isOpen) return null;
 
   const creditPacks = [
-    { credits: 10, price: 4.99, popular: false },
-    { credits: 25, price: 9.99, popular: true },
-    { credits: 50, price: 16.99, popular: false },
-    { credits: 100, price: 29.99, popular: false },
-    { credits: 250, price: 69.99, popular: false },
-    { credits: 500, price: 119.99, popular: false },
+    { 
+      name: 'Starter Pack', 
+      credits: 20, 
+      price: 4.99, 
+      perCredit: 0.249, 
+      description: 'Perfect for occasional use',
+      popular: false 
+    },
+    { 
+      name: 'Pro Pack', 
+      credits: 50, 
+      price: 9.99, 
+      perCredit: 0.200, 
+      description: 'Best value for regular users',
+      popular: true 
+    },
+    { 
+      name: 'Ultra Pack', 
+      credits: 120, 
+      price: 19.99, 
+      perCredit: 0.167, 
+      description: 'For power users',
+      popular: false 
+    },
   ];
 
   function handlePurchase(pack: typeof creditPacks[0]) {
@@ -26,48 +44,84 @@ export function CreditModal({ isOpen, onClose, currentCredits }: CreditModalProp
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-header">
-          <h2>💰 Buy Credits</h2>
-          <button className="modal-close" onClick={onClose}>×</button>
-        </div>
-        
-        <div className="modal-body">
-          <p className="current-credits-display">
-            Your current balance: <strong>{currentCredits === null ? '...' : currentCredits === -1 ? 'Unlimited' : `${currentCredits} credits`}</strong>
+      <div className="credit-modal-content" onClick={(e) => e.stopPropagation()}>
+        <div className="credit-modal-header">
+          <h1>Buy Credits</h1>
+          <p className="credit-subtitle">
+            Purchase credits to continue analyzing relationship behaviors after your free searches are used up!
           </p>
+        </div>
 
-          <div className="credit-packs">
+        <div className="benefits-section">
+          <div className="benefit-card">
+            <div className="benefit-icon">🎁</div>
+            <div className="benefit-text">
+              <strong>5 Free Searches</strong>
+              <span>Start with 5 free translations - no credit card required.</span>
+            </div>
+          </div>
+          <div className="benefit-card">
+            <div className="benefit-icon">🐷</div>
+            <div className="benefit-text">
+              <strong>Credits Never Expire</strong>
+              <span>Use your credits whenever you need them.</span>
+            </div>
+          </div>
+          <div className="benefit-card">
+            <div className="benefit-icon">👑</div>
+            <div className="benefit-text">
+              <strong>Same Quality Analysis</strong>
+              <span>All translations use the same advanced AI analysis.</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="packs-section">
+          <h2 className="packs-title">Choose Your Credit Pack</h2>
+          <div className="packs-grid">
             {creditPacks.map((pack) => (
-              <div key={pack.credits} className={`credit-pack ${pack.popular ? 'popular' : ''}`}>
-                {pack.popular && <div className="popular-badge">Most Popular</div>}
-                <div className="pack-credits">{pack.credits} Credits</div>
-                <div className="pack-price">${pack.price}</div>
-                <div className="pack-per-credit">
-                  ${(pack.price / pack.credits).toFixed(2)} per credit
+              <div key={pack.name} className={`pack-card ${pack.popular ? 'popular-pack' : ''}`}>
+                {pack.popular && (
+                  <div className="popular-badge-top">
+                    <span className="crown-icon">👑</span>
+                    Most Popular
+                  </div>
+                )}
+                <h3 className="pack-name">{pack.name}</h3>
+                <div className="pack-price">
+                  ${pack.price}
+                  <span className="price-label">one-time</span>
                 </div>
+                <div className="pack-credits-box">
+                  <span className="coin-icon">🪙</span>
+                  <span className="coin-icon">🪙</span>
+                  <span className="credits-amount">{pack.credits} Credits</span>
+                </div>
+                <p className="pack-description">{pack.description}</p>
+                <div className="pack-per-credit">${pack.perCredit.toFixed(3)} per credit</div>
                 <button
-                  className="pack-buy-btn"
+                  className={`pack-button ${pack.popular ? 'popular-button' : ''}`}
                   onClick={() => handlePurchase(pack)}
                 >
-                  Buy Now
+                  <span className="check-icon">✓</span>
+                  Get {pack.name}
                 </button>
               </div>
             ))}
           </div>
+        </div>
 
-          <div className="credit-info">
-            <p>💡 <strong>How it works:</strong></p>
-            <ul>
-              <li>1 credit = 1 behavior analysis</li>
-              <li>Credits never expire</li>
-              <li>Secure payment via Stripe</li>
-              <li>Instant credit delivery</li>
-            </ul>
+        <div className="credit-footer">
+          <div className="secure-payment">
+            <span className="lock-icon">🔒</span>
+            Secure payment powered by Stripe
           </div>
+          <button className="back-button" onClick={onClose}>
+            <span className="back-icon">↻</span>
+            Back to Translator
+          </button>
         </div>
       </div>
     </div>
   );
 }
-

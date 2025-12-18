@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 type HelpModalProps = {
   isOpen: boolean;
@@ -6,79 +6,96 @@ type HelpModalProps = {
 };
 
 export function HelpModal({ isOpen, onClose }: HelpModalProps) {
+  const [email, setEmail] = useState('');
+  const [subject, setSubject] = useState('');
+  const [message, setMessage] = useState('');
+
   if (!isOpen) return null;
 
-  const faqs = [
-    {
-      question: "How does the AI analysis work?",
-      answer: "Our AI analyzes the relationship behavior you describe and provides evidence-based insights, emotional understanding, practical advice, and gentle reassurance. It's designed to help you understand patterns and communicate better."
-    },
-    {
-      question: "What analysis styles are available?",
-      answer: "We offer four analysis styles: Gentle (compassionate and supportive), Analytical (fact-based and structured), Brutally Honest (direct and unfiltered), and Light & Funny (uplifting with humor)."
-    },
-    {
-      question: "How do credits work?",
-      answer: "Each behavior analysis costs 1 credit. New users receive 5 free credits to get started. You can purchase additional credits anytime. Credits never expire."
-    },
-    {
-      question: "Is this professional therapy?",
-      answer: "No. This app provides general relationship insights and is not professional therapy or counseling. For serious relationship issues, please consult a licensed therapist or counselor."
-    },
-    {
-      question: "Can I get a refund?",
-      answer: "If you're not satisfied with your analysis, please contact support. We offer refunds for unused credits within 30 days of purchase."
-    },
-    {
-      question: "How do I contact support?",
-      answer: "You can reach our support team by clicking the 'Need Help?' button or emailing support@lovebehaviortranslator.com. We typically respond within 24 hours."
-    }
-  ];
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    // TODO: Send to backend support endpoint
+    alert('Support message sent! (Backend integration coming soon)');
+    setEmail('');
+    setSubject('');
+    setMessage('');
+    onClose();
+  }
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content help-modal" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-header">
-          <h2>❓ Need Help?</h2>
-          <button className="modal-close" onClick={onClose}>×</button>
+      <div className="support-modal-content" onClick={(e) => e.stopPropagation()}>
+        <div className="support-modal-header">
+          <div className="headset-icon">🎧</div>
+          <h1>Contact Support</h1>
         </div>
-        
-        <div className="modal-body">
-          <div className="help-sections">
-            <section className="help-section">
-              <h3>Frequently Asked Questions</h3>
-              <div className="faq-list">
-                {faqs.map((faq, index) => (
-                  <div key={index} className="faq-item">
-                    <div className="faq-question">{faq.question}</div>
-                    <div className="faq-answer">{faq.answer}</div>
-                  </div>
-                ))}
-              </div>
-            </section>
 
-            <section className="help-section">
-              <h3>Contact Support</h3>
-              <div className="contact-info">
-                <p>📧 <strong>Email:</strong> support@lovebehaviortranslator.com</p>
-                <p>⏰ <strong>Response time:</strong> Within 24 hours</p>
-                <p>💬 <strong>Support hours:</strong> Monday - Friday, 9 AM - 5 PM EST</p>
-              </div>
-            </section>
+        <form className="support-form" onSubmit={handleSubmit}>
+          <div className="form-field">
+            <label>
+              <span className="field-icon">✉</span>
+              Email <span className="required">*</span>
+            </label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="your@email.com"
+              required
+              className="support-input"
+            />
+          </div>
 
-            <section className="help-section">
-              <h3>Quick Tips</h3>
-              <ul className="tips-list">
-                <li>Be specific when describing behavior - include context and examples</li>
-                <li>Try different analysis styles to get varied perspectives</li>
-                <li>Use the quick action buttons for common scenarios</li>
-                <li>Remember: This is a tool for insight, not a replacement for professional help</li>
-              </ul>
-            </section>
+          <div className="form-field">
+            <label>
+              Subject <span className="required">*</span>
+            </label>
+            <input
+              type="text"
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+              placeholder="What's this about?"
+              required
+              className="support-input"
+            />
+          </div>
+
+          <div className="form-field">
+            <label>
+              Message <span className="required">*</span>
+            </label>
+            <textarea
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              placeholder="Describe your question or issue..."
+              rows={6}
+              required
+              className="support-textarea"
+            />
+          </div>
+
+          <button type="submit" className="send-message-button">
+            <span className="envelope-icon">✉</span>
+            Send Message
+          </button>
+        </form>
+
+        <div className="response-times-box">
+          <div className="response-times-title">Response Times:</div>
+          <div className="response-time-item">
+            <span className="premium-icon">👑</span>
+            <strong>Premium:</strong> Within 24 hours
+          </div>
+          <div className="response-time-item">
+            <strong>Free:</strong> Within 48 hours
           </div>
         </div>
+
+        <button className="back-button support-back" onClick={onClose}>
+          <span className="heart-icon-back">💕</span>
+          Back to Translator
+        </button>
       </div>
     </div>
   );
 }
-
