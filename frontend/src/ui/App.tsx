@@ -41,6 +41,8 @@ export function App() {
   const [emotionalState, setEmotionalState] = useState<EmotionalState | ''>('');
   const [mode, setMode] = useState<AnalysisMode>('gentle');
   const [emailTo, setEmailTo] = useState('');
+  const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [newsletterSubmitted, setNewsletterSubmitted] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -137,6 +139,14 @@ export function App() {
 
   function handleQuickAction(text: string) {
     setBehavior(text);
+  }
+
+  function handleNewsletterSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    // TODO: Send to backend/newsletter service
+    setNewsletterSubmitted(true);
+    setNewsletterEmail('');
+    setTimeout(() => setNewsletterSubmitted(false), 3000);
   }
 
   const displayCredits = credits === null ? '...' : credits === -1 ? 'Unlimited' : credits.toString();
@@ -420,28 +430,97 @@ export function App() {
       </main>
 
       <footer className="app-footer">
-        <div className="footer-buttons">
-          <button 
-            className="footer-btn buy-credits"
-            onClick={() => setShowCreditModal(true)}
-          >
-            💡 Unlock Clarity
-          </button>
-          <button 
-            className="footer-btn need-help"
-            onClick={() => setShowHelpModal(true)}
-          >
-            ❓ Need Help?
-          </button>
+        <div className="footer-content">
+          <div className="footer-section">
+            <h3 className="footer-title">Start with 5 Free Analysis</h3>
+            <p className="footer-text">
+              Get 5 free deep relationship readings to understand what's really happening in your relationship. No credit card required.
+            </p>
+          </div>
+
+          <div className="footer-section">
+            <h3 className="footer-title">Popular Relationship Questions</h3>
+            <ul className="footer-links-list">
+              <li><button type="button" onClick={() => handleQuickAction("My partner has been pulling away. They used to text me all the time, but now I'm always the one initiating.")}>Is my partner pulling away?</button></li>
+              <li><button type="button" onClick={() => handleQuickAction("I notice a pattern where I get anxious when my partner needs space, but they seem to pull away more when I try to get closer.")}>Avoidant vs anxious attachment</button></li>
+              <li><button type="button" onClick={() => handleQuickAction("I'm worried my partner is losing interest. They don't make plans anymore and our conversations feel surface-level.")}>Are they losing interest?</button></li>
+              <li><button type="button" onClick={() => handleQuickAction("I'm at a crossroads in my relationship. Part of me wants to stay and work through our issues, but another part wonders if I'm wasting my time.")}>Should I stay or leave?</button></li>
+            </ul>
+          </div>
+
+          <div className="footer-section">
+            <h3 className="footer-title">What This AI Can & Can't Do</h3>
+            <div className="can-cannot">
+              <div className="can-item">
+                <span className="check-icon-green">✓</span>
+                <span>Spot relationship patterns you might miss</span>
+              </div>
+              <div className="can-item">
+                <span className="check-icon-green">✓</span>
+                <span>Provide emotional insights and validation</span>
+              </div>
+              <div className="can-item">
+                <span className="check-icon-green">✓</span>
+                <span>Offer practical communication advice</span>
+              </div>
+              <div className="cannot-item">
+                <span className="x-icon">✗</span>
+                <span>Replace professional therapy or counseling</span>
+              </div>
+              <div className="cannot-item">
+                <span className="x-icon">✗</span>
+                <span>Diagnose mental health conditions</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="footer-section newsletter-section">
+            <h3 className="footer-title">Get Weekly Relationship Insights (Free)</h3>
+            <p className="footer-text">Join thousands getting clarity on their relationships every week.</p>
+            <form className="newsletter-form" onSubmit={handleNewsletterSubmit}>
+              <input
+                type="email"
+                value={newsletterEmail}
+                onChange={(e) => setNewsletterEmail(e.target.value)}
+                placeholder="your@email.com"
+                required
+                className="newsletter-input"
+              />
+              <button type="submit" className="newsletter-button">
+                Subscribe
+              </button>
+            </form>
+            {newsletterSubmitted && (
+              <div className="newsletter-success">✓ Thanks! Check your email to confirm.</div>
+            )}
+            <p className="newsletter-privacy">We respect your privacy. Unsubscribe anytime.</p>
+          </div>
         </div>
-        <div className="footer-links">
-          <Link to="/admin/login" className="admin-link-footer">Admin</Link>
+
+        <div className="footer-bottom">
+          <div className="footer-buttons">
+            <button 
+              className="footer-btn buy-credits"
+              onClick={() => setShowCreditModal(true)}
+            >
+              💡 Unlock Clarity
+            </button>
+            <button 
+              className="footer-btn need-help"
+              onClick={() => setShowHelpModal(true)}
+            >
+              ❓ Need Help?
+            </button>
+          </div>
+          <div className="footer-links">
+            <Link to="/admin/login" className="admin-link-footer">Admin</Link>
+          </div>
+          <p className="copyright">© 2025 Love Behavior Translator. All rights reserved.</p>
+          <p className="made-with">Made with ❤️ for couples</p>
+          <p className="disclaimer-text">
+            This app provides general relationship insights and is not professional therapy or counseling.
+          </p>
         </div>
-        <p className="copyright">© 2025 Love Behavior Translator. All rights reserved.</p>
-        <p className="made-with">Made with ❤️ for couples</p>
-        <p className="disclaimer-text">
-          This app provides general relationship insights and is not professional therapy or counseling.
-        </p>
       </footer>
 
       <CreditModal
