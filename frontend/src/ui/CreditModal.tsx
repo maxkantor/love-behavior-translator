@@ -46,10 +46,45 @@ export function CreditModal({ isOpen, onClose, currentCredits }: CreditModalProp
     },
   ];
 
-  function handlePurchase(pack: typeof creditPacks[0]) {
-    // TODO: Integrate with Stripe
-    alert(`Stripe integration coming soon! This would unlock ${pack.credits} deep relationship readings for $${pack.price}`);
-    onClose();
+  async function handlePurchase(pack: typeof creditPacks[0]) {
+    try {
+      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL?.replace(/\/+$/, '') || '';
+      if (!apiBaseUrl) {
+        alert('API not configured. Please contact support.');
+        return;
+      }
+
+      const response = await fetch(`${apiBaseUrl}/stripe/create-checkout-session`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          credits: pack.credits,
+          price: pack.price,
+          successUrl: `${window.location.origin}/?payment=success&credits=${pack.credits}`,
+          cancelUrl: `${window.location.origin}/?payment=cancelled`,
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        alert(`Failed to create checkout: ${error.error || 'Unknown error'}`);
+        return;
+      }
+
+      const data = await response.json();
+      
+      // Redirect to Stripe Checkout
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        alert('Failed to get checkout URL');
+      }
+    } catch (error) {
+      console.error('Error creating checkout session:', error);
+      alert('Failed to start checkout. Please try again.');
+    }
   }
 
   return (

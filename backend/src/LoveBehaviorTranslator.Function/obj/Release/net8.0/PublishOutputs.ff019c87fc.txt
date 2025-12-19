@@ -10,3 +10,10 @@ C:\Apps\LoveBehaviorTranslator\backend\dist\publish\AWSSDK.DynamoDBv2.dll
 C:\Apps\LoveBehaviorTranslator\backend\dist\publish\AWSSDK.S3.dll
 C:\Apps\LoveBehaviorTranslator\backend\dist\publish\AWSSDK.SecretsManager.dll
 C:\Apps\LoveBehaviorTranslator\backend\dist\publish\AWSSDK.SimpleEmail.dll
+C:\Apps\LoveBehaviorTranslator\backend\dist\publish\Newtonsoft.Json.dll
+C:\Apps\LoveBehaviorTranslator\backend\dist\publish\Stripe.net.dll
+C:\Apps\LoveBehaviorTranslator\backend\dist\publish\System.Configuration.ConfigurationManager.dll
+C:\Apps\LoveBehaviorTranslator\backend\dist\publish\System.Diagnostics.EventLog.dll
+C:\Apps\LoveBehaviorTranslator\backend\dist\publish\System.Security.Cryptography.ProtectedData.dll
+C:\Apps\LoveBehaviorTranslator\backend\dist\publish\runtimes\win\lib\net8.0\System.Diagnostics.EventLog.Messages.dll
+C:\Apps\LoveBehaviorTranslator\backend\dist\publish\runtimes\win\lib\net8.0\System.Diagnostics.EventLog.dll

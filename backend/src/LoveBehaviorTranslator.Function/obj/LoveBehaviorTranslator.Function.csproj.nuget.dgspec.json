@@ -78,6 +78,10 @@
             "Amazon.Lambda.Serialization.SystemTextJson": {
               "target": "Package",
               "version": "[2.4.0, )"
+            },
+            "Stripe.net": {
+              "target": "Package",
+              "version": "[47.0.0, )"
             }
           },
           "imports": [

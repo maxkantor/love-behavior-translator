@@ -47,6 +47,27 @@ export function App() {
 
   const remaining = 2000 - behavior.length;
 
+  // Handle payment success/cancellation
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const payment = params.get('payment');
+    if (payment === 'success') {
+      const creditsPurchased = params.get('credits');
+      refreshCredits();
+      // Remove payment params from URL
+      window.history.replaceState({}, '', window.location.pathname);
+      if (creditsPurchased) {
+        // Show success message (optional)
+        setTimeout(() => {
+          alert(`Payment successful! ${creditsPurchased} credits have been added to your account.`);
+        }, 500);
+      }
+    } else if (payment === 'cancelled') {
+      // Remove payment params from URL
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  }, [refreshCredits]);
+
   // Note: refreshCredits is already called in CreditContext on mount
   // This is just for periodic refresh
 

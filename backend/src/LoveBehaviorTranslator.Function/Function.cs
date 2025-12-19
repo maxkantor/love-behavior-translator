@@ -11,6 +11,8 @@ using Amazon.SecretsManager;
 using Amazon.SecretsManager.Model;
 using Amazon.SimpleEmail;
 using Amazon.SimpleEmail.Model;
+using Stripe;
+using Stripe.Checkout;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly: Amazon.Lambda.Core.LambdaSerializer(typeof(Amazon.Lambda.Serialization.SystemTextJson.DefaultLambdaJsonSerializer))]
@@ -37,6 +39,7 @@ public sealed class Function
     private readonly int _rateLimitPerMinute;
     private readonly int _rateLimitBurst;
     private readonly string _sesFromEmail;
+    private readonly string _stripeSecretKey;
 
     public Function()
     {
@@ -56,6 +59,13 @@ public sealed class Function
         _rateLimitPerMinute = int.TryParse(Environment.GetEnvironmentVariable("RATE_LIMIT_PER_MINUTE"), out var rpm) ? rpm : 10;
         _rateLimitBurst = int.TryParse(Environment.GetEnvironmentVariable("RATE_LIMIT_BURST"), out var burst) ? burst : 5;
         _sesFromEmail = Environment.GetEnvironmentVariable("SES_FROM_EMAIL") ?? "";
+        _stripeSecretKey = Environment.GetEnvironmentVariable("STRIPE_SECRET_KEY") ?? "";
+        
+        // Initialize Stripe if key is provided
+        if (!string.IsNullOrWhiteSpace(_stripeSecretKey))
+        {
+            StripeConfiguration.ApiKey = _stripeSecretKey;
+        }
     }
 
     public async Task<APIGatewayProxyResponse> FunctionHandler(APIGatewayProxyRequest request, ILambdaContext context)
@@ -140,6 +150,14 @@ public sealed class Function
             // Analyze endpoint
             if (method == "POST" && (path.EndsWith("/analyze") || path == "/analyze"))
                 return await HandleAnalyze(request, context);
+
+            // Stripe checkout session creation
+            if (method == "POST" && (path.EndsWith("/stripe/create-checkout-session") || path == "/stripe/create-checkout-session"))
+                return await HandleCreateCheckoutSession(request, context);
+
+            // Stripe webhook
+            if (method == "POST" && (path.EndsWith("/stripe/webhook") || path == "/stripe/webhook"))
+                return await HandleStripeWebhook(request, context);
 
             return JsonResponse(404, new { error = "Not found" });
         }
@@ -828,6 +846,149 @@ Reassurance:
         catch (Exception ex)
         {
             context.Logger.LogError($"SES send failed: {ex}");
+        }
+    }
+
+    private async Task<APIGatewayProxyResponse> HandleCreateCheckoutSession(APIGatewayProxyRequest request, ILambdaContext context)
+    {
+        if (string.IsNullOrWhiteSpace(_stripeSecretKey))
+            return JsonResponse(500, new { error = "Stripe not configured" });
+
+        if (string.IsNullOrWhiteSpace(request.Body))
+            return JsonResponse(400, new { error = "Request body required" });
+
+        CreateCheckoutSessionRequest? input;
+        try
+        {
+            input = JsonSerializer.Deserialize<CreateCheckoutSessionRequest>(request.Body, Json);
+        }
+        catch
+        {
+            return JsonResponse(400, new { error = "Invalid JSON body" });
+        }
+
+        if (input == null || input.Credits <= 0 || input.Price <= 0)
+            return JsonResponse(400, new { error = "Invalid request: credits and price required" });
+
+        var ip = GetClientIp(request) ?? "unknown";
+        var userId = CreditSystem.GetUserId(request, ip);
+
+        try
+        {
+            var options = new SessionCreateOptions
+            {
+                PaymentMethodTypes = new List<string> { "card" },
+                LineItems = new List<SessionLineItemOptions>
+                {
+                    new SessionLineItemOptions
+                    {
+                        PriceData = new SessionLineItemPriceDataOptions
+                        {
+                            Currency = "usd",
+                            ProductData = new SessionLineItemPriceDataProductDataOptions
+                            {
+                                Name = $"{input.Credits} Deep Relationship Readings",
+                                Description = "Get clarity on your relationship with AI-powered behavioral analysis"
+                            },
+                            UnitAmount = (long)(input.Price * 100) // Convert to cents
+                        },
+                        Quantity = 1
+                    }
+                },
+                Mode = "payment",
+                SuccessUrl = input.SuccessUrl ?? "https://lovebehaviortranslator.com/?payment=success",
+                CancelUrl = input.CancelUrl ?? "https://lovebehaviortranslator.com/?payment=cancelled",
+                Metadata = new Dictionary<string, string>
+                {
+                    ["userId"] = userId,
+                    ["credits"] = input.Credits.ToString(),
+                    ["price"] = input.Price.ToString("F2")
+                },
+                CustomerEmail = input.Email // Optional: pre-fill email
+            };
+
+            var service = new SessionService();
+            var session = await service.CreateAsync(options);
+
+            return JsonResponse(200, new { sessionId = session.Id, url = session.Url });
+        }
+        catch (StripeException ex)
+        {
+            context.Logger.LogError($"Stripe error creating checkout session: {ex}");
+            return JsonResponse(500, new { error = $"Stripe error: {ex.Message}" });
+        }
+        catch (Exception ex)
+        {
+            context.Logger.LogError($"Error creating checkout session: {ex}");
+            return JsonResponse(500, new { error = "Failed to create checkout session" });
+        }
+    }
+
+    private async Task<APIGatewayProxyResponse> HandleStripeWebhook(APIGatewayProxyRequest request, ILambdaContext context)
+    {
+        if (string.IsNullOrWhiteSpace(_stripeSecretKey))
+            return JsonResponse(500, new { error = "Stripe not configured" });
+
+        var webhookSecret = Environment.GetEnvironmentVariable("STRIPE_WEBHOOK_SECRET") ?? "";
+        if (string.IsNullOrWhiteSpace(webhookSecret))
+        {
+            context.Logger.LogWarning("STRIPE_WEBHOOK_SECRET not set; webhook verification skipped");
+        }
+
+        var body = request.Body ?? "";
+        var signature = request.Headers?.ContainsKey("stripe-signature") == true 
+            ? request.Headers["stripe-signature"] 
+            : null;
+
+        if (string.IsNullOrWhiteSpace(signature))
+            return JsonResponse(400, new { error = "Missing stripe-signature header" });
+
+        try
+        {
+            Event stripeEvent;
+            if (!string.IsNullOrWhiteSpace(webhookSecret))
+            {
+                stripeEvent = EventUtility.ConstructEvent(body, signature, webhookSecret);
+            }
+            else
+            {
+                // In development, parse without verification (not recommended for production)
+                stripeEvent = JsonSerializer.Deserialize<Event>(body, Json) ?? throw new Exception("Failed to parse event");
+            }
+
+            // Handle the event
+            if (stripeEvent.Type == "checkout.session.completed")
+            {
+                var session = stripeEvent.Data.Object as Session;
+                if (session?.Metadata != null && session.Metadata.ContainsKey("userId") && session.Metadata.ContainsKey("credits"))
+                {
+                    var userId = session.Metadata["userId"];
+                    var credits = int.Parse(session.Metadata["credits"]);
+                    var amountPaid = session.Metadata.ContainsKey("price") 
+                        ? decimal.Parse(session.Metadata["price"]) 
+                        : (decimal?)null;
+
+                    // Grant credits to user
+                    await CreditSystem.GrantCredits(userId, credits, _ddb, context.Logger);
+                    
+                    // Notify admin
+                    await CreditSystem.NotifyCreditPurchase(userId, credits, amountPaid, _ddb, _ses, _sesFromEmail, context.Logger);
+                    
+                    context.Logger.LogInformation($"Credits granted: {credits} to user {userId} from Stripe payment");
+                }
+            }
+
+            return JsonResponse(200, new { received = true });
+        }
+        catch (StripeException ex)
+        {
+            context.Logger.LogError($"Stripe webhook error: {ex}");
+            return JsonResponse(400, new { error = $"Webhook error: {ex.Message}" });
+        }
+        catch (Exception ex)
+        {
+            context.Logger.LogError($"Error processing webhook: {ex}");
+            return JsonResponse(500, new { error = "Failed to process webhook" });
         }
     }
 

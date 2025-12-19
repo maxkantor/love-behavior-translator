@@ -410,6 +410,178 @@ SES is required for:
 
 ### 4.7 Best Practices
 
+---
+
+## Step 5: Configure Stripe for Payments
+
+Stripe is required for users to purchase credits through the "Unlock Clarity" feature.
+
+### 5.1 Create Stripe Account
+
+1. Go to [Stripe Dashboard](https://dashboard.stripe.com/register)
+2. Sign up with your email address
+3. Complete business verification:
+   - Business type and details
+   - Business address
+   - Bank account information (for payouts)
+4. Verify your email address
+
+### 5.2 Get Stripe API Keys
+
+1. In Stripe Dashboard → **Developers** → **API keys**
+2. You'll see two sets of keys:
+   - **Test mode keys** (for development/testing)
+   - **Live mode keys** (for production)
+3. Copy your **Secret key** (starts with `sk_test_` for test mode or `sk_live_` for live mode)
+4. Copy your **Publishable key** (starts with `pk_test_` or `pk_live_`) - you'll need this later for frontend if needed
+
+> **Important**: 
+> - Use **test mode** keys during development
+> - Switch to **live mode** keys only when ready for production
+> - Never commit API keys to git
+
+### 5.3 Store Stripe Secret Key in Secrets Manager
+
+1. AWS Console → **Secrets Manager**
+2. **Store a new secret** (or edit existing `love-behavior-translator/app-secrets`)
+3. **Secret type**: **Other type of secret** → **Plaintext** or **Key/value**
+4. If using existing secret, add a new key:
+   - **Key**: `STRIPE_SECRET_KEY`
+   - **Value**: Your Stripe secret key (e.g., `sk_test_...` or `sk_live_...`)
+5. If creating new secret:
+   - **Secret name**: `love-behavior-translator/app-secrets`
+   - **Value**: JSON format:
+     ```json
+     {
+       "OPENAI_API_KEY": "sk-...",
+       "ADMIN_PASSWORD": "your-admin-password",
+       "STRIPE_SECRET_KEY": "sk_test_..."
+     }
+     ```
+6. Click **Store** (or **Save**)
+
+### 5.4 Configure Lambda Environment Variables
+
+1. AWS Console → **Lambda** → `LoveBehaviorTranslatorFunction`
+2. **Configuration** → **Environment variables** → **Edit**
+3. Add:
+   - **Key**: `STRIPE_SECRET_KEY`
+   - **Value**: Your Stripe secret key directly (e.g., `sk_test_...`)
+   - **OR** use the secret ARN if you prefer (see below)
+4. Click **Save**
+
+> **Alternative**: You can also read from Secrets Manager in code, but environment variables are simpler for Lambda.
+
+### 5.5 Set Up Stripe Webhook
+
+**For Production:**
+
+1. In Stripe Dashboard → **Developers** → **Webhooks**
+2. Click **Add endpoint**
+3. **Endpoint URL**: `https://your-api-gateway-url.amazonaws.com/prod/stripe/webhook`
+   - Replace with your actual API Gateway URL
+4. **Description**: "Love Behavior Translator - Credit Purchase Webhook"
+5. **Events to send**: Select `checkout.session.completed`
+6. Click **Add endpoint**
+7. **Copy the Signing secret** (starts with `whsec_...`)
+8. Add to Lambda environment variable:
+   - **Key**: `STRIPE_WEBHOOK_SECRET`
+   - **Value**: The webhook signing secret
+
+**For Testing (Local Development):**
+
+1. Install Stripe CLI: `stripe listen --forward-to http://localhost:3000/stripe/webhook`
+2. Use the webhook secret provided by the CLI
+
+### 5.6 Create API Gateway Endpoints for Stripe
+
+#### 5.6.1 Create `/stripe/create-checkout-session` Endpoint
+
+1. API Gateway → Your API → **Resources**
+2. **Create resource**
+3. **Resource name**: `stripe`
+4. **Resource path**: `/stripe`
+5. Click **Create resource**
+6. Select `/stripe` → **Create resource**
+7. **Resource name**: `create-checkout-session`
+8. **Resource path**: `/create-checkout-session`
+9. Click **Create resource**
+10. Select `/stripe/create-checkout-session` → **Create method** → `POST`
+11. **Integration type**: **Lambda Function**
+12. ✅ Check **Use Lambda Proxy integration**
+13. **Lambda Function**: `LoveBehaviorTranslatorFunction`
+14. Click **Save** → **OK**
+
+#### 5.6.2 Create `/stripe/webhook` Endpoint
+
+1. Select `/stripe` resource → **Create resource**
+2. **Resource name**: `webhook`
+3. **Resource path**: `/webhook`
+4. Click **Create resource**
+5. Select `/stripe/webhook` → **Create method** → `POST`
+6. **Integration type**: **Lambda Function**
+7. ✅ Check **Use Lambda Proxy integration**
+8. **Lambda Function**: `LoveBehaviorTranslatorFunction`
+9. Click **Save** → **OK**
+
+> **Important**: The webhook endpoint should **NOT** require authentication. Stripe will sign the requests.
+
+#### 5.6.3 Add OPTIONS Methods for CORS
+
+For both `/stripe/create-checkout-session` and `/stripe/webhook`:
+
+1. Select the resource → **Create method** → `OPTIONS`
+2. **Integration type**: **Lambda Function**
+3. ✅ Check **Use Lambda Proxy integration**
+4. **Lambda Function**: `LoveBehaviorTranslatorFunction`
+5. Click **Save** → **OK**
+
+### 5.7 Test Stripe Integration
+
+1. **Test Mode**: Use test card numbers from [Stripe Testing](https://stripe.com/docs/testing)
+   - Success: `4242 4242 4242 4242`
+   - Decline: `4000 0000 0000 0002`
+2. Go to your website → Click **Unlock Clarity**
+3. Select a credit pack → Click **Get [Pack Name]**
+4. You should be redirected to Stripe Checkout
+5. Use test card: `4242 4242 4242 4242`, any future expiry, any CVC, any ZIP
+6. Complete payment
+7. You should be redirected back with `?payment=success`
+8. Check that credits were added to your account
+9. Check Stripe Dashboard → **Payments** to see the test payment
+
+### 5.8 Go Live with Stripe
+
+When ready for production:
+
+1. Complete Stripe account verification (business details, bank account)
+2. Switch to **Live mode** in Stripe Dashboard
+3. Update Lambda environment variable `STRIPE_SECRET_KEY` with live key (`sk_live_...`)
+4. Update webhook endpoint URL to production API Gateway URL
+5. Update webhook signing secret in Lambda (`STRIPE_WEBHOOK_SECRET`)
+6. Test with a small real payment first
+
+### 5.9 Troubleshooting
+
+**Error: "Stripe not configured"**
+- Solution: Set `STRIPE_SECRET_KEY` in Lambda environment variables
+
+**Error: "Webhook signature verification failed"**
+- Solution: Ensure `STRIPE_WEBHOOK_SECRET` matches the webhook signing secret in Stripe Dashboard
+
+**Credits not added after payment**
+- Check CloudWatch logs for webhook processing errors
+- Verify webhook endpoint is receiving events in Stripe Dashboard
+- Ensure `checkout.session.completed` event is selected in webhook configuration
+
+**Payment succeeds but redirect fails**
+- Check `successUrl` and `cancelUrl` in checkout session creation
+- Ensure URLs are absolute (include `https://`)
+
+---
+
+### 4.7 Best Practices
+
 1. **Use a domain** instead of a single email for better deliverability
 2. **Set up DKIM** signing (automatic with domain verification)
 3. **Monitor sending statistics** in SES Console

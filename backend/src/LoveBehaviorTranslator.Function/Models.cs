@@ -70,6 +70,14 @@ public sealed record BehaviorAnalysisResponse(
     [property: JsonPropertyName("mode_used")] string ModeUsed
 );
 
+public sealed record CreateCheckoutSessionRequest(
+    [property: JsonPropertyName("credits")] int Credits,
+    [property: JsonPropertyName("price")] decimal Price,
+    [property: JsonPropertyName("successUrl")] string? SuccessUrl,
+    [property: JsonPropertyName("cancelUrl")] string? CancelUrl,
+    [property: JsonPropertyName("email")] string? Email
+);
+
 public sealed record ContactRequest(
     [property: JsonPropertyName("email")] string Email,
     [property: JsonPropertyName("subject")] string Subject,
