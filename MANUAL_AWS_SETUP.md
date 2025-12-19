@@ -232,8 +232,10 @@ SES is required for:
    b. **Go to Route 53 Console:**
       - AWS Console → **Route 53** → **Hosted zones**
       - Click on your domain (e.g., `lovebehaviortranslator.com`)
+      - You should see a table with existing DNS records (A, NS, SOA, CNAME, etc.)
    
    c. **Add the TXT record:**
+      - Look for the **"Create record"** button above the records table (top right area)
       - Click **Create record**
       - **Record name**: Enter `_amazonses` (SES will show the full name, but you only need the subdomain part)
       - **Record type**: Select **TXT**
