@@ -126,10 +126,6 @@ public sealed class Function
             if (method == "GET" && (path.EndsWith("/credits") || path == "/credits"))
                 return await HandleGetCredits(request, context);
 
-            // Get user credits endpoint
-            if (method == "GET" && (path.EndsWith("/credits") || path == "/credits"))
-                return await HandleGetCredits(request, context);
-
             // Analyze endpoint
             if (method == "POST" && (path.EndsWith("/analyze") || path == "/analyze"))
                 return await HandleAnalyze(request, context);

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useCredits } from './CreditContext';
 
 type CreditModalProps = {
   isOpen: boolean;
@@ -7,6 +8,15 @@ type CreditModalProps = {
 };
 
 export function CreditModal({ isOpen, onClose, currentCredits }: CreditModalProps) {
+  const { refreshCredits } = useCredits();
+  
+  // Refresh credits when modal opens
+  React.useEffect(() => {
+    if (isOpen) {
+      refreshCredits();
+    }
+  }, [isOpen, refreshCredits]);
+  
   if (!isOpen) return null;
 
   const creditPacks = [

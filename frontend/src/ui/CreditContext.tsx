@@ -24,7 +24,10 @@ export function CreditProvider({ children }: { children: React.ReactNode }) {
   async function refreshCredits() {
     try {
       const apiBaseUrl = import.meta.env.VITE_API_BASE_URL?.replace(/\/+$/, '') || '';
-      if (!apiBaseUrl) return;
+      if (!apiBaseUrl) {
+        console.warn('No API base URL configured, skipping credit refresh');
+        return;
+      }
       
       const resp = await fetch(`${apiBaseUrl}/credits`, {
         method: 'GET',
@@ -36,10 +39,17 @@ export function CreditProvider({ children }: { children: React.ReactNode }) {
       if (resp.ok) {
         const data = await resp.json();
         const creditsValue = data.credits ?? null;
+        console.log('Refreshed credits from server:', creditsValue, 'userId:', userId);
         setCredits(creditsValue);
         if (creditsValue !== null) {
           localStorage.setItem('credits', creditsValue.toString());
+        } else {
+          // If server returns null, clear localStorage too
+          localStorage.removeItem('credits');
         }
+      } else {
+        const errorText = await resp.text();
+        console.error('Failed to refresh credits:', resp.status, errorText);
       }
     } catch (err) {
       console.error('Error refreshing credits:', err);

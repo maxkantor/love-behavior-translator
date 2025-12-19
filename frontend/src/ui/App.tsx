@@ -47,25 +47,18 @@ export function App() {
 
   const remaining = 2000 - behavior.length;
 
-  // Update credits from localStorage on mount, then refresh from server
+  // Refresh credits from server on mount and periodically
   useEffect(() => {
-    const stored = localStorage.getItem('credits');
-    if (stored) {
-      const parsed = parseInt(stored, 10);
-      if (!isNaN(parsed)) {
-        setCredits(parsed);
-      }
-    }
-    // Refresh credits from server on mount
+    // Always refresh from server on mount (don't trust localStorage)
     refreshCredits();
-  }, [setCredits, refreshCredits]);
+  }, [refreshCredits]);
 
   // Refresh credits periodically and on window focus
   useEffect(() => {
-    // Refresh every 30 seconds
+    // Refresh every 10 seconds (more frequent for testing)
     const interval = setInterval(() => {
       refreshCredits();
-    }, 30000);
+    }, 10000);
 
     // Refresh when window gains focus (user comes back to tab)
     const handleFocus = () => {
