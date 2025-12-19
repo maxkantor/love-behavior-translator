@@ -162,13 +162,17 @@ export function App() {
           <p className="tagline">You're probably not imagining it. Get clarity on your partner's behavior in minutes.</p>
           
           <div className="credits-header">
-            <div className="free-analysis-badge">
-              <span className="free-badge-text">Start with 5 Free Analyses</span>
-              <span className="free-badge-subtext">No credit card required</span>
+            <div className="credits-display-pill">
+              <div className="credits-icon-wrapper">
+                <span className="credits-icon">🪙</span>
+                <span className="credits-icon">🪙</span>
+                <span className="credits-icon">🪙</span>
+              </div>
+              <span className="credits-number">{displayCredits}</span>
+              <span className="credits-label">Credits</span>
             </div>
-            <div className="credits-display">
-              <span className="credits-count">{displayCredits} Relationship Insights</span>
-              <span className="credits-explanation">1 Deep Relationship Reading</span>
+            <div className="credits-explanation-text">
+              1 credit = 1 behavior analysis
             </div>
           </div>
         </div>
@@ -215,13 +219,6 @@ export function App() {
         
         {/* Left Sidebar - on purple background */}
         <div className="main-sidebar main-sidebar-left">
-          <div className="sidebar-section">
-            <h3 className="sidebar-title">Start with 5 Free Analysis</h3>
-            <p className="sidebar-text">
-              Get 5 free deep relationship readings to understand what's really happening in your relationship. No credit card required.
-            </p>
-          </div>
-
           <div className="sidebar-section">
             <h3 className="sidebar-title">Popular Relationship Questions</h3>
             <ul className="sidebar-links-list">
@@ -277,7 +274,7 @@ export function App() {
                   <span className="mode-badge">Mode: {result.mode_used}</span>
                   {result.credits_remaining && (
                     <span className="credits-remaining">
-                      Relationship Insights remaining: {result.credits_remaining === 'unlimited' ? 'Unlimited' : result.credits_remaining}
+                      Credits remaining: {result.credits_remaining === 'unlimited' ? 'Unlimited' : result.credits_remaining}
                     </span>
                   )}
                 </div>

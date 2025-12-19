@@ -114,48 +114,56 @@ body {
   margin-top: 6px;
 }
 
-.free-analysis-badge {
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(10px);
+.credits-display-pill {
+  background: var(--yellow);
   border: 2px solid rgba(255, 255, 255, 0.3);
   padding: 12px 24px;
-  border-radius: 30px;
+  border-radius: 50px;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 4px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  gap: 10px;
+  box-shadow: 0 4px 16px rgba(251, 191, 36, 0.3);
+  min-width: 180px;
+  justify-content: center;
 }
 
-.free-badge-text {
+.credits-icon-wrapper {
+  display: flex;
+  align-items: center;
+  gap: -4px;
+  margin-right: 4px;
+}
+
+.credits-icon {
+  font-size: 1.2rem;
+  line-height: 1;
+  margin-left: -6px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.credits-icon:first-child {
+  margin-left: 0;
+}
+
+.credits-number {
+  font-size: 1.4rem;
   font-weight: 700;
-  font-size: 1.05rem;
-  color: white;
+  color: #000;
+  letter-spacing: -0.02em;
 }
 
-.free-badge-subtext {
-  font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.9);
-  font-weight: 400;
-}
-
-.credits-display {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-}
-
-.credits-count {
-  font-size: 0.95rem;
+.credits-label {
+  font-size: 1rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.95);
+  color: #000;
 }
 
-.credits-explanation {
-  font-size: 0.85rem;
-  opacity: 0.85;
-  color: rgba(255, 255, 255, 0.9);
+.credits-explanation-text {
+  margin-top: 8px;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.95);
+  text-align: center;
+  font-weight: 500;
 }
 
 /* Main content wrapper - purple background */
@@ -1310,8 +1318,21 @@ body {
     margin-bottom: 12px;
   }
   
-  .free-analysis-badge {
+  .credits-display-pill {
     padding: 10px 20px;
+    min-width: 160px;
+  }
+  
+  .credits-number {
+    font-size: 1.2rem;
+  }
+  
+  .credits-label {
+    font-size: 0.9rem;
+  }
+  
+  .credits-explanation-text {
+    font-size: 0.85rem;
   }
   
   .app-main {
