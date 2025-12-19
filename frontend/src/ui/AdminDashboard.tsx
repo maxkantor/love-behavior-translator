@@ -177,12 +177,18 @@ export function AdminDashboard() {
         setReplyMessage('');
         alert('Reply sent successfully!');
       } else {
-        const error = await resp.json();
-        alert(`Failed to send reply: ${error.error || 'Unknown error'}`);
+        let errorMessage = 'Unknown error';
+        try {
+          const error = await resp.json();
+          errorMessage = error.error || error.message || 'Unknown error';
+        } catch {
+          errorMessage = `HTTP ${resp.status}: ${resp.statusText}`;
+        }
+        alert(`Failed to send reply: ${errorMessage}`);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error replying to contact:', err);
-      alert('Failed to send reply');
+      alert(`Failed to send reply: ${err?.message || 'Network error'}`);
     } finally {
       setReplying(false);
     }

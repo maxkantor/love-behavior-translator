@@ -527,7 +527,12 @@ public sealed class Function
         catch (Exception ex)
         {
             context.Logger.LogError($"Error replying to contact: {ex}");
-            return JsonResponse(500, new { error = "Failed to send reply" });
+            var errorMessage = ex.Message;
+            if (errorMessage.Contains("SES_FROM_EMAIL"))
+                errorMessage = "Email service not configured. Please set SES_FROM_EMAIL in Lambda environment variables.";
+            else if (errorMessage.Contains("not verified") || errorMessage.Contains("verification"))
+                errorMessage = "Email address not verified in SES. Please verify the sender email in Amazon SES.";
+            return JsonResponse(500, new { error = errorMessage });
         }
     }
 
@@ -612,7 +617,12 @@ Love Behavior Translator Support
         catch (Exception ex)
         {
             context.Logger.LogError($"Failed to send contact reply: {ex}");
-            throw;
+            // Provide more specific error message
+            if (ex.Message.Contains("not verified") || ex.Message.Contains("verification"))
+                throw new Exception("Email address not verified in SES. Please verify the sender email in Amazon SES.");
+            if (ex.Message.Contains("SES_FROM_EMAIL"))
+                throw new Exception("SES_FROM_EMAIL not configured in Lambda environment variables.");
+            throw new Exception($"Email send failed: {ex.Message}");
         }
     }
 
