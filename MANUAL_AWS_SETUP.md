@@ -235,10 +235,11 @@ SES is required for:
       - **Record 3 value**: `def456.dkim.amazonses.com`
       - **Copy each name and value pair**
    
-   > **Tip**: You can also find these records later by:
-   > - Going to SES → **Verified identities** → Click your domain
-   > - Click the **"Authentication"** tab
-   > - Scroll down to see the DNS records if verification is pending
+      > **Important Notes:**
+      > - **If your domain is already verified**: The TXT record might not be visible in SES anymore, but it's already working in Route 53
+      > - **To verify the TXT record exists**: Go to Route 53 → Your hosted zone → Look for a record named `_amazonses` with type `TXT`
+      > - **DKIM records**: These are always visible in the "Publish DNS records" section under DKIM, even after verification
+      > - **If you can't find the TXT record in SES**: It's likely already set up correctly since your domain is verified
    
 8. **Add DNS Records in Route 53:**
    
