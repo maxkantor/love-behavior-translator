@@ -231,6 +231,14 @@ export function App() {
               <li><button type="button" onClick={() => handleQuickAction("I'm at a crossroads in my relationship. Part of me wants to stay and work through our issues, but another part wonders if I'm wasting my time.")}>Should I stay or leave?</button></li>
             </ul>
           </div>
+
+          <div className="sidebar-section how-it-works-sidebar">
+            <h3 className="sidebar-title">How This Works</h3>
+            <p className="sidebar-text">
+              Our AI analyzes your relationship behavior patterns and provides evidence-based insights, not literal translation. 
+              You'll receive likely causes, emotional insights, practical advice, and guidance on when to consult a relationship counselor.
+            </p>
+          </div>
         </div>
 
         {/* Center White Form */}
@@ -354,14 +362,6 @@ export function App() {
                 <p className="cta-microcopy">Takes less than 60 seconds. No judgment. Just clarity.</p>
               </div>
             </form>
-
-            <div className="how-it-works">
-              <h3>How This Works</h3>
-              <p>
-                Our AI analyzes your relationship behavior patterns and provides evidence-based insights, not literal translation. 
-                You'll receive likely causes, emotional insights, practical advice, and guidance on when to consult a relationship counselor.
-              </p>
-            </div>
           </div>
         </div>
 
