@@ -137,6 +137,19 @@ Should return `True`.
 
 > **Note:** This table stores user credit balances and usage statistics for the credit-based monetization system.
 
+### 2.3 Create Contacts Table (For Contact Form)
+
+1. AWS Console → **DynamoDB** → **Tables** → **Create table**
+2. **Table name**: `LoveBehaviorTranslatorContacts`
+3. **Partition key**: `contactId` (String)
+4. **Table settings**: **On-demand** (or provisioned if preferred)
+5. **Additional settings** → **Time to live (TTL)**:
+   - **TTL attribute name**: `ttl`
+   - This will auto-delete contacts after 1 year
+6. Click **Create table**
+
+> **Note:** This table stores contact form submissions. Messages are automatically deleted after 1 year via TTL.
+
 ---
 
 ## Step 3: Create S3 Bucket
