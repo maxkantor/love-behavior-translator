@@ -244,6 +244,46 @@ export function App() {
         {/* Center White Form */}
         <div className="app-main">
           <div className="main-content-center">
+            {result ? (
+              <div className="result-card-inline">
+                <div className="result-header">
+                  <h2>Analysis Results</h2>
+                  <button onClick={onNew} className="new-analysis-btn">New Analysis</button>
+                </div>
+                
+                <div className="result-content-scrollable">
+                  <div className="result-section">
+                    <h3>Analysis</h3>
+                    <p>{result.analysis}</p>
+                  </div>
+
+                  <div className="result-section">
+                    <h3>Emotional Insight</h3>
+                    <p>{result.emotional_insight}</p>
+                  </div>
+
+                  <div className="result-section">
+                    <h3>Practical Advice</h3>
+                    <p>{result.practical_advice}</p>
+                  </div>
+
+                  <div className="result-section">
+                    <h3>Reassurance</h3>
+                    <p>{result.reassurance}</p>
+                  </div>
+                </div>
+
+                <div className="result-footer">
+                  <span className="mode-badge">Mode: {result.mode_used}</span>
+                  {result.credits_remaining && (
+                    <span className="credits-remaining">
+                      Relationship Insights remaining: {result.credits_remaining === 'unlimited' ? 'Unlimited' : result.credits_remaining}
+                    </span>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <>
             <div className="entry-points-section">
               <h3 className="entry-points-title">What's on your mind?</h3>
               
@@ -362,6 +402,8 @@ export function App() {
                 <p className="cta-microcopy">Takes less than 60 seconds. No judgment. Just clarity.</p>
               </div>
             </form>
+            </>
+            )}
           </div>
         </div>
 
@@ -416,44 +458,6 @@ export function App() {
             </div>
           </div>
         </div>
-        
-        {result && (
-          <div className="result-card">
-            <div className="result-header">
-              <h2>Analysis Results</h2>
-              <button onClick={onNew} className="new-analysis-btn">New Analysis</button>
-            </div>
-            
-            <div className="result-section">
-              <h3>Analysis</h3>
-              <p>{result.analysis}</p>
-            </div>
-
-            <div className="result-section">
-              <h3>Emotional Insight</h3>
-              <p>{result.emotional_insight}</p>
-            </div>
-
-            <div className="result-section">
-              <h3>Practical Advice</h3>
-              <p>{result.practical_advice}</p>
-            </div>
-
-            <div className="result-section">
-              <h3>Reassurance</h3>
-              <p>{result.reassurance}</p>
-            </div>
-
-            <div className="result-footer">
-              <span className="mode-badge">Mode: {result.mode_used}</span>
-              {result.credits_remaining && (
-                <span className="credits-remaining">
-                  Relationship Insights remaining: {result.credits_remaining === 'unlimited' ? 'Unlimited' : result.credits_remaining}
-                </span>
-              )}
-            </div>
-          </div>
-        )}
       </main>
 
       <footer className="app-footer">
