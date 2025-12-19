@@ -1770,6 +1770,235 @@ body {
 
 .admin-user-id {
   font-weight: 600;
+}
+
+/* Contact Messages */
+.admin-contacts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.admin-contact-item {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  background: #f9fafb;
+}
+
+.admin-contact-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.admin-contact-email {
+  font-weight: 700;
+  color: var(--text);
+  font-size: 1rem;
+  margin-bottom: 4px;
+}
+
+.admin-contact-subject {
+  font-weight: 600;
+  color: var(--text-soft);
+  font-size: 0.95rem;
+  margin-bottom: 6px;
+}
+
+.admin-contact-meta {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.contact-status {
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+}
+
+.contact-status.new {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.contact-status.replied {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.contact-status.closed {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.admin-reply-btn {
+  background: var(--teal);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.9rem;
+}
+
+.admin-reply-btn:hover {
+  background: var(--teal-dark);
+  transform: translateY(-1px);
+}
+
+.admin-contact-message {
+  background: white;
+  padding: 12px;
+  border-radius: 6px;
+  border-left: 3px solid var(--teal);
+  color: var(--text-soft);
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+/* Admin Reply Modal */
+.admin-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 20px;
+}
+
+.admin-modal-content {
+  background: white;
+  border-radius: 12px;
+  max-width: 700px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  padding: 32px;
+}
+
+.admin-modal-content h2 {
+  margin: 0 0 24px;
+  color: var(--text);
+  font-size: 1.5rem;
+}
+
+.admin-reply-info {
+  background: #f9fafb;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  border-left: 3px solid var(--teal);
+}
+
+.admin-reply-info p {
+  margin: 8px 0;
+  color: var(--text-soft);
+  font-size: 0.95rem;
+}
+
+.admin-reply-info strong {
+  color: var(--text);
+}
+
+.admin-original-message {
+  background: white;
+  padding: 12px;
+  border-radius: 6px;
+  margin-top: 8px;
+  color: var(--text-soft);
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.admin-reply-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.admin-reply-form label {
+  font-weight: 600;
+  color: var(--text);
+  font-size: 0.95rem;
+}
+
+.admin-reply-textarea {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 150px;
+  line-height: 1.6;
+}
+
+.admin-reply-textarea:focus {
+  outline: none;
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+.admin-modal-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+.admin-cancel-btn {
+  background: #f3f4f6;
+  color: var(--text);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.admin-cancel-btn:hover {
+  background: #e5e7eb;
+}
+
+.admin-send-btn {
+  background: var(--teal);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.admin-send-btn:hover:not(:disabled) {
+  background: var(--teal-dark);
+  transform: translateY(-1px);
+}
+
+.admin-send-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
   color: var(--text);
   flex: 1;
 }
@@ -2215,6 +2444,24 @@ body {
 
 .required {
   color: #dc2626;
+}
+
+.field-error {
+  display: block;
+  color: #dc2626;
+  font-size: 0.85rem;
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+.input-error {
+  border-color: #dc2626 !important;
+  background-color: #fef2f2;
+}
+
+.input-error:focus {
+  border-color: #dc2626 !important;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1) !important;
 }
 
 .support-input,

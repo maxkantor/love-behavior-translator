@@ -118,6 +118,12 @@ public sealed class Function
                 if (method == "PUT" && (path.EndsWith("/admin/me/credits") || path == "/admin/me/credits"))
                     return await HandleAdminSetMyCredits(request, context);
 
+                if (method == "GET" && (path.EndsWith("/admin/contacts") || path == "/admin/contacts"))
+                    return await HandleAdminGetContacts(context);
+
+                if (method == "POST" && path.Contains("/admin/contacts/") && path.EndsWith("/reply"))
+                    return await HandleAdminReplyContact(request, context);
+
                 // If we're in /admin but no route matched, return 404
                 return JsonResponse(404, new { error = "Admin endpoint not found" });
             }
@@ -125,6 +131,10 @@ public sealed class Function
             // Get user credits endpoint
             if (method == "GET" && (path.EndsWith("/credits") || path == "/credits"))
                 return await HandleGetCredits(request, context);
+
+            // Contact form endpoint
+            if (method == "POST" && (path.EndsWith("/contact") || path == "/contact"))
+                return await HandleContact(request, context);
 
             // Analyze endpoint
             if (method == "POST" && (path.EndsWith("/analyze") || path == "/analyze"))
@@ -317,6 +327,10 @@ public sealed class Function
         await CreditSystem.GrantCredits(userId, creditsToAdd, _ddb, context.Logger);
 
         var newBalance = await CreditSystem.GetUserCredits(userId, _ddb, context.Logger);
+        
+        // Notify admin of credit grant (treat as purchase notification)
+        await CreditSystem.NotifyCreditPurchase(userId, creditsToAdd, null, _ddb, _ses, _sesFromEmail, context.Logger);
+
         return JsonResponse(200, new { message = "Credits granted", userId, creditsAdded = creditsToAdd, newBalance });
     }
 
@@ -336,6 +350,270 @@ public sealed class Function
         await CreditSystem.SetUserCredits(adminUserId, credits, _ddb, context.Logger);
 
         return JsonResponse(200, new { message = "Your credits updated", credits });
+    }
+
+    private async Task<APIGatewayProxyResponse> HandleContact(APIGatewayProxyRequest request, ILambdaContext context)
+    {
+        if (string.IsNullOrWhiteSpace(request.Body))
+            return JsonResponse(400, new { error = "Request body is required." });
+
+        ContactRequest? input;
+        try
+        {
+            input = JsonSerializer.Deserialize<ContactRequest>(request.Body, Json);
+        }
+        catch
+        {
+            return JsonResponse(400, new { error = "Invalid JSON body." });
+        }
+
+        if (input is null)
+            return JsonResponse(400, new { error = "Invalid request." });
+
+        try
+        {
+            input = input.Validate();
+        }
+        catch (ClientVisibleException ex)
+        {
+            return JsonResponse(ex.StatusCode, new { error = ex.Message });
+        }
+
+        var contactId = Guid.NewGuid().ToString("N");
+        var ip = GetClientIp(request) ?? "unknown";
+        var userId = CreditSystem.GetUserId(request, ip);
+        var timestamp = DateTimeOffset.UtcNow.ToString("O");
+
+        // Store contact message in DynamoDB
+        try
+        {
+            await _ddb.PutItemAsync(new PutItemRequest
+            {
+                TableName = "LoveBehaviorTranslatorContacts",
+                Item = new Dictionary<string, AttributeValue>
+                {
+                    ["contactId"] = new AttributeValue { S = contactId },
+                    ["email"] = new AttributeValue { S = input.Email },
+                    ["subject"] = new AttributeValue { S = input.Subject },
+                    ["message"] = new AttributeValue { S = input.Message },
+                    ["userId"] = new AttributeValue { S = userId },
+                    ["ip"] = new AttributeValue { S = ip },
+                    ["createdAt"] = new AttributeValue { S = timestamp },
+                    ["status"] = new AttributeValue { S = "new" }, // new, replied, closed
+                    ["repliedAt"] = new AttributeValue { S = "" },
+                    ["ttl"] = new AttributeValue { N = ((DateTimeOffset.UtcNow.ToUnixTimeSeconds()) + (365 * 24 * 60 * 60)).ToString() } // 1 year TTL
+                }
+            });
+
+            // Send notification email to admin
+            await SendContactNotification(input, contactId, context);
+
+            return JsonResponse(200, new { message = "Contact message received. We'll get back to you soon.", contactId });
+        }
+        catch (Exception ex)
+        {
+            context.Logger.LogError($"Error storing contact: {ex}");
+            return JsonResponse(500, new { error = "Failed to submit contact message. Please try again." });
+        }
+    }
+
+    private async Task<APIGatewayProxyResponse> HandleAdminGetContacts(ILambdaContext context)
+    {
+        try
+        {
+            var scanResp = await _ddb.ScanAsync(new ScanRequest
+            {
+                TableName = "LoveBehaviorTranslatorContacts"
+            });
+
+            var contacts = new List<Dictionary<string, object>>();
+            foreach (var item in scanResp.Items)
+            {
+                var contact = new Dictionary<string, object>
+                {
+                    ["contactId"] = item["contactId"].S,
+                    ["email"] = item["email"].S,
+                    ["subject"] = item["subject"].S,
+                    ["message"] = item["message"].S,
+                    ["createdAt"] = item["createdAt"].S,
+                    ["status"] = item.ContainsKey("status") ? item["status"].S : "new"
+                };
+
+                if (item.ContainsKey("userId"))
+                    contact["userId"] = item["userId"].S;
+
+                if (item.ContainsKey("repliedAt") && !string.IsNullOrWhiteSpace(item["repliedAt"].S))
+                    contact["repliedAt"] = item["repliedAt"].S;
+
+                contacts.Add(contact);
+            }
+
+            // Sort by createdAt descending (newest first)
+            contacts = contacts.OrderByDescending(c => c["createdAt"].ToString()).ToList();
+
+            return JsonResponse(200, new { contacts });
+        }
+        catch (Exception ex)
+        {
+            context.Logger.LogError($"Error getting contacts: {ex}");
+            return JsonResponse(500, new { error = "Failed to get contacts" });
+        }
+    }
+
+    private async Task<APIGatewayProxyResponse> HandleAdminReplyContact(APIGatewayProxyRequest request, ILambdaContext context)
+    {
+        var pathParts = request.Path?.Split('/') ?? Array.Empty<string>();
+        var contactIdIndex = Array.IndexOf(pathParts, "contacts");
+        if (contactIdIndex < 0 || contactIdIndex + 1 >= pathParts.Length)
+            return JsonResponse(400, new { error = "Invalid contact ID" });
+
+        var contactId = pathParts[contactIdIndex + 1];
+
+        if (string.IsNullOrWhiteSpace(request.Body))
+            return JsonResponse(400, new { error = "Reply message required" });
+
+        var body = JsonSerializer.Deserialize<Dictionary<string, string>>(request.Body, Json);
+        if (body == null || !body.ContainsKey("replyMessage"))
+            return JsonResponse(400, new { error = "Reply message required" });
+
+        var replyMessage = body["replyMessage"]?.Trim() ?? "";
+        if (string.IsNullOrWhiteSpace(replyMessage))
+            return JsonResponse(400, new { error = "Reply message cannot be empty" });
+
+        try
+        {
+            // Get contact details
+            var getResp = await _ddb.GetItemAsync(new GetItemRequest
+            {
+                TableName = "LoveBehaviorTranslatorContacts",
+                Key = new Dictionary<string, AttributeValue>
+                {
+                    ["contactId"] = new AttributeValue { S = contactId }
+                }
+            });
+
+            if (getResp.Item.Count == 0)
+                return JsonResponse(404, new { error = "Contact not found" });
+
+            var contactEmail = getResp.Item["email"].S;
+            var originalSubject = getResp.Item["subject"].S;
+            var originalMessage = getResp.Item["message"].S;
+
+            // Send reply email
+            await SendContactReply(contactEmail, originalSubject, originalMessage, replyMessage, context);
+
+            // Update contact status
+            await _ddb.UpdateItemAsync(new UpdateItemRequest
+            {
+                TableName = "LoveBehaviorTranslatorContacts",
+                Key = new Dictionary<string, AttributeValue>
+                {
+                    ["contactId"] = new AttributeValue { S = contactId }
+                },
+                UpdateExpression = "SET #status = :status, repliedAt = :repliedAt",
+                ExpressionAttributeNames = new Dictionary<string, string>
+                {
+                    ["#status"] = "status"
+                },
+                ExpressionAttributeValues = new Dictionary<string, AttributeValue>
+                {
+                    [":status"] = new AttributeValue { S = "replied" },
+                    [":repliedAt"] = new AttributeValue { S = DateTimeOffset.UtcNow.ToString("O") }
+                }
+            });
+
+            return JsonResponse(200, new { message = "Reply sent successfully", contactId });
+        }
+        catch (Exception ex)
+        {
+            context.Logger.LogError($"Error replying to contact: {ex}");
+            return JsonResponse(500, new { error = "Failed to send reply" });
+        }
+    }
+
+    private async Task SendContactNotification(ContactRequest contact, string contactId, ILambdaContext context)
+    {
+        if (string.IsNullOrWhiteSpace(_sesFromEmail))
+        {
+            context.Logger.LogWarning("SES_FROM_EMAIL not set; skipping contact notification.");
+            return;
+        }
+
+        var subject = $"New Contact Form Submission: {contact.Subject}";
+        var body = $@"New contact form submission received:
+
+Contact ID: {contactId}
+Email: {contact.Email}
+Subject: {contact.Subject}
+
+Message:
+{contact.Message}
+
+---
+Reply to this contact at: {contact.Email}
+";
+
+        try
+        {
+            await _ses.SendEmailAsync(new SendEmailRequest
+            {
+                Source = _sesFromEmail,
+                Destination = new Destination { ToAddresses = new List<string> { _sesFromEmail } },
+                Message = new Message
+                {
+                    Subject = new Content(subject),
+                    Body = new Body { Text = new Content(body) }
+                }
+            });
+        }
+        catch (Exception ex)
+        {
+            context.Logger.LogError($"Failed to send contact notification: {ex}");
+        }
+    }
+
+    private async Task SendContactReply(string toEmail, string originalSubject, string originalMessage, string replyMessage, ILambdaContext context)
+    {
+        if (string.IsNullOrWhiteSpace(_sesFromEmail))
+        {
+            context.Logger.LogError("SES_FROM_EMAIL not set; cannot send reply.");
+            throw new Exception("SES_FROM_EMAIL not configured");
+        }
+
+        var subject = $"Re: {originalSubject}";
+        var body = $@"Hello,
+
+Thank you for contacting Love Behavior Translator. Here's our response:
+
+{replyMessage}
+
+---
+Original message:
+{originalMessage}
+
+Best regards,
+Love Behavior Translator Support
+";
+
+        try
+        {
+            await _ses.SendEmailAsync(new SendEmailRequest
+            {
+                Source = _sesFromEmail,
+                Destination = new Destination { ToAddresses = new List<string> { toEmail } },
+                Message = new Message
+                {
+                    Subject = new Content(subject),
+                    Body = new Body { Text = new Content(body) }
+                },
+                ReplyToAddresses = new List<string> { _sesFromEmail }
+            });
+        }
+        catch (Exception ex)
+        {
+            context.Logger.LogError($"Failed to send contact reply: {ex}");
+            throw;
+        }
     }
 
     private async Task<string> GetOpenAiApiKey()

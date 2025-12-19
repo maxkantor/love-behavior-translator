@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("LoveBehaviorTranslator.Function")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f0ff34ddf3f87e06502943d15822a68a41de55d9")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+14a8d110361fca8d39ca71c63ec7d029193685e0")]
 [assembly: System.Reflection.AssemblyProductAttribute("LoveBehaviorTranslator.Function")]
 [assembly: System.Reflection.AssemblyTitleAttribute("LoveBehaviorTranslator.Function")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

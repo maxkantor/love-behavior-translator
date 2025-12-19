@@ -1,5 +1,17 @@
 import React, { useState } from 'react';
 
+function getApiBaseUrl(): string {
+  const envUrl = import.meta.env.VITE_API_BASE_URL as string | undefined;
+  if (envUrl && envUrl.trim()) return envUrl.replace(/\/+$/, '');
+  return '';
+}
+
+function isValidEmail(email: string): boolean {
+  if (!email || email.length > 254) return false;
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
+
 type HelpModalProps = {
   isOpen: boolean;
   onClose: () => void;
@@ -11,6 +23,7 @@ export function HelpModal({ isOpen, onClose }: HelpModalProps) {
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [emailError, setEmailError] = useState('');
 
   if (!isOpen) return null;
 
@@ -41,15 +54,52 @@ export function HelpModal({ isOpen, onClose }: HelpModalProps) {
     }
   ];
 
+  function handleEmailChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const value = e.target.value;
+    setEmail(value);
+    
+    if (value && !isValidEmail(value)) {
+      setEmailError('Please enter a valid email address');
+    } else {
+      setEmailError('');
+    }
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    
+    // Validate email
+    if (!isValidEmail(email)) {
+      setEmailError('Please enter a valid email address');
+      return;
+    }
+
     setIsSubmitting(true);
     setSubmitStatus('idle');
+    setEmailError('');
 
     try {
-      // TODO: Send to backend support endpoint
-      // For now, simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const apiBaseUrl = getApiBaseUrl();
+      if (!apiBaseUrl) {
+        throw new Error('API base URL not configured');
+      }
+
+      const resp = await fetch(`${apiBaseUrl}/contact`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email.trim(),
+          subject: subject.trim(),
+          message: message.trim(),
+        }),
+      });
+
+      if (!resp.ok) {
+        const errorData = await resp.json();
+        throw new Error(errorData.error || 'Failed to send message');
+      }
       
       setSubmitStatus('success');
       setEmail('');
@@ -61,8 +111,9 @@ export function HelpModal({ isOpen, onClose }: HelpModalProps) {
         setSubmitStatus('idle');
         onClose();
       }, 3000);
-    } catch (error) {
+    } catch (error: any) {
       setSubmitStatus('error');
+      console.error('Error submitting contact form:', error);
     } finally {
       setIsSubmitting(false);
     }
@@ -102,12 +153,20 @@ export function HelpModal({ isOpen, onClose }: HelpModalProps) {
                 <input
                   type="email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={handleEmailChange}
+                  onBlur={() => {
+                    if (email && !isValidEmail(email)) {
+                      setEmailError('Please enter a valid email address');
+                    }
+                  }}
                   placeholder="your@email.com"
                   required
-                  className="support-input"
+                  className={`support-input ${emailError ? 'input-error' : ''}`}
                   disabled={isSubmitting}
                 />
+                {emailError && (
+                  <span className="field-error">{emailError}</span>
+                )}
               </div>
 
               <div className="form-field">

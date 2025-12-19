@@ -22,13 +22,28 @@ type DashboardSummary = {
   freeSearchLimit: number;
 };
 
+type Contact = {
+  contactId: string;
+  email: string;
+  subject: string;
+  message: string;
+  createdAt: string;
+  status: string;
+  userId?: string;
+  repliedAt?: string;
+};
+
 export function AdminDashboard() {
   const [users, setUsers] = useState<User[]>([]);
   const [dashboard, setDashboard] = useState<DashboardSummary | null>(null);
+  const [contacts, setContacts] = useState<Contact[]>([]);
   const [selectedUserId, setSelectedUserId] = useState('');
   const [creditAmount, setCreditAmount] = useState('');
   const [grantAmount, setGrantAmount] = useState('100');
   const [loading, setLoading] = useState(false);
+  const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
+  const [replyMessage, setReplyMessage] = useState('');
+  const [replying, setReplying] = useState(false);
   const navigate = useNavigate();
   const apiBaseUrl = getApiBaseUrl();
 
@@ -46,11 +61,14 @@ export function AdminDashboard() {
     if (!adminToken) return;
     setLoading(true);
     try {
-      const [usersResp, dashboardResp] = await Promise.all([
+      const [usersResp, dashboardResp, contactsResp] = await Promise.all([
         fetch(`${apiBaseUrl}/admin/users`, {
           headers: { Authorization: `Bearer ${adminToken}` },
         }),
         fetch(`${apiBaseUrl}/admin/dashboard`, {
+          headers: { Authorization: `Bearer ${adminToken}` },
+        }),
+        fetch(`${apiBaseUrl}/admin/contacts`, {
           headers: { Authorization: `Bearer ${adminToken}` },
         }),
       ]);
@@ -67,6 +85,13 @@ export function AdminDashboard() {
         setDashboard(dashboardData);
       } else {
         console.error('Failed to load dashboard:', dashboardResp.status, await dashboardResp.text());
+      }
+
+      if (contactsResp.ok) {
+        const contactsData = await contactsResp.json();
+        setContacts(contactsData.contacts || []);
+      } else {
+        console.error('Failed to load contacts:', contactsResp.status, await contactsResp.text());
       }
     } catch (err) {
       console.error('Error loading data:', err);
@@ -131,6 +156,35 @@ export function AdminDashboard() {
       }
     } catch (err) {
       console.error('Error setting my credits:', err);
+    }
+  }
+
+  async function handleReplyContact(contactId: string) {
+    if (!adminToken || !replyMessage.trim()) return;
+    setReplying(true);
+    try {
+      const resp = await fetch(`${apiBaseUrl}/admin/contacts/${contactId}/reply`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${adminToken}`,
+        },
+        body: JSON.stringify({ replyMessage: replyMessage.trim() }),
+      });
+      if (resp.ok) {
+        await loadData();
+        setSelectedContact(null);
+        setReplyMessage('');
+        alert('Reply sent successfully!');
+      } else {
+        const error = await resp.json();
+        alert(`Failed to send reply: ${error.error || 'Unknown error'}`);
+      }
+    } catch (err) {
+      console.error('Error replying to contact:', err);
+      alert('Failed to send reply');
+    } finally {
+      setReplying(false);
     }
   }
 
@@ -299,7 +353,85 @@ export function AdminDashboard() {
             ))}
           </div>
         </div>
+
+        {/* Contact Messages */}
+        <div className="admin-card">
+          <h2>📧 Contact Messages ({contacts.length})</h2>
+          <div className="admin-contacts-list">
+            {contacts.length === 0 ? (
+              <p style={{ color: 'var(--muted)', padding: '20px', textAlign: 'center' }}>No contact messages yet.</p>
+            ) : (
+              contacts.map((contact) => (
+                <div key={contact.contactId} className="admin-contact-item">
+                  <div className="admin-contact-header">
+                    <div>
+                      <div className="admin-contact-email">{contact.email}</div>
+                      <div className="admin-contact-subject">{contact.subject}</div>
+                      <div className="admin-contact-meta">
+                        {new Date(contact.createdAt).toLocaleString()} • 
+                        Status: <span className={`contact-status ${contact.status}`}>{contact.status}</span>
+                        {contact.repliedAt && ` • Replied: ${new Date(contact.repliedAt).toLocaleString()}`}
+                      </div>
+                    </div>
+                    {contact.status === 'new' && (
+                      <button
+                        onClick={() => setSelectedContact(contact)}
+                        className="admin-reply-btn"
+                      >
+                        Reply
+                      </button>
+                    )}
+                  </div>
+                  <div className="admin-contact-message">{contact.message}</div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
       </div>
+
+      {/* Reply Modal */}
+      {selectedContact && (
+        <div className="admin-modal-overlay" onClick={() => setSelectedContact(null)}>
+          <div className="admin-modal-content" onClick={(e) => e.stopPropagation()}>
+            <h2>Reply to Contact</h2>
+            <div className="admin-reply-info">
+              <p><strong>From:</strong> {selectedContact.email}</p>
+              <p><strong>Subject:</strong> {selectedContact.subject}</p>
+              <p><strong>Original Message:</strong></p>
+              <div className="admin-original-message">{selectedContact.message}</div>
+            </div>
+            <div className="admin-reply-form">
+              <label>Your Reply:</label>
+              <textarea
+                value={replyMessage}
+                onChange={(e) => setReplyMessage(e.target.value)}
+                rows={8}
+                className="admin-reply-textarea"
+                placeholder="Type your reply here..."
+              />
+              <div className="admin-modal-buttons">
+                <button
+                  onClick={() => {
+                    setSelectedContact(null);
+                    setReplyMessage('');
+                  }}
+                  className="admin-cancel-btn"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => handleReplyContact(selectedContact.contactId)}
+                  className="admin-send-btn"
+                  disabled={!replyMessage.trim() || replying}
+                >
+                  {replying ? 'Sending...' : 'Send Reply'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

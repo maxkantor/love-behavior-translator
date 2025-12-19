@@ -2,6 +2,8 @@ using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.Model;
 using Amazon.Lambda.APIGatewayEvents;
 using Amazon.Lambda.Core;
+using Amazon.SimpleEmail;
+using Amazon.SimpleEmail.Model;
 
 namespace LoveBehaviorTranslator.Function;
 
@@ -135,6 +137,47 @@ public static class CreditSystem
         {
             logger.LogError($"Error granting credits: {ex}");
             throw;
+        }
+    }
+
+    /// <summary>
+    /// Notify admin when credits are purchased (called from Stripe webhook or admin grant).
+    /// </summary>
+    public static async Task NotifyCreditPurchase(string userId, int creditsPurchased, decimal? amount, IAmazonDynamoDB ddb, IAmazonSimpleEmailService ses, string fromEmail, ILambdaLogger logger)
+    {
+        if (string.IsNullOrWhiteSpace(fromEmail))
+        {
+            logger.LogWarning("SES_FROM_EMAIL not set; skipping credit purchase notification.");
+            return;
+        }
+
+        try
+        {
+            var userCredits = await GetUserCredits(userId, ddb, logger);
+            var subject = $"Credit Purchase: {creditsPurchased} credits";
+            var body = $@"New credit purchase:
+
+User ID: {userId}
+Credits Purchased: {creditsPurchased}
+New Balance: {userCredits}
+Amount: {(amount.HasValue ? $"${amount.Value:F2}" : "N/A")}
+Timestamp: {DateTimeOffset.UtcNow:O}
+";
+
+            await ses.SendEmailAsync(new Amazon.SimpleEmail.Model.SendEmailRequest
+            {
+                Source = fromEmail,
+                Destination = new Amazon.SimpleEmail.Model.Destination { ToAddresses = new List<string> { fromEmail } },
+                Message = new Amazon.SimpleEmail.Model.Message
+                {
+                    Subject = new Amazon.SimpleEmail.Model.Content(subject),
+                    Body = new Amazon.SimpleEmail.Model.Body { Text = new Amazon.SimpleEmail.Model.Content(body) }
+                }
+            });
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Failed to send credit purchase notification: {ex}");
         }
     }
 

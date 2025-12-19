@@ -361,7 +361,7 @@ LoveBehaviorTranslator.Function::LoveBehaviorTranslator.Function.Function::Funct
 4. **Lambda Function**: `LoveBehaviorTranslatorFunction`
 5. Click **Save** → **OK**
 
-### 7.3.2 Create `/admin` Proxy Resource (For Admin Routes)
+### 7.3.3 Create `/admin` Proxy Resource (For Admin Routes)
 
 1. **Resources** → **Create resource**
 2. **Resource name**: `admin`
@@ -394,7 +394,7 @@ LoveBehaviorTranslator.Function::LoveBehaviorTranslator.Function.Function::Funct
 
 If you prefer API Gateway to handle CORS:
 
-For each resource (`/`, `/health`, `/analyze`, `/credits`, `/admin/*`):
+For each resource (`/`, `/health`, `/analyze`, `/credits`, `/contact`, `/admin/*`):
 
 1. Select the resource in the left pane
 2. Click **Actions** → **Enable CORS**

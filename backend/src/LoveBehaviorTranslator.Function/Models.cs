@@ -70,4 +70,59 @@ public sealed record BehaviorAnalysisResponse(
     [property: JsonPropertyName("mode_used")] string ModeUsed
 );
 
+public sealed record ContactRequest(
+    [property: JsonPropertyName("email")] string Email,
+    [property: JsonPropertyName("subject")] string Subject,
+    [property: JsonPropertyName("message")] string Message
+)
+{
+    public ContactRequest Validate()
+    {
+        var email = (Email ?? "").Trim();
+        var subject = (Subject ?? "").Trim();
+        var message = (Message ?? "").Trim();
+
+        if (string.IsNullOrWhiteSpace(email))
+            throw new ClientVisibleException(400, "Email is required.");
+        
+        if (!IsValidEmail(email))
+            throw new ClientVisibleException(400, "Invalid email address format.");
+
+        if (string.IsNullOrWhiteSpace(subject))
+            throw new ClientVisibleException(400, "Subject is required.");
+        
+        if (subject.Length > 200)
+            throw new ClientVisibleException(400, "Subject must be 200 characters or less.");
+
+        if (string.IsNullOrWhiteSpace(message))
+            throw new ClientVisibleException(400, "Message is required.");
+        
+        if (message.Length > 5000)
+            throw new ClientVisibleException(400, "Message must be 5000 characters or less.");
+
+        return this with
+        {
+            Email = email,
+            Subject = subject,
+            Message = message
+        };
+    }
+
+    private static bool IsValidEmail(string email)
+    {
+        if (string.IsNullOrWhiteSpace(email) || email.Length > 254)
+            return false;
+
+        try
+        {
+            var addr = new System.Net.Mail.MailAddress(email);
+            return addr.Address == email;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+}
+
 
