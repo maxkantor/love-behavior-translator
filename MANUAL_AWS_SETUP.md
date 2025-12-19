@@ -177,19 +177,146 @@ To automatically delete old artifacts:
 
 ---
 
-## Step 4: (Optional) Configure SES for Email
+## Step 4: Configure SES for Email
 
-Only needed if you want the "email me this analysis" feature.
+SES is required for:
+- Contact form notifications (admin receives emails when users submit contact form)
+- Admin reply emails (sending replies to users)
+- Credit purchase notifications
+- Optional: "Email me this analysis" feature
 
-1. AWS Console → **Amazon SES** (same region as Lambda)
-2. **Identities** → **Create identity**
-3. Choose:
-   - **Email address** (fastest for testing)
-   - **Domain** (better for production)
-4. Follow verification steps (check email or add DNS records)
-5. **Note the verified sender email** — you'll use this as Lambda env var `SES_FROM_EMAIL`
+### 4.1 Navigate to SES
 
-> **SES Sandbox**: If your account is in SES Sandbox, you can only email **verified recipient addresses** until you request production access.
+1. AWS Console → **Amazon SES** (make sure you're in the **same region** as your Lambda function)
+2. If you don't see SES, search for "SES" in the AWS Console search bar
+
+### 4.2 Verify Your Email Address
+
+**Option A: Verify a Single Email Address (Recommended for Testing)**
+
+1. In SES Console → **Verified identities** → **Create identity**
+2. **Identity type**: Select **Email address**
+3. **Email address**: Enter your email (e.g., `support@lovebehaviortranslator.com` or your personal email)
+4. Click **Create identity**
+5. **Check your email inbox** for a verification email from AWS
+6. Click the verification link in the email
+7. The email address will now show as **Verified** in SES
+
+**Option B: Verify Your Domain (Recommended for Production)**
+
+1. In SES Console → **Verified identities** → **Create identity**
+2. **Identity type**: Select **Domain**
+3. **Domain**: Enter your domain (e.g., `lovebehaviortranslator.com`)
+4. **Configuration set**: Leave empty (optional)
+5. **DKIM signing**: Select **Easy DKIM** (recommended for better deliverability)
+6. Click **Create identity**
+7. SES will provide **DNS records** to add to your domain:
+   - **CNAME records** for DKIM verification
+   - **TXT record** for domain verification
+8. Go to your domain registrar (Route 53 or other) and add these DNS records
+9. Wait 5-10 minutes for DNS propagation
+10. Click **Verify** in SES Console
+11. Once verified, you can send from **any email address** on that domain (e.g., `support@`, `noreply@`, etc.)
+
+### 4.3 Request Production Access (Move Out of Sandbox)
+
+**Important**: By default, SES starts in **Sandbox mode**, which means:
+- You can only send emails **TO verified email addresses**
+- You can send up to 200 emails per day
+- You can send 1 email per second
+
+**To request production access:**
+
+1. In SES Console → **Account dashboard** (or **Sending statistics**)
+2. Look for **Account status** section
+3. If it shows **Sandbox**, click **Request production access**
+4. Fill out the form:
+   - **Mail type**: Select **Transactional** (for contact forms, replies, notifications)
+   - **Website URL**: Your website URL (e.g., `https://lovebehaviortranslator.com`)
+   - **Use case description**: 
+     ```
+     We use SES to send:
+     - Contact form submission notifications to admin
+     - Reply emails to users who contact us
+     - Credit purchase notifications
+     - Optional: Analysis results to users who request email delivery
+     ```
+   - **Expected sending volume**: Estimate (e.g., "100-500 emails per day")
+   - **Compliance**: Check the boxes for:
+     - ✅ I have read and agree to the AWS Service Terms
+     - ✅ I will only send to recipients who have opted-in
+5. Click **Submit request**
+6. AWS typically approves within 24-48 hours
+7. Once approved, you can send to **any email address** (not just verified ones)
+
+### 4.4 Configure Lambda Environment Variable
+
+1. AWS Console → **Lambda** → Select `LoveBehaviorTranslatorFunction`
+2. **Configuration** → **Environment variables** → **Edit**
+3. Add or update:
+   - **Key**: `SES_FROM_EMAIL`
+   - **Value**: Your verified email address (e.g., `support@lovebehaviortranslator.com`)
+4. Click **Save**
+
+> **Important**: 
+> - If you verified a **domain**, you can use any email on that domain (e.g., `support@`, `noreply@`, `admin@`)
+> - If you verified a **single email**, you must use that exact email address
+> - The email must be **verified** before you can send from it
+
+### 4.5 Test Email Sending
+
+**Option 1: Test via Contact Form**
+
+1. Go to your website
+2. Click **Need Help?**
+3. Fill out the contact form and submit
+4. Check your email (the one set as `SES_FROM_EMAIL`) for a notification
+
+**Option 2: Test via Admin Dashboard**
+
+1. Log into admin dashboard
+2. Go to **Contact Messages** section
+3. Click **Reply** on a contact message
+4. Type a reply and send
+5. Check the user's email for the reply
+
+**Option 3: Test via AWS Console**
+
+1. SES Console → **Verified identities**
+2. Select your verified email
+3. Click **Send test email**
+4. Enter a test recipient (must be verified if in Sandbox)
+5. Send and check recipient's inbox
+
+### 4.6 Troubleshooting
+
+**Error: "Email address not verified"**
+- Solution: Verify the email address in SES Console → Verified identities
+
+**Error: "SES_FROM_EMAIL not configured"**
+- Solution: Set the `SES_FROM_EMAIL` environment variable in Lambda
+
+**Error: "Message rejected: Email address is not verified"**
+- Solution: You're in Sandbox mode. Either:
+  - Verify the recipient email address in SES, OR
+  - Request production access (see Step 4.3)
+
+**Error: "Daily sending quota exceeded"**
+- Solution: You've hit the 200 emails/day limit in Sandbox. Request production access.
+
+**Emails going to spam**
+- Solution: 
+  - Verify your domain (not just email) and set up DKIM
+  - Use a professional email address (e.g., `support@` instead of `test@`)
+  - Include proper email content (avoid spam trigger words)
+
+### 4.7 Best Practices
+
+1. **Use a domain** instead of a single email for better deliverability
+2. **Set up DKIM** signing (automatic with domain verification)
+3. **Monitor sending statistics** in SES Console
+4. **Set up bounce/complaint handling** (optional, for production)
+5. **Use a dedicated email** like `support@` or `noreply@` for automated emails
 
 ---
 
