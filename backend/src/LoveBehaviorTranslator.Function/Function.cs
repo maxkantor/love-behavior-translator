@@ -69,7 +69,7 @@ public sealed class Function
             var method = (request.HttpMethod ?? "GET").ToUpperInvariant();
             
             // Log for debugging (remove in production)
-            context.Logger.LogInformation($"Request: {method} {path}");
+            context.Logger.LogInformation($"Request: {method} {path} (raw: {rawPath})");
 
             // Handle CORS preflight (OPTIONS) requests
             if (method == "OPTIONS")
@@ -125,7 +125,8 @@ public sealed class Function
                     return await HandleAdminReplyContact(request, context);
 
                 // If we're in /admin but no route matched, return 404
-                return JsonResponse(404, new { error = "Admin endpoint not found" });
+                context.Logger.LogWarning($"Admin route not found: {method} {path}");
+                return JsonResponse(404, new { error = $"Admin endpoint not found: {method} {path}" });
             }
 
             // Get user credits endpoint

@@ -77,21 +77,33 @@ export function AdminDashboard() {
         const usersData = await usersResp.json();
         setUsers(usersData.users || []);
       } else {
-        console.error('Failed to load users:', usersResp.status, await usersResp.text());
+        const errorText = await usersResp.text();
+        console.error(`❌ Failed to load users (${usersResp.status}):`, errorText);
+        if (usersResp.status === 404) {
+          console.error('⚠️ /admin/users endpoint not found. Check API Gateway configuration.');
+        }
       }
 
       if (dashboardResp.ok) {
         const dashboardData = await dashboardResp.json();
         setDashboard(dashboardData);
       } else {
-        console.error('Failed to load dashboard:', dashboardResp.status, await dashboardResp.text());
+        const errorText = await dashboardResp.text();
+        console.error(`❌ Failed to load dashboard (${dashboardResp.status}):`, errorText);
+        if (dashboardResp.status === 404) {
+          console.error('⚠️ /admin/dashboard endpoint not found. Check API Gateway configuration.');
+        }
       }
 
       if (contactsResp.ok) {
         const contactsData = await contactsResp.json();
         setContacts(contactsData.contacts || []);
       } else {
-        console.error('Failed to load contacts:', contactsResp.status, await contactsResp.text());
+        const errorText = await contactsResp.text();
+        console.error(`❌ Failed to load contacts (${contactsResp.status}):`, errorText);
+        if (contactsResp.status === 404) {
+          console.error('⚠️ /admin/contacts endpoint not found. Check API Gateway configuration.');
+        }
       }
     } catch (err) {
       console.error('Error loading data:', err);
