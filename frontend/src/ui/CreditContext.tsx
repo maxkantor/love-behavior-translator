@@ -22,8 +22,28 @@ export function CreditProvider({ children }: { children: React.ReactNode }) {
   });
 
   async function refreshCredits() {
-    // Credits will be updated from analyze response
-    // For now, we'll get it from the response
+    try {
+      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL?.replace(/\/+$/, '') || '';
+      if (!apiBaseUrl) return;
+      
+      const resp = await fetch(`${apiBaseUrl}/credits`, {
+        method: 'GET',
+        headers: {
+          'x-user-id': userId,
+        },
+      });
+      
+      if (resp.ok) {
+        const data = await resp.json();
+        const creditsValue = data.credits ?? null;
+        setCredits(creditsValue);
+        if (creditsValue !== null) {
+          localStorage.setItem('credits', creditsValue.toString());
+        }
+      }
+    } catch (err) {
+      console.error('Error refreshing credits:', err);
+    }
   }
 
   useEffect(() => {

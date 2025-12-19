@@ -122,6 +122,14 @@ public sealed class Function
                 return JsonResponse(404, new { error = "Admin endpoint not found" });
             }
 
+            // Get user credits endpoint
+            if (method == "GET" && (path.EndsWith("/credits") || path == "/credits"))
+                return await HandleGetCredits(request, context);
+
+            // Get user credits endpoint
+            if (method == "GET" && (path.EndsWith("/credits") || path == "/credits"))
+                return await HandleGetCredits(request, context);
+
             // Analyze endpoint
             if (method == "POST" && (path.EndsWith("/analyze") || path == "/analyze"))
                 return await HandleAnalyze(request, context);
@@ -136,6 +144,23 @@ public sealed class Function
         {
             context.Logger.LogError($"Unhandled error: {ex}");
             return JsonResponse(500, new { error = "Internal server error" });
+        }
+    }
+
+    private async Task<APIGatewayProxyResponse> HandleGetCredits(APIGatewayProxyRequest request, ILambdaContext context)
+    {
+        var ip = GetClientIp(request) ?? "unknown";
+        var userId = CreditSystem.GetUserId(request, ip);
+        
+        try
+        {
+            var credits = await CreditSystem.GetUserCredits(userId, _ddb, context.Logger);
+            return JsonResponse(200, new { credits, userId });
+        }
+        catch (Exception ex)
+        {
+            context.Logger.LogError($"Error getting credits: {ex}");
+            return JsonResponse(500, new { error = "Failed to get credits" });
         }
     }
 

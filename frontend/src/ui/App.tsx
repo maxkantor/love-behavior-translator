@@ -34,7 +34,7 @@ function getApiBaseUrl(): string {
 
 export function App() {
   const apiBaseUrl = useMemo(() => getApiBaseUrl(), []);
-  const { credits, setCredits, userId } = useCredits();
+  const { credits, setCredits, userId, refreshCredits } = useCredits();
   const [behavior, setBehavior] = useState('');
   const [emailTo, setEmailTo] = useState('');
   const [selectedChips, setSelectedChips] = useState<Set<string>>(new Set());
@@ -47,7 +47,7 @@ export function App() {
 
   const remaining = 2000 - behavior.length;
 
-  // Update credits from localStorage on mount
+  // Update credits from localStorage on mount, then refresh from server
   useEffect(() => {
     const stored = localStorage.getItem('credits');
     if (stored) {
@@ -56,7 +56,28 @@ export function App() {
         setCredits(parsed);
       }
     }
-  }, [setCredits]);
+    // Refresh credits from server on mount
+    refreshCredits();
+  }, [setCredits, refreshCredits]);
+
+  // Refresh credits periodically and on window focus
+  useEffect(() => {
+    // Refresh every 30 seconds
+    const interval = setInterval(() => {
+      refreshCredits();
+    }, 30000);
+
+    // Refresh when window gains focus (user comes back to tab)
+    const handleFocus = () => {
+      refreshCredits();
+    };
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [refreshCredits]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
