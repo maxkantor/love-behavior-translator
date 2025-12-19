@@ -214,9 +214,31 @@ SES is required for:
 4. **Configuration set**: Leave empty (optional)
 5. **DKIM signing**: Select **Easy DKIM** (recommended for better deliverability)
 6. Click **Create identity**
-7. SES will provide **DNS records** to add to your domain:
-   - **CNAME records** for DKIM verification (usually 3 records)
-   - **TXT record** for domain verification (1 record)
+7. **Copy DNS records from SES:**
+   
+   After clicking "Create identity", SES will show you a page titled **"Verify this domain"** with all the DNS records you need to add.
+   
+   **You'll see two sections:**
+   
+   a. **Domain verification record (TXT record):**
+      - **Record name**: `_amazonses.lovebehaviortranslator.com` (or similar)
+      - **Record type**: `TXT`
+      - **Value**: A long string like `"v=spf1 include:amazonses.com ~all"` or similar
+      - **Copy the entire value** (it's usually in a code box or text field)
+   
+   b. **DKIM records (3 CNAME records):**
+      - **Record 1 name**: Something like `abc123._domainkey.lovebehaviortranslator.com`
+      - **Record 1 value**: Something like `abc123.dkim.amazonses.com`
+      - **Record 2 name**: Another `xyz789._domainkey.lovebehaviortranslator.com`
+      - **Record 2 value**: `xyz789.dkim.amazonses.com`
+      - **Record 3 name**: Another `def456._domainkey.lovebehaviortranslator.com`
+      - **Record 3 value**: `def456.dkim.amazonses.com`
+      - **Copy each name and value pair**
+   
+   > **Tip**: You can also find these records later by:
+   > - Going to SES → **Verified identities** → Click your domain
+   > - Click the **"Authentication"** tab
+   > - Scroll down to see the DNS records if verification is pending
    
 8. **Add DNS Records in Route 53:**
    
@@ -237,20 +259,31 @@ SES is required for:
    c. **Add the TXT record:**
       - Look for the **"Create record"** button above the records table (top right area)
       - Click **Create record**
-      - **Record name**: Enter `_amazonses` (SES will show the full name, but you only need the subdomain part)
+      - **Record name**: 
+        - If SES shows `_amazonses.lovebehaviortranslator.com`, enter just `_amazonses`
+        - Route 53 will automatically append your domain name
       - **Record type**: Select **TXT**
-      - **Value**: Paste the TXT record value from SES (it will be a long string)
+      - **Value**: 
+        - Paste the **entire value** from SES (including quotes if present)
+        - It will look like: `"v=spf1 include:amazonses.com ~all"` or a long verification string
+        - Make sure to include everything SES provided
       - **TTL**: Leave as default (300) or set to 300
       - Click **Create records**
    
    d. **Add the CNAME records (3 records):**
       - Click **Create record** (repeat for each of the 3 CNAME records)
-      - **Record name**: Enter the subdomain part (e.g., `abc123._domainkey` - SES will show the full name)
+      - **Record name**: 
+        - If SES shows `abc123._domainkey.lovebehaviortranslator.com`, enter just `abc123._domainkey`
+        - Route 53 will automatically append your domain name
+        - Use the **exact prefix** from SES (e.g., `abc123._domainkey`, `xyz789._domainkey`, `def456._domainkey`)
       - **Record type**: Select **CNAME**
-      - **Value**: Paste the CNAME target from SES (e.g., `abc123.dkim.amazonses.com`)
+      - **Value**: 
+        - Paste the **target** from SES (e.g., `abc123.dkim.amazonses.com`)
+        - Make sure to include the trailing dot if SES shows it (`.dkim.amazonses.com.`)
+        - Usually it's something like: `abc123.dkim.amazonses.com`
       - **TTL**: Leave as default (300) or set to 300
       - Click **Create records**
-      - Repeat for all 3 CNAME records
+      - **Repeat for all 3 CNAME records** (each will have a different prefix like `abc123`, `xyz789`, `def456`)
    
    e. **Verify the records are added:**
       - You should see all 4 records in your Route 53 hosted zone:
