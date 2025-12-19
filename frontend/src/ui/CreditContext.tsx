@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
 type CreditContextType = {
   credits: number | null;
@@ -21,14 +21,23 @@ export function CreditProvider({ children }: { children: React.ReactNode }) {
     return id;
   });
 
-  async function refreshCredits() {
+  const refreshCredits = useCallback(async () => {
     try {
       const apiBaseUrl = import.meta.env.VITE_API_BASE_URL?.replace(/\/+$/, '') || '';
       if (!apiBaseUrl) {
         console.warn('No API base URL configured, skipping credit refresh');
+        // Fallback to localStorage if API not configured
+        const stored = localStorage.getItem('credits');
+        if (stored) {
+          const parsed = parseInt(stored, 10);
+          if (!isNaN(parsed)) {
+            setCredits(parsed);
+          }
+        }
         return;
       }
       
+      console.log('Refreshing credits from server...', 'userId:', userId);
       const resp = await fetch(`${apiBaseUrl}/credits`, {
         method: 'GET',
         headers: {
@@ -39,7 +48,7 @@ export function CreditProvider({ children }: { children: React.ReactNode }) {
       if (resp.ok) {
         const data = await resp.json();
         const creditsValue = data.credits ?? null;
-        console.log('Refreshed credits from server:', creditsValue, 'userId:', userId);
+        console.log('✅ Refreshed credits from server:', creditsValue, 'userId:', userId);
         setCredits(creditsValue);
         if (creditsValue !== null) {
           localStorage.setItem('credits', creditsValue.toString());
@@ -49,20 +58,35 @@ export function CreditProvider({ children }: { children: React.ReactNode }) {
         }
       } else {
         const errorText = await resp.text();
-        console.error('Failed to refresh credits:', resp.status, errorText);
+        console.error('❌ Failed to refresh credits:', resp.status, errorText);
+        // On error, fallback to localStorage
+        const stored = localStorage.getItem('credits');
+        if (stored) {
+          const parsed = parseInt(stored, 10);
+          if (!isNaN(parsed)) {
+            console.log('Using cached credits from localStorage:', parsed);
+            setCredits(parsed);
+          }
+        }
       }
     } catch (err) {
-      console.error('Error refreshing credits:', err);
+      console.error('❌ Error refreshing credits:', err);
+      // On error, fallback to localStorage
+      const stored = localStorage.getItem('credits');
+      if (stored) {
+        const parsed = parseInt(stored, 10);
+        if (!isNaN(parsed)) {
+          console.log('Using cached credits from localStorage:', parsed);
+          setCredits(parsed);
+        }
+      }
     }
-  }
+  }, [userId]); // Only recreate if userId changes
 
+  // Refresh credits immediately on mount (before any component uses it)
   useEffect(() => {
-    // Initialize credits (will be set from first API call)
-    const stored = localStorage.getItem('credits');
-    if (stored) {
-      setCredits(parseInt(stored, 10));
-    }
-  }, []);
+    refreshCredits();
+  }, [refreshCredits]); // Run when refreshCredits changes (which should only be on mount)
 
   return (
     <CreditContext.Provider value={{ credits, setCredits, refreshCredits, userId }}>

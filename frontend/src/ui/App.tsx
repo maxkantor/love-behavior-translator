@@ -47,11 +47,8 @@ export function App() {
 
   const remaining = 2000 - behavior.length;
 
-  // Refresh credits from server on mount and periodically
-  useEffect(() => {
-    // Always refresh from server on mount (don't trust localStorage)
-    refreshCredits();
-  }, [refreshCredits]);
+  // Note: refreshCredits is already called in CreditContext on mount
+  // This is just for periodic refresh
 
   // Refresh credits periodically and on window focus
   useEffect(() => {
