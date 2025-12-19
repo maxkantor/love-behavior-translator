@@ -36,11 +36,8 @@ export function App() {
   const apiBaseUrl = useMemo(() => getApiBaseUrl(), []);
   const { credits, setCredits, userId } = useCredits();
   const [behavior, setBehavior] = useState('');
-  const [relationshipType, setRelationshipType] = useState<RelationshipType | ''>('');
-  const [relationshipLength, setRelationshipLength] = useState('');
-  const [emotionalState, setEmotionalState] = useState<EmotionalState | ''>('');
-  const [mode, setMode] = useState<AnalysisMode>('gentle');
   const [emailTo, setEmailTo] = useState('');
+  const [selectedChips, setSelectedChips] = useState<Set<string>>(new Set());
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -74,12 +71,9 @@ export function App() {
 
     const payload: AnalyzeRequest = {
       behavior_description: trimmed,
-      analysis_mode: mode,
+      analysis_mode: 'gentle', // Default to gentle mode
     };
 
-    if (relationshipType) payload.relationship_type = relationshipType;
-    if (relationshipLength) payload.relationship_length = relationshipLength;
-    if (emotionalState) payload.emotional_state = emotionalState;
     if (emailTo) payload.email_to = emailTo;
 
     setLoading(true);
@@ -139,6 +133,20 @@ export function App() {
     setBehavior(text);
   }
 
+  function handleChipClick(chipText: string, chipLabel: string) {
+    const newSelected = new Set(selectedChips);
+    if (newSelected.has(chipLabel)) {
+      newSelected.delete(chipLabel);
+    } else {
+      newSelected.add(chipLabel);
+      // Append to textarea if not already there
+      if (!behavior.includes(chipText)) {
+        setBehavior(prev => prev ? `${prev}\n\n${chipText}` : chipText);
+      }
+    }
+    setSelectedChips(newSelected);
+  }
+
   const displayCredits = credits === null ? '...' : credits === -1 ? 'Unlimited' : credits.toString();
 
   return (
@@ -170,17 +178,17 @@ export function App() {
         {/* Decorative images - Left side (female images only) */}
         <div className="decorative-images-left">
           <img 
-            src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop&crop=face" 
+            src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&h=500&fit=crop&crop=face&auto=format&q=80" 
             alt="Decorative" 
             className="decorative-image"
           />
           <img 
-            src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=400&fit=crop&crop=face" 
+            src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=500&h=500&fit=crop&crop=face&auto=format&q=80" 
             alt="Decorative" 
             className="decorative-image"
           />
           <img 
-            src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=400&h=400&fit=crop&crop=face" 
+            src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=500&h=500&fit=crop&crop=face&auto=format&q=80" 
             alt="Decorative" 
             className="decorative-image"
           />
@@ -189,17 +197,17 @@ export function App() {
         {/* Decorative images - Right side (male images only) */}
         <div className="decorative-images-right">
           <img 
-            src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face" 
+            src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&h=500&fit=crop&crop=face&auto=format&q=80" 
             alt="Decorative" 
             className="decorative-image"
           />
           <img 
-            src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face" 
+            src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=500&h=500&fit=crop&crop=face&auto=format&q=80" 
             alt="Decorative" 
             className="decorative-image"
           />
           <img 
-            src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=400&fit=crop&crop=face" 
+            src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=500&h=500&fit=crop&crop=face&auto=format&q=80" 
             alt="Decorative" 
             className="decorative-image"
           />
@@ -230,6 +238,8 @@ export function App() {
           <div className="main-content-center">
             <div className="entry-points-section">
               <h3 className="entry-points-title">What's on your mind?</h3>
+              
+              {/* Main entry point cards */}
               <div className="entry-points-grid">
                 <button
                   type="button"
@@ -264,6 +274,41 @@ export function App() {
                   <span className="entry-text">Should I Stay or Leave?</span>
                 </button>
               </div>
+
+              {/* Quick action chips - merged into this section */}
+              <div className="quick-chips-container">
+                <p className="quick-chips-label">Or describe a specific situation:</p>
+                <div className="quick-chips">
+                  <button
+                    type="button"
+                    className={`quick-chip ${selectedChips.has('Canceling plans') ? 'selected' : ''}`}
+                    onClick={() => handleChipClick("My partner has been canceling plans last minute", "Canceling plans")}
+                  >
+                    💔 Canceling plans
+                  </button>
+                  <button
+                    type="button"
+                    className={`quick-chip ${selectedChips.has('Feeling distant') ? 'selected' : ''}`}
+                    onClick={() => handleChipClick("My partner seems distant and avoids deep conversations", "Feeling distant")}
+                  >
+                    😔 Feeling distant
+                  </button>
+                  <button
+                    type="button"
+                    className={`quick-chip ${selectedChips.has('Defensive behavior') ? 'selected' : ''}`}
+                    onClick={() => handleChipClick("My partner gets defensive when I try to discuss our relationship", "Defensive behavior")}
+                  >
+                    🛡️ Defensive behavior
+                  </button>
+                  <button
+                    type="button"
+                    className={`quick-chip ${selectedChips.has('No initiation') ? 'selected' : ''}`}
+                    onClick={() => handleChipClick("My partner never initiates contact or makes plans", "No initiation")}
+                  >
+                    📱 No initiation
+                  </button>
+                </div>
+              </div>
             </div>
 
             <div className="textarea-wrapper">
@@ -273,7 +318,7 @@ export function App() {
               <textarea
                 id="behavior-input"
                 className="behavior-input"
-                rows={4}
+                rows={5}
                 value={behavior}
                 onChange={(e) => setBehavior(e.target.value)}
                 placeholder="Share what you've noticed... For example: 'My partner used to text me throughout the day, but now I'm always the one reaching out. When we're together, they seem distracted and less engaged. I'm worried they're pulling away.'"
@@ -281,127 +326,33 @@ export function App() {
               <p className="textarea-hint">Be as detailed as you're comfortable with. This helps us understand the full picture.</p>
             </div>
 
-            <div className="quick-actions">
-              <span className="quick-actions-label">Quick actions:</span>
-              <div className="quick-action-buttons">
-                <button
-                  type="button"
-                  className="quick-action-btn"
-                  onClick={() => handleQuickAction("My partner has been canceling plans last minute")}
-                >
-                  💔 Canceling plans
-                </button>
-                <button
-                  type="button"
-                  className="quick-action-btn"
-                  onClick={() => handleQuickAction("My partner seems distant and avoids deep conversations")}
-                >
-                  😔 Feeling distant
-                </button>
-                <button
-                  type="button"
-                  className="quick-action-btn"
-                  onClick={() => handleQuickAction("My partner gets defensive when I try to discuss our relationship")}
-                >
-                  🛡️ Defensive behavior
-                </button>
-                <button
-                  type="button"
-                  className="quick-action-btn"
-                  onClick={() => handleQuickAction("My partner never initiates contact or makes plans")}
-                >
-                  📱 No initiation
-                </button>
-              </div>
-            </div>
-
             <form onSubmit={onSubmit} className="analysis-form">
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Relationship type</label>
-                  <select
-                    className="form-input"
-                    value={relationshipType}
-                    onChange={(e) => setRelationshipType(e.target.value as any)}
-                  >
-                    <option value="">Optional</option>
-                    <option value="dating">Dating</option>
-                    <option value="married">Married</option>
-                    <option value="situationship">Situationship</option>
-                    <option value="friendship">Friendship</option>
-                    <option value="other">Other</option>
-                  </select>
+              {error && (
+                <div className="error-message">
+                  {error}
                 </div>
+              )}
 
-                <div className="form-group">
-                  <label>Relationship length</label>
-                  <input
-                    type="text"
-                    className="form-input"
-                    value={relationshipLength}
-                    onChange={(e) => setRelationshipLength(e.target.value)}
-                    placeholder="e.g., 3 months, 2 years"
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label>Your emotional state</label>
-                  <select
-                    className="form-input"
-                    value={emotionalState}
-                    onChange={(e) => setEmotionalState(e.target.value as any)}
-                  >
-                    <option value="">Optional</option>
-                    <option value="anxious">Anxious</option>
-                    <option value="confused">Confused</option>
-                    <option value="hurt">Hurt</option>
-                    <option value="hopeful">Hopeful</option>
-                    <option value="neutral">Neutral</option>
-                    <option value="frustrated">Frustrated</option>
-                  </select>
-                </div>
-
-                <div className="form-group">
-                  <label>Analysis style</label>
-                  <select
-                    className="form-input"
-                    value={mode}
-                    onChange={(e) => setMode(e.target.value as AnalysisMode)}
-                  >
-                    <option value="gentle">Gentle</option>
-                    <option value="analytical">Analytical</option>
-                    <option value="brutally_honest">Brutally Honest</option>
-                    <option value="light_funny">Light & Funny</option>
-                  </select>
-                </div>
+              <div className="cta-section">
+                <button
+                  type="submit"
+                  className="analyze-button"
+                  disabled={loading || behavior.trim().length < 10}
+                >
+                  {loading ? (
+                    <>
+                      <span className="spinner"></span>
+                      <span>Analyzing your situation...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="heart-icon-small">💕</span>
+                      <span>Get Clarity Now</span>
+                    </>
+                  )}
+                </button>
+                <p className="cta-microcopy">Takes less than 60 seconds. No judgment. Just clarity.</p>
               </div>
-
-            {error && (
-              <div className="error-message">
-                {error}
-              </div>
-            )}
-
-            <div className="cta-section">
-              <button
-                type="submit"
-                className="analyze-button"
-                disabled={loading || behavior.trim().length < 10}
-              >
-                {loading ? (
-                  <>
-                    <span className="spinner"></span>
-                    <span>Analyzing your situation...</span>
-                  </>
-                ) : (
-                  <>
-                    <span className="heart-icon-small">💕</span>
-                    <span>Get Clarity Now</span>
-                  </>
-                )}
-              </button>
-              <p className="cta-microcopy">Takes less than 60 seconds. No judgment. Just clarity.</p>
-            </div>
             </form>
 
             <div className="how-it-works">
