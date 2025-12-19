@@ -349,13 +349,17 @@ SES is required for:
 2. **Configuration** → **Environment variables** → **Edit**
 3. Add or update:
    - **Key**: `SES_FROM_EMAIL`
-   - **Value**: Your verified email address (e.g., `support@lovebehaviortranslator.com`)
+   - **Value**: `support@lovebehaviortranslator.com` (or your preferred email address on your verified domain)
 4. Click **Save**
 
 > **Important**: 
-> - If you verified a **domain**, you can use any email on that domain (e.g., `support@`, `noreply@`, `admin@`)
+> - If you verified a **domain** (`lovebehaviortranslator.com`), you can use any email on that domain:
+>   - ✅ `support@lovebehaviortranslator.com` (recommended)
+>   - ✅ `noreply@lovebehaviortranslator.com`
+>   - ✅ `admin@lovebehaviortranslator.com`
 > - If you verified a **single email**, you must use that exact email address
 > - The email must be **verified** before you can send from it
+> - **All reply emails will be sent FROM this address**, so choose a professional email like `support@`
 
 ### 4.5 Test Email Sending
 
