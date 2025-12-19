@@ -206,7 +206,11 @@ SES is required for:
 
 1. In SES Console → **Verified identities** → **Create identity**
 2. **Identity type**: Select **Domain**
-3. **Domain**: Enter your domain (e.g., `lovebehaviortranslator.com`)
+3. **Domain**: Enter your domain **without** `https://` or trailing slash
+   - ✅ Correct: `lovebehaviortranslator.com`
+   - ❌ Wrong: `https://lovebehaviortranslator.com/`
+   - ❌ Wrong: `https://lovebehaviortranslator.com`
+   - ❌ Wrong: `www.lovebehaviortranslator.com` (unless you want to verify www subdomain separately)
 4. **Configuration set**: Leave empty (optional)
 5. **DKIM signing**: Select **Easy DKIM** (recommended for better deliverability)
 6. Click **Create identity**
