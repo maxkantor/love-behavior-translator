@@ -215,12 +215,66 @@ SES is required for:
 5. **DKIM signing**: Select **Easy DKIM** (recommended for better deliverability)
 6. Click **Create identity**
 7. SES will provide **DNS records** to add to your domain:
-   - **CNAME records** for DKIM verification
-   - **TXT record** for domain verification
-8. Go to your domain registrar (Route 53 or other) and add these DNS records
-9. Wait 5-10 minutes for DNS propagation
-10. Click **Verify** in SES Console
-11. Once verified, you can send from **any email address** on that domain (e.g., `support@`, `noreply@`, etc.)
+   - **CNAME records** for DKIM verification (usually 3 records)
+   - **TXT record** for domain verification (1 record)
+   
+8. **Add DNS Records in Route 53:**
+   
+   **If your domain is in Route 53:**
+   
+   a. **Copy the DNS records from SES:**
+      - After clicking "Create identity", SES will show you a page with all the DNS records
+      - You'll see something like:
+        - **TXT record**: `_amazonses.lovebehaviortranslator.com` → `abc123...`
+        - **CNAME records**: `abc123._domainkey.lovebehaviortranslator.com` → `abc123.dkim.amazonses.com`
+        - (There will be 3 CNAME records with different prefixes)
+   
+   b. **Go to Route 53 Console:**
+      - AWS Console → **Route 53** → **Hosted zones**
+      - Click on your domain (e.g., `lovebehaviortranslator.com`)
+   
+   c. **Add the TXT record:**
+      - Click **Create record**
+      - **Record name**: Enter `_amazonses` (SES will show the full name, but you only need the subdomain part)
+      - **Record type**: Select **TXT**
+      - **Value**: Paste the TXT record value from SES (it will be a long string)
+      - **TTL**: Leave as default (300) or set to 300
+      - Click **Create records**
+   
+   d. **Add the CNAME records (3 records):**
+      - Click **Create record** (repeat for each of the 3 CNAME records)
+      - **Record name**: Enter the subdomain part (e.g., `abc123._domainkey` - SES will show the full name)
+      - **Record type**: Select **CNAME**
+      - **Value**: Paste the CNAME target from SES (e.g., `abc123.dkim.amazonses.com`)
+      - **TTL**: Leave as default (300) or set to 300
+      - Click **Create records**
+      - Repeat for all 3 CNAME records
+   
+   e. **Verify the records are added:**
+      - You should see all 4 records in your Route 53 hosted zone:
+        - 1 TXT record: `_amazonses`
+        - 3 CNAME records: `[prefix]._domainkey`
+   
+   **If your domain is NOT in Route 53 (using another DNS provider):**
+   
+   - Go to your DNS provider's console (GoDaddy, Namecheap, Cloudflare, etc.)
+   - Add the same DNS records (TXT and 3 CNAME records) as shown in SES
+   - Use the exact record names and values provided by SES
+   - Save the records
+   
+9. **Wait for DNS propagation:**
+   - DNS changes typically take 5-15 minutes to propagate
+   - You can check if records are live using:
+     - `nslookup -type=TXT _amazonses.lovebehaviortranslator.com`
+     - Or use online tools like `dnschecker.org`
+   
+10. **Verify in SES:**
+    - Go back to SES Console → **Verified identities**
+    - Find your domain in the list
+    - Click **Verify** (or it may auto-verify once DNS records are detected)
+    - Status should change to **Verified** ✅
+   
+11. **Once verified, you can send from any email address** on that domain (e.g., `support@lovebehaviortranslator.com`, `noreply@lovebehaviortranslator.com`, etc.)
 
 ### 4.3 Request Production Access (Move Out of Sandbox)
 
