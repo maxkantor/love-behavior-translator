@@ -391,14 +391,13 @@ export function AdminDashboard() {
                         {contact.repliedAt && ` • Replied: ${new Date(contact.repliedAt).toLocaleString()}`}
                       </div>
                     </div>
-                    {contact.status === 'new' && (
-                      <button
-                        onClick={() => setSelectedContact(contact)}
-                        className="admin-reply-btn"
-                      >
-                        Reply
-                      </button>
-                    )}
+                    <button
+                      onClick={() => setSelectedContact(contact)}
+                      className="admin-reply-btn"
+                      title={contact.status === 'replied' ? 'Reply again (previous reply will be replaced)' : 'Reply to contact'}
+                    >
+                      {contact.status === 'replied' ? 'Reply Again' : 'Reply'}
+                    </button>
                   </div>
                   <div className="admin-contact-message">{contact.message}</div>
                 </div>

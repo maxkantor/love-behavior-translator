@@ -503,7 +503,7 @@ public sealed class Function
             // Send reply email
             await SendContactReply(contactEmail, originalSubject, originalMessage, replyMessage, context);
 
-            // Update contact status
+            // Update contact status (allow replying multiple times)
             await _ddb.UpdateItemAsync(new UpdateItemRequest
             {
                 TableName = "LoveBehaviorTranslatorContacts",
@@ -511,7 +511,7 @@ public sealed class Function
                 {
                     ["contactId"] = new AttributeValue { S = contactId }
                 },
-                UpdateExpression = "SET #status = :status, repliedAt = :repliedAt",
+                UpdateExpression = "SET #status = :status, repliedAt = :repliedAt, replyMessage = :replyMessage",
                 ExpressionAttributeNames = new Dictionary<string, string>
                 {
                     ["#status"] = "status"
@@ -519,7 +519,8 @@ public sealed class Function
                 ExpressionAttributeValues = new Dictionary<string, AttributeValue>
                 {
                     [":status"] = new AttributeValue { S = "replied" },
-                    [":repliedAt"] = new AttributeValue { S = DateTimeOffset.UtcNow.ToString("O") }
+                    [":repliedAt"] = new AttributeValue { S = DateTimeOffset.UtcNow.ToString("O") },
+                    [":replyMessage"] = new AttributeValue { S = replyMessage }
                 }
             });
 
