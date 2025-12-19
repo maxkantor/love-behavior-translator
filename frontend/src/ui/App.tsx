@@ -181,10 +181,22 @@ export function App() {
               </div>
               <span className="credits-number">{displayCredits}</span>
               <span className="credits-label">Credits</span>
+              <button 
+                onClick={() => refreshCredits()} 
+                className="refresh-credits-btn"
+                title="Refresh credits"
+              >
+                🔄
+              </button>
             </div>
             <div className="credits-explanation-text">
               1 credit = 1 behavior analysis
             </div>
+            {process.env.NODE_ENV === 'development' && (
+              <div style={{ fontSize: '0.7rem', opacity: 0.7, marginTop: '4px' }}>
+                User ID: {userId}
+              </div>
+            )}
           </div>
         </div>
       </header>

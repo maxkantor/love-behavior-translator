@@ -37,24 +37,38 @@ export function CreditProvider({ children }: { children: React.ReactNode }) {
         return;
       }
       
-      console.log('Refreshing credits from server...', 'userId:', userId);
+      console.log('🔄 Refreshing credits from server...', 'userId:', userId, 'url:', `${apiBaseUrl}/credits`);
+      const startTime = Date.now();
       const resp = await fetch(`${apiBaseUrl}/credits`, {
         method: 'GET',
         headers: {
           'x-user-id': userId,
         },
+        cache: 'no-cache', // Force fresh fetch
       });
+      const duration = Date.now() - startTime;
+      
+      console.log(`📡 Response received in ${duration}ms:`, resp.status, resp.statusText);
       
       if (resp.ok) {
         const data = await resp.json();
+        console.log('📦 Response data:', data);
         const creditsValue = data.credits ?? null;
-        console.log('✅ Refreshed credits from server:', creditsValue, 'userId:', userId);
+        console.log('✅ Refreshed credits from server:', creditsValue, 'userId:', userId, 'response userId:', data.userId);
+        
+        // Verify userId matches
+        if (data.userId && data.userId !== userId) {
+          console.warn('⚠️ userId mismatch! Request:', userId, 'Response:', data.userId);
+        }
+        
         setCredits(creditsValue);
         if (creditsValue !== null) {
           localStorage.setItem('credits', creditsValue.toString());
+          console.log('💾 Saved to localStorage:', creditsValue);
         } else {
           // If server returns null, clear localStorage too
           localStorage.removeItem('credits');
+          console.log('🗑️ Cleared localStorage (null credits)');
         }
       } else {
         const errorText = await resp.text();
@@ -64,7 +78,7 @@ export function CreditProvider({ children }: { children: React.ReactNode }) {
         if (stored) {
           const parsed = parseInt(stored, 10);
           if (!isNaN(parsed)) {
-            console.log('Using cached credits from localStorage:', parsed);
+            console.log('⚠️ Using cached credits from localStorage:', parsed);
             setCredits(parsed);
           }
         }

@@ -158,6 +158,31 @@ body {
   color: #000;
 }
 
+.refresh-credits-btn {
+  background: rgba(0, 0, 0, 0.1);
+  border: none;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.2s;
+  margin-left: 4px;
+  padding: 0;
+}
+
+.refresh-credits-btn:hover {
+  background: rgba(0, 0, 0, 0.2);
+  transform: rotate(180deg);
+}
+
+.refresh-credits-btn:active {
+  transform: rotate(360deg);
+}
+
 .credits-explanation-text {
   margin-top: 8px;
   font-size: 0.9rem;
