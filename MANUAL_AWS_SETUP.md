@@ -629,39 +629,66 @@ When ready for production:
 
 **404 Error: "Not found" when clicking "Get [Pack Name]"**
 
-This means the `/stripe/create-checkout-session` endpoint doesn't exist or isn't deployed:
+**If CloudWatch logs show NO request to `/stripe/create-checkout-session`**, this means the endpoint doesn't exist in API Gateway or isn't deployed.
 
-1. **Verify endpoint exists:**
-   - API Gateway → Resources
-   - Look for `/stripe/create-checkout-session` in the resource tree
-   - You should see a `POST` method under it
-   - If it doesn't exist, create it (see Step 5.6.1)
+**Quick Fix Checklist:**
 
-2. **Verify API is deployed:**
-   - API Gateway → **Actions** → **Deploy API**
-   - Check the deployment date - if it's old, deploy again
-   - Select your stage and click **Deploy**
+1. **Verify endpoint exists in API Gateway:**
+   - API Gateway → Your API → **Resources**
+   - Look in the resource tree for:
+     ```
+     /
+     ├── /stripe
+     │   └── /create-checkout-session
+     │       └── POST (method)
+     ```
+   - **If `/stripe` doesn't exist:**
+     - Click **Create resource** (at root `/`)
+     - Name: `stripe`, Path: `/stripe`
+     - Click **Create resource**
+   - **If `/stripe` exists but `/create-checkout-session` doesn't:**
+     - Select `/stripe` → **Create resource**
+     - Name: `create-checkout-session`
+     - Path: `/create-checkout-session`
+     - Click **Create resource**
+   - **If `/stripe/create-checkout-session` exists but has no POST method:**
+     - Select `/stripe/create-checkout-session` → **Create method** → `POST`
+     - Integration: **Lambda Function**
+     - ✅ Check **Use Lambda Proxy integration**
+     - Lambda: `LoveBehaviorTranslatorFunction`
+     - Click **Save** → **OK**
 
-3. **Check CloudWatch logs:**
-   - Lambda → `LoveBehaviorTranslatorFunction` → **Monitor** → **View CloudWatch logs**
-   - Look for the request log when you click "Get [Pack Name]"
-   - You should see: `Request: POST /stripe/create-checkout-session`
-   - If you see a different path, the endpoint path might be wrong
+2. **Enable CORS:**
+   - Select `/stripe/create-checkout-session` → **Actions** → **Enable CORS**
+   - Access-Control-Allow-Origin: `*`
+   - Access-Control-Allow-Headers: `Content-Type,Authorization,x-user-id`
+   - Access-Control-Allow-Methods: `POST,OPTIONS`
+   - Click **Enable CORS and replace existing CORS headers**
+   - Click **Yes, replace existing values**
 
-4. **Verify the endpoint path:**
-   - The endpoint should be exactly: `/stripe/create-checkout-session`
-   - Not `/stripe/createcheckoutsession` (no hyphens)
-   - Not `/stripe/create_checkout_session` (underscores)
+3. **Deploy the API (CRITICAL!):**
+   - **Actions** → **Deploy API**
+   - Select your stage (e.g., `prod`)
+   - Click **Deploy**
+   - **Wait 10-30 seconds** for propagation
 
-5. **Test the endpoint directly:**
-   - Use a tool like Postman or curl to test:
+4. **Verify in CloudWatch:**
+   - Try clicking "Get [Pack Name]" again
+   - Check CloudWatch logs - you should NOW see:
+     ```
+     Request: POST /stripe/create-checkout-session (raw: /stripe/create-checkout-session)
+     ```
+   - If you still don't see this log, the endpoint still doesn't exist or isn't deployed
+
+5. **Test directly with curl:**
    ```bash
-   curl -X POST https://your-api-url.amazonaws.com/prod/stripe/create-checkout-session \
+   curl -X POST https://8dr22prv81.execute-api.us-east-1.amazonaws.com/prod/stripe/create-checkout-session \
      -H "Content-Type: application/json" \
      -d '{"credits":20,"price":4.99}'
    ```
-   - If this returns 404, the endpoint doesn't exist
-   - If it returns 500 "Stripe not configured", the endpoint exists but Stripe key is missing
+   - **404 response** = endpoint doesn't exist or not deployed
+   - **500 "Stripe not configured"** = endpoint exists, but `STRIPE_SECRET_KEY` missing
+   - **200 with JSON** = endpoint works!
 
 **CORS Error: "No 'Access-Control-Allow-Origin' header is present"**
 
