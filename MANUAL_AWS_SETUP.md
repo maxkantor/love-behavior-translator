@@ -536,15 +536,23 @@ Stripe is required for users to purchase credits through the "Unlock Clarity" fe
 
 > **Important**: The webhook endpoint should **NOT** require authentication. Stripe will sign the requests.
 
-#### 5.6.3 Add OPTIONS Methods for CORS
+#### 5.6.3 Add OPTIONS Methods for CORS (IMPORTANT!)
+
+**⚠️ CORS errors will occur if you skip this step!**
 
 For both `/stripe/create-checkout-session` and `/stripe/webhook`:
 
-1. Select the resource → **Create method** → `OPTIONS`
+1. Select the resource (e.g., `/stripe/create-checkout-session`) → **Create method** → `OPTIONS`
 2. **Integration type**: **Lambda Function**
 3. ✅ Check **Use Lambda Proxy integration**
 4. **Lambda Function**: `LoveBehaviorTranslatorFunction`
 5. Click **Save** → **OK**
+
+> **Note**: The Lambda function already handles OPTIONS requests and returns proper CORS headers, so this will work automatically once the method is created.
+
+**After creating all methods, make sure to:**
+1. **Deploy the API** (see Step 7.5)
+2. Test the endpoint to ensure CORS is working
 
 ### 5.7 Test Stripe Integration
 
