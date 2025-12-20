@@ -80,6 +80,7 @@ public sealed class Function
             
             // Log for debugging (remove in production)
             context.Logger.LogInformation($"Request: {method} {path} (raw: {rawPath})");
+            context.Logger.LogInformation($"Path matching: EndsWith('/stripe/create-checkout-session')={path.EndsWith("/stripe/create-checkout-session")}, == '/stripe/create-checkout-session'={path == "/stripe/create-checkout-session"}");
 
             // Handle CORS preflight (OPTIONS) requests
             if (method == "OPTIONS")
@@ -152,8 +153,17 @@ public sealed class Function
                 return await HandleAnalyze(request, context);
 
             // Stripe checkout session creation
-            if (method == "POST" && (path.EndsWith("/stripe/create-checkout-session") || path == "/stripe/create-checkout-session"))
+            // Handle both with and without leading slash, and case variations
+            if (method == "POST" && (
+                path.EndsWith("/stripe/create-checkout-session") || 
+                path == "/stripe/create-checkout-session" ||
+                path.EndsWith("stripe/create-checkout-session") ||
+                path == "stripe/create-checkout-session" ||
+                rawPath.Contains("/stripe/create-checkout-session", StringComparison.OrdinalIgnoreCase)))
+            {
+                context.Logger.LogInformation("Matched Stripe checkout session endpoint");
                 return await HandleCreateCheckoutSession(request, context);
+            }
 
             // Stripe webhook
             if (method == "POST" && (path.EndsWith("/stripe/webhook") || path == "/stripe/webhook"))

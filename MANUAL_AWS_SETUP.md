@@ -627,6 +627,42 @@ When ready for production:
 - Check `successUrl` and `cancelUrl` in checkout session creation
 - Ensure URLs are absolute (include `https://`)
 
+**404 Error: "Not found" when clicking "Get [Pack Name]"**
+
+This means the `/stripe/create-checkout-session` endpoint doesn't exist or isn't deployed:
+
+1. **Verify endpoint exists:**
+   - API Gateway → Resources
+   - Look for `/stripe/create-checkout-session` in the resource tree
+   - You should see a `POST` method under it
+   - If it doesn't exist, create it (see Step 5.6.1)
+
+2. **Verify API is deployed:**
+   - API Gateway → **Actions** → **Deploy API**
+   - Check the deployment date - if it's old, deploy again
+   - Select your stage and click **Deploy**
+
+3. **Check CloudWatch logs:**
+   - Lambda → `LoveBehaviorTranslatorFunction` → **Monitor** → **View CloudWatch logs**
+   - Look for the request log when you click "Get [Pack Name]"
+   - You should see: `Request: POST /stripe/create-checkout-session`
+   - If you see a different path, the endpoint path might be wrong
+
+4. **Verify the endpoint path:**
+   - The endpoint should be exactly: `/stripe/create-checkout-session`
+   - Not `/stripe/createcheckoutsession` (no hyphens)
+   - Not `/stripe/create_checkout_session` (underscores)
+
+5. **Test the endpoint directly:**
+   - Use a tool like Postman or curl to test:
+   ```bash
+   curl -X POST https://your-api-url.amazonaws.com/prod/stripe/create-checkout-session \
+     -H "Content-Type: application/json" \
+     -d '{"credits":20,"price":4.99}'
+   ```
+   - If this returns 404, the endpoint doesn't exist
+   - If it returns 500 "Stripe not configured", the endpoint exists but Stripe key is missing
+
 **CORS Error: "No 'Access-Control-Allow-Origin' header is present"**
 
 This is the most common issue. Follow these steps in order:
