@@ -474,12 +474,22 @@ Stripe is required for users to purchase credits through the "Unlock Clarity" fe
 
 ### 5.5 Set Up Stripe Webhook
 
+**First, find your API Gateway endpoint URL:**
+
+1. AWS Console → **API Gateway**
+2. Select your API (`love-behavior-translator-api`)
+3. Click **Stages** in the left sidebar
+4. Click on your stage (usually `prod` or `default`)
+5. You'll see **Invoke URL** at the top (e.g., `https://abc123xyz.execute-api.us-east-1.amazonaws.com/prod`)
+6. **Copy this URL** - this is your API Gateway endpoint URL
+
 **For Production:**
 
 1. In Stripe Dashboard → **Developers** → **Webhooks**
 2. Click **Add endpoint**
-3. **Endpoint URL**: `https://your-api-gateway-url.amazonaws.com/prod/stripe/webhook`
-   - Replace with your actual API Gateway URL
+3. **Endpoint URL**: `{YOUR_INVOKE_URL}/stripe/webhook`
+   - Example: `https://abc123xyz.execute-api.us-east-1.amazonaws.com/prod/stripe/webhook`
+   - Replace `{YOUR_INVOKE_URL}` with the Invoke URL from step 5 above
 4. **Description**: "Love Behavior Translator - Credit Purchase Webhook"
 5. **Events to send**: Select `checkout.session.completed`
 6. Click **Add endpoint**
