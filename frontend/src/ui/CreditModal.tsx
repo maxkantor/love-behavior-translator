@@ -61,6 +61,7 @@ export function CreditModal({ isOpen, onClose, currentCredits }: CreditModalProp
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'x-user-id': userId, // Send userId in header so backend uses it instead of IP
         },
         body: JSON.stringify({
           credits: pack.credits,
