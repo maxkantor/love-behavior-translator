@@ -913,11 +913,13 @@ Reassurance:
 
         var ip = GetClientIp(request) ?? "unknown";
         var userId = CreditSystem.GetUserId(request, ip);
+        
+        // Log userId source for debugging
+        var userIdSource = request.Headers?.ContainsKey("x-user-id") == true ? "header" : "ip-based";
+        context.Logger.LogInformation($"Creating Stripe checkout session: {input.Credits} credits for ${input.Price}, userId: {userId} (source: {userIdSource})");
 
         try
         {
-            context.Logger.LogInformation($"Creating Stripe checkout session: {input.Credits} credits for ${input.Price}");
-            
             var options = new SessionCreateOptions
             {
                 PaymentMethodTypes = new List<string> { "card" },
@@ -949,6 +951,8 @@ Reassurance:
                 },
                 CustomerEmail = input.Email // Optional: pre-fill email
             };
+            
+            context.Logger.LogInformation($"Stripe session metadata: userId={userId}, credits={input.Credits}, price=${input.Price:F2}");
 
             var service = new SessionService();
             var session = await service.CreateAsync(options);
@@ -977,13 +981,20 @@ Reassurance:
 
     private async Task<APIGatewayProxyResponse> HandleStripeWebhook(APIGatewayProxyRequest request, ILambdaContext context)
     {
+        context.Logger.LogInformation("🔔 Stripe webhook received!");
+        context.Logger.LogInformation($"Request body length: {request.Body?.Length ?? 0}");
+        context.Logger.LogInformation($"Headers: {string.Join(", ", request.Headers?.Keys ?? Array.Empty<string>())}");
+        
         if (string.IsNullOrWhiteSpace(_stripeSecretKey))
+        {
+            context.Logger.LogError("❌ STRIPE_SECRET_KEY not configured");
             return JsonResponse(500, new { error = "Stripe not configured" });
+        }
 
         var webhookSecret = Environment.GetEnvironmentVariable("STRIPE_WEBHOOK_SECRET") ?? "";
         if (string.IsNullOrWhiteSpace(webhookSecret))
         {
-            context.Logger.LogWarning("STRIPE_WEBHOOK_SECRET not set; webhook verification skipped");
+            context.Logger.LogWarning("⚠️ STRIPE_WEBHOOK_SECRET not set; webhook verification skipped (INSECURE - only for testing)");
         }
 
         var body = request.Body ?? "";
@@ -992,7 +1003,12 @@ Reassurance:
             : null;
 
         if (string.IsNullOrWhiteSpace(signature))
+        {
+            context.Logger.LogError("❌ Missing stripe-signature header");
             return JsonResponse(400, new { error = "Missing stripe-signature header" });
+        }
+        
+        context.Logger.LogInformation($"✅ Stripe signature present: {signature.Substring(0, Math.Min(20, signature.Length))}...");
 
         try
         {

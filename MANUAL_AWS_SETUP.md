@@ -474,6 +474,8 @@ Stripe is required for users to purchase credits through the "Unlock Clarity" fe
 
 ### 5.5 Set Up Stripe Webhook
 
+**⚠️ CRITICAL: The webhook is what grants credits after payment. If this isn't set up correctly, users won't receive credits!**
+
 **First, find your API Gateway endpoint URL:**
 
 1. AWS Console → **API Gateway**
@@ -675,6 +677,7 @@ When ready for production:
 - Check CloudWatch logs for webhook processing errors
 - Verify webhook endpoint is receiving events in Stripe Dashboard
 - Ensure `checkout.session.completed` event is selected in webhook configuration
+- **See detailed troubleshooting below**
 
 **Payment succeeds but redirect fails**
 - Check `successUrl` and `cancelUrl` in checkout session creation
