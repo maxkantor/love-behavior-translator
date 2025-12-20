@@ -542,6 +542,8 @@ Stripe is required for users to purchase credits through the "Unlock Clarity" fe
 
 For both `/stripe/create-checkout-session` and `/stripe/webhook`:
 
+**Option A: Use Lambda Proxy Integration (Recommended)**
+
 1. Select the resource (e.g., `/stripe/create-checkout-session`) → **Create method** → `OPTIONS`
 2. **Integration type**: **Lambda Function**
 3. ✅ Check **Use Lambda Proxy integration**
@@ -550,9 +552,23 @@ For both `/stripe/create-checkout-session` and `/stripe/webhook`:
 
 > **Note**: The Lambda function already handles OPTIONS requests and returns proper CORS headers, so this will work automatically once the method is created.
 
+**Option B: Use Mock Integration (Alternative if Lambda doesn't work)**
+
+If Option A doesn't work, you can use API Gateway's built-in CORS:
+
+1. Select the resource (e.g., `/stripe/create-checkout-session`)
+2. Click **Actions** → **Enable CORS**
+3. **Access-Control-Allow-Origin**: `*` (or your domain: `https://lovebehaviortranslator.com`)
+4. **Access-Control-Allow-Headers**: `Content-Type,Authorization,x-user-id`
+5. **Access-Control-Allow-Methods**: `POST,OPTIONS`
+6. Click **Enable CORS and replace existing CORS headers**
+7. Click **Yes, replace existing values**
+
 **After creating all methods, make sure to:**
-1. **Deploy the API** (see Step 7.5)
-2. Test the endpoint to ensure CORS is working
+1. **Deploy the API** (see Step 7.5) - **This is critical!**
+2. Wait a few seconds for the deployment to propagate
+3. Test the endpoint to ensure CORS is working
+4. Clear your browser cache if the error persists
 
 ### 5.7 Test Stripe Integration
 
@@ -597,11 +613,38 @@ When ready for production:
 - Ensure URLs are absolute (include `https://`)
 
 **CORS Error: "No 'Access-Control-Allow-Origin' header is present"**
-- **Solution 1**: Make sure you created the `OPTIONS` method for `/stripe/create-checkout-session` (see Step 5.6.3)
-- **Solution 2**: Deploy your API after creating the endpoints (see Step 7.5)
-- **Solution 3**: Verify the endpoint exists in API Gateway → Resources → `/stripe/create-checkout-session`
-- **Solution 4**: Check CloudWatch logs to see if the OPTIONS request is reaching Lambda
-- **Solution 5**: Make sure you selected the correct resource when creating the OPTIONS method (it should be `/stripe/create-checkout-session`, not just `/stripe`)
+
+This is the most common issue. Follow these steps in order:
+
+1. **Verify OPTIONS method exists:**
+   - API Gateway → Resources → `/stripe/create-checkout-session`
+   - You should see both `POST` and `OPTIONS` methods listed
+   - If OPTIONS is missing, create it (see Step 5.6.3)
+
+2. **Deploy the API (CRITICAL!):**
+   - API Gateway → **Actions** → **Deploy API**
+   - Select your stage (e.g., `prod`)
+   - Click **Deploy**
+   - **This must be done after creating any new methods!**
+
+3. **Wait for propagation:**
+   - Wait 10-30 seconds after deploying
+   - API Gateway changes can take a moment to propagate
+
+4. **Clear browser cache:**
+   - Hard refresh: `Ctrl+Shift+R` (Windows) or `Cmd+Shift+R` (Mac)
+   - Or clear browser cache completely
+
+5. **Verify in API Gateway:**
+   - Check that both POST and OPTIONS methods show "Lambda Proxy" integration
+   - Both should point to `LoveBehaviorTranslatorFunction`
+
+6. **Check CloudWatch logs:**
+   - Lambda → `LoveBehaviorTranslatorFunction` → **Monitor** → **View CloudWatch logs**
+   - Look for OPTIONS requests - if you don't see them, API Gateway isn't routing them
+
+7. **Alternative: Use API Gateway CORS:**
+   - If Lambda OPTIONS still doesn't work, use Option B in Step 5.6.3 (Enable CORS directly in API Gateway)
 
 ---
 
