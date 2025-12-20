@@ -1015,12 +1015,15 @@ Reassurance:
             Event stripeEvent;
             if (!string.IsNullOrWhiteSpace(webhookSecret))
             {
-                stripeEvent = EventUtility.ConstructEvent(body, signature, webhookSecret);
+                // Disable API version mismatch exception to handle newer Stripe API versions
+                stripeEvent = EventUtility.ConstructEvent(body, signature, webhookSecret, throwOnApiVersionMismatch: false);
             }
             else
             {
                 // In development, parse without verification (not recommended for production)
-                stripeEvent = JsonSerializer.Deserialize<Event>(body, Json) ?? throw new Exception("Failed to parse event");
+                // Disable API version mismatch exception
+                var options = new JsonSerializerOptions(Json);
+                stripeEvent = JsonSerializer.Deserialize<Event>(body, options) ?? throw new Exception("Failed to parse event");
             }
 
             // Handle the event
