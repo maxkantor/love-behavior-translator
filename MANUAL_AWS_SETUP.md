@@ -507,20 +507,30 @@ Stripe is required for users to purchase credits through the "Unlock Clarity" fe
 
 #### 5.6.1 Create `/stripe/create-checkout-session` Endpoint
 
+**⚠️ IMPORTANT: This endpoint must exist or you'll get a 404 error!**
+
 1. API Gateway → Your API → **Resources**
-2. **Create resource**
-3. **Resource name**: `stripe`
-4. **Resource path**: `/stripe`
-5. Click **Create resource**
-6. Select `/stripe` → **Create resource**
-7. **Resource name**: `create-checkout-session`
-8. **Resource path**: `/create-checkout-session`
-9. Click **Create resource**
-10. Select `/stripe/create-checkout-session` → **Create method** → `POST`
-11. **Integration type**: **Lambda Function**
-12. ✅ Check **Use Lambda Proxy integration**
-13. **Lambda Function**: `LoveBehaviorTranslatorFunction`
-14. Click **Save** → **OK**
+2. Check if `/stripe` resource exists:
+   - If it exists, skip to step 6
+   - If it doesn't exist, continue with step 3
+3. **Create resource** (to create `/stripe`)
+4. **Resource name**: `stripe`
+5. **Resource path**: `/stripe`
+6. Click **Create resource**
+7. Select `/stripe` resource → **Create resource** (to create `/create-checkout-session` under `/stripe`)
+8. **Resource name**: `create-checkout-session`
+9. **Resource path**: `/create-checkout-session` (API Gateway will show the full path as `/stripe/create-checkout-session`)
+10. Click **Create resource**
+11. **Verify the full path**: You should now see `/stripe/create-checkout-session` in the resource tree
+12. Select `/stripe/create-checkout-session` → **Create method** → `POST`
+13. **Integration type**: **Lambda Function**
+14. ✅ Check **Use Lambda Proxy integration**
+15. **Lambda Function**: `LoveBehaviorTranslatorFunction`
+16. Click **Save** → **OK** (when prompted to grant permissions)
+
+**Verify the endpoint:**
+- You should see `POST` method listed under `/stripe/create-checkout-session`
+- The integration should show "Lambda Proxy" and point to `LoveBehaviorTranslatorFunction`
 
 #### 5.6.2 Create `/stripe/webhook` Endpoint
 
@@ -895,7 +905,17 @@ For each resource (`/`, `/health`, `/analyze`, `/credits`, `/contact`, `/admin/*
    - Under **200**, edit **Header Mappings**
    - Set `Access-Control-Allow-Headers` to: `'Content-Type,Authorization,x-user-id'`
 
-### 7.5 Deploy API
+### 7.5 Deploy API (CRITICAL!)
+
+**⚠️ You MUST deploy the API after creating any new endpoints or methods!**
+
+1. **Actions** → **Deploy API**
+2. **Deployment stage**: Select your stage (e.g., `prod` or create a new one)
+3. **Deployment description**: (optional) e.g., "Added Stripe endpoints"
+4. Click **Deploy**
+5. **Wait 10-30 seconds** for the deployment to propagate
+
+> **Important**: If you don't deploy after creating endpoints, they won't be accessible and you'll get 404 errors!
 
 1. **Actions** → **Deploy API**
 2. **Deployment stage**: **New stage**
