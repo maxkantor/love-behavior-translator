@@ -8,7 +8,7 @@ type CreditModalProps = {
 };
 
 export function CreditModal({ isOpen, onClose, currentCredits }: CreditModalProps) {
-  const { refreshCredits } = useCredits();
+  const { refreshCredits, userId } = useCredits();
   
   // Refresh credits when modal opens
   React.useEffect(() => {
