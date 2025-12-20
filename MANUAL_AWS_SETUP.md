@@ -596,6 +596,13 @@ When ready for production:
 - Check `successUrl` and `cancelUrl` in checkout session creation
 - Ensure URLs are absolute (include `https://`)
 
+**CORS Error: "No 'Access-Control-Allow-Origin' header is present"**
+- **Solution 1**: Make sure you created the `OPTIONS` method for `/stripe/create-checkout-session` (see Step 5.6.3)
+- **Solution 2**: Deploy your API after creating the endpoints (see Step 7.5)
+- **Solution 3**: Verify the endpoint exists in API Gateway → Resources → `/stripe/create-checkout-session`
+- **Solution 4**: Check CloudWatch logs to see if the OPTIONS request is reaching Lambda
+- **Solution 5**: Make sure you selected the correct resource when creating the OPTIONS method (it should be `/stripe/create-checkout-session`, not just `/stripe`)
+
 ---
 
 ### 4.7 Best Practices
