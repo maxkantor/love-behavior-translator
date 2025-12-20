@@ -852,7 +852,10 @@ Reassurance:
     private async Task<APIGatewayProxyResponse> HandleCreateCheckoutSession(APIGatewayProxyRequest request, ILambdaContext context)
     {
         if (string.IsNullOrWhiteSpace(_stripeSecretKey))
-            return JsonResponse(500, new { error = "Stripe not configured" });
+        {
+            context.Logger.LogError("STRIPE_SECRET_KEY not set in Lambda environment variables");
+            return JsonResponse(500, new { error = "Stripe not configured. Please set STRIPE_SECRET_KEY in Lambda environment variables." });
+        }
 
         if (string.IsNullOrWhiteSpace(request.Body))
             return JsonResponse(400, new { error = "Request body required" });
@@ -868,13 +871,18 @@ Reassurance:
         }
 
         if (input == null || input.Credits <= 0 || input.Price <= 0)
-            return JsonResponse(400, new { error = "Invalid request: credits and price required" });
+        {
+            context.Logger.LogWarning($"Invalid checkout session request: credits={input?.Credits}, price={input?.Price}");
+            return JsonResponse(400, new { error = "Invalid request: credits and price must be greater than 0" });
+        }
 
         var ip = GetClientIp(request) ?? "unknown";
         var userId = CreditSystem.GetUserId(request, ip);
 
         try
         {
+            context.Logger.LogInformation($"Creating Stripe checkout session: {input.Credits} credits for ${input.Price}");
+            
             var options = new SessionCreateOptions
             {
                 PaymentMethodTypes = new List<string> { "card" },
@@ -909,6 +917,14 @@ Reassurance:
 
             var service = new SessionService();
             var session = await service.CreateAsync(options);
+
+            context.Logger.LogInformation($"Stripe checkout session created: {session.Id}, URL: {session.Url}");
+            
+            if (string.IsNullOrWhiteSpace(session.Url))
+            {
+                context.Logger.LogError($"Stripe session created but URL is empty: {session.Id}");
+                return JsonResponse(500, new { error = "Checkout session created but URL is missing" });
+            }
 
             return JsonResponse(200, new { sessionId = session.Id, url = session.Url });
         }

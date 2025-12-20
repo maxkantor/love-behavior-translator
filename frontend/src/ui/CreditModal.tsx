@@ -54,6 +54,9 @@ export function CreditModal({ isOpen, onClose, currentCredits }: CreditModalProp
         return;
       }
 
+      console.log('Creating checkout session for pack:', pack);
+      console.log('API URL:', `${apiBaseUrl}/stripe/create-checkout-session`);
+
       const response = await fetch(`${apiBaseUrl}/stripe/create-checkout-session`, {
         method: 'POST',
         headers: {
@@ -67,23 +70,41 @@ export function CreditModal({ isOpen, onClose, currentCredits }: CreditModalProp
         }),
       });
 
+      console.log('Response status:', response.status, response.statusText);
+
       if (!response.ok) {
-        const error = await response.json();
-        alert(`Failed to create checkout: ${error.error || 'Unknown error'}`);
+        let errorMessage = 'Unknown error';
+        try {
+          const error = await response.json();
+          errorMessage = error.error || error.message || JSON.stringify(error);
+          console.error('Error response:', error);
+        } catch (e) {
+          const text = await response.text();
+          errorMessage = text || `HTTP ${response.status}: ${response.statusText}`;
+          console.error('Error response (text):', text);
+        }
+        alert(`Failed to create checkout: ${errorMessage}\n\nPlease check:\n1. STRIPE_SECRET_KEY is set in Lambda\n2. Stripe endpoint is created in API Gateway\n3. Check CloudWatch logs for details`);
         return;
       }
 
       const data = await response.json();
+      console.log('Checkout session response:', data);
       
       // Redirect to Stripe Checkout
       if (data.url) {
+        console.log('Redirecting to Stripe Checkout:', data.url);
         window.location.href = data.url;
+      } else if (data.sessionId) {
+        // Fallback: construct Stripe Checkout URL if only sessionId is returned
+        console.warn('No URL in response, only sessionId:', data.sessionId);
+        alert('Checkout session created but URL missing. Please check backend logs.');
       } else {
-        alert('Failed to get checkout URL');
+        console.error('Invalid response format:', data);
+        alert(`Invalid response from server: ${JSON.stringify(data)}\n\nExpected: { url: "..." } or { sessionId: "..." }`);
       }
     } catch (error) {
       console.error('Error creating checkout session:', error);
-      alert('Failed to start checkout. Please try again.');
+      alert(`Failed to start checkout: ${error instanceof Error ? error.message : 'Network error'}\n\nPlease check your browser console for details.`);
     }
   }
 
