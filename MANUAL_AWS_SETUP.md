@@ -894,11 +894,22 @@ git push -u origin main
 
 ### 8.4 Add Environment Variable
 
+**First, find your API Gateway endpoint URL:**
+
+1. AWS Console → **API Gateway**
+2. Select your API (`love-behavior-translator-api`)
+3. Click **Stages** in the left sidebar
+4. Click on your stage (usually `prod` or `default`)
+5. You'll see **Invoke URL** at the top (e.g., `https://abc123xyz.execute-api.us-east-1.amazonaws.com/prod`)
+6. **Copy this URL** - this is your API Gateway endpoint URL
+
+**Add to Amplify:**
+
 1. **Environment variables** section
 2. Add:
    - **Key**: `VITE_API_BASE_URL`
    - **Value**: Your API Gateway Invoke URL (including `/prod`)
-     - Example: `https://xxxx.execute-api.us-east-1.amazonaws.com/prod`
+     - Example: `https://abc123xyz.execute-api.us-east-1.amazonaws.com/prod`
 3. Click **Next** → **Save and deploy**
 
 ### 8.5 Wait for Deployment
