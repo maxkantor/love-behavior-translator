@@ -509,6 +509,8 @@ Stripe is required for users to purchase credits through the "Unlock Clarity" fe
 
 **⚠️ IMPORTANT: This endpoint must exist or you'll get a 404 error!**
 
+**Option A: Create Specific Endpoint (Recommended)**
+
 1. API Gateway → Your API → **Resources**
 2. Check if `/stripe` resource exists:
    - If it exists, skip to step 6
@@ -531,6 +533,28 @@ Stripe is required for users to purchase credits through the "Unlock Clarity" fe
 **Verify the endpoint:**
 - You should see `POST` method listed under `/stripe/create-checkout-session`
 - The integration should show "Lambda Proxy" and point to `LoveBehaviorTranslatorFunction`
+
+**Option B: Use Proxy Resource (Easier - Catches All Stripe Routes)**
+
+If Option A doesn't work or you want a simpler setup:
+
+1. API Gateway → Your API → **Resources**
+2. Check if `/stripe` resource exists:
+   - If it exists, select it
+   - If it doesn't exist, create it: **Create resource** → Name: `stripe`, Path: `/stripe` → **Create resource**
+3. With `/stripe` selected → **Create resource**
+4. **Resource name**: `proxy`
+5. **Resource path**: `{proxy+}`
+6. ✅ **Check "Configure as proxy resource"**
+7. Click **Create resource**
+8. You should now see `/stripe/{proxy+}` in the resource tree
+9. Select `/stripe/{proxy+}` → **Create method** → `ANY`
+10. **Integration type**: **Lambda Function**
+11. ✅ Check **Use Lambda Proxy integration**
+12. **Lambda Function**: `LoveBehaviorTranslatorFunction`
+13. Click **Save** → **OK**
+
+> **Note**: Option B (proxy) will route ALL requests to `/stripe/*` to Lambda, which then handles routing internally. This is simpler but less explicit.
 
 #### 5.6.2 Create `/stripe/webhook` Endpoint
 

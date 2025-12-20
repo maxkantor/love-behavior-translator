@@ -80,7 +80,13 @@ public sealed class Function
             
             // Log for debugging (remove in production)
             context.Logger.LogInformation($"Request: {method} {path} (raw: {rawPath})");
-            context.Logger.LogInformation($"Path matching: EndsWith('/stripe/create-checkout-session')={path.EndsWith("/stripe/create-checkout-session")}, == '/stripe/create-checkout-session'={path == "/stripe/create-checkout-session"}");
+            context.Logger.LogInformation($"Request path details: rawPath='{rawPath}', lowerPath='{path}', method='{method}'");
+            
+            // Log all path components for debugging
+            if (rawPath.Contains("stripe", StringComparison.OrdinalIgnoreCase))
+            {
+                context.Logger.LogInformation($"Stripe-related path detected! rawPath='{rawPath}', path='{path}'");
+            }
 
             // Handle CORS preflight (OPTIONS) requests
             if (method == "OPTIONS")
@@ -153,23 +159,42 @@ public sealed class Function
                 return await HandleAnalyze(request, context);
 
             // Stripe checkout session creation
-            // Handle both with and without leading slash, and case variations
-            if (method == "POST" && (
+            // Handle various path formats that API Gateway might send
+            var isStripeCheckout = method == "POST" && (
                 path.EndsWith("/stripe/create-checkout-session") || 
                 path == "/stripe/create-checkout-session" ||
                 path.EndsWith("stripe/create-checkout-session") ||
                 path == "stripe/create-checkout-session" ||
-                rawPath.Contains("/stripe/create-checkout-session", StringComparison.OrdinalIgnoreCase)))
+                rawPath.Contains("/stripe/create-checkout-session", StringComparison.OrdinalIgnoreCase) ||
+                rawPath.Contains("stripe/create-checkout-session", StringComparison.OrdinalIgnoreCase));
+            
+            if (isStripeCheckout)
             {
-                context.Logger.LogInformation("Matched Stripe checkout session endpoint");
+                context.Logger.LogInformation($"✅ Matched Stripe checkout session endpoint! rawPath='{rawPath}', path='{path}'");
                 return await HandleCreateCheckoutSession(request, context);
+            }
+            
+            // Debug logging for unmatched Stripe requests
+            if (method == "POST" && (rawPath.Contains("stripe", StringComparison.OrdinalIgnoreCase) || path.Contains("stripe")))
+            {
+                context.Logger.LogWarning($"⚠️ Stripe-related POST request but didn't match checkout endpoint. rawPath='{rawPath}', path='{path}'");
             }
 
             // Stripe webhook
-            if (method == "POST" && (path.EndsWith("/stripe/webhook") || path == "/stripe/webhook"))
+            var isStripeWebhook = method == "POST" && (
+                path.EndsWith("/stripe/webhook") || 
+                path == "/stripe/webhook" ||
+                rawPath.Contains("/stripe/webhook", StringComparison.OrdinalIgnoreCase));
+            
+            if (isStripeWebhook)
+            {
+                context.Logger.LogInformation($"✅ Matched Stripe webhook endpoint! rawPath='{rawPath}', path='{path}'");
                 return await HandleStripeWebhook(request, context);
+            }
 
-            return JsonResponse(404, new { error = "Not found" });
+            // Final 404 - log what we received for debugging
+            context.Logger.LogWarning($"❌ 404 - No route matched. Method: {method}, Path: {path}, RawPath: {rawPath}");
+            return JsonResponse(404, new { error = "Not found", method, path, rawPath });
         }
         catch (ClientVisibleException ex)
         {
