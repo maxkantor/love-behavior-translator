@@ -180,15 +180,24 @@ public sealed class Function
                 context.Logger.LogWarning($"⚠️ Stripe-related POST request but didn't match checkout endpoint. rawPath='{rawPath}', path='{path}'");
             }
 
-            // Stripe webhook
-            var isStripeWebhook = method == "POST" && (
+            // Stripe webhook - handle both POST (webhook events) and GET (verification/health checks)
+            var isStripeWebhook = (method == "POST" || method == "GET") && (
                 path.EndsWith("/stripe/webhook") || 
                 path == "/stripe/webhook" ||
                 rawPath.Contains("/stripe/webhook", StringComparison.OrdinalIgnoreCase));
             
             if (isStripeWebhook)
             {
-                context.Logger.LogInformation($"✅ Matched Stripe webhook endpoint! rawPath='{rawPath}', path='{path}'");
+                context.Logger.LogInformation($"✅ Matched Stripe webhook endpoint! Method: {method}, rawPath='{rawPath}', path='{path}'");
+                
+                // Handle GET requests (Stripe verification or health checks)
+                if (method == "GET")
+                {
+                    context.Logger.LogInformation("Stripe webhook GET request (verification/health check)");
+                    return JsonResponse(200, new { status = "ok", message = "Webhook endpoint is active" });
+                }
+                
+                // Handle POST requests (actual webhook events)
                 return await HandleStripeWebhook(request, context);
             }
 
