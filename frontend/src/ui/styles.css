@@ -1999,9 +1999,6 @@ body {
   opacity: 0.6;
   cursor: not-allowed;
 }
-  color: var(--text);
-  flex: 1;
-}
 
 .admin-user-credits {
   font-weight: 700;
@@ -2073,28 +2070,31 @@ body {
   background: white;
   border-radius: 16px;
   max-width: 1000px;
-  width: 100%;
-  max-height: 90vh;
-  overflow-y: auto;
+  width: 95%;
+  max-height: 95vh;
+  overflow: hidden;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   animation: slideUp 0.3s ease-out;
-  padding: 40px;
+  padding: 24px 32px;
+  display: flex;
+  flex-direction: column;
 }
 
 .credit-modal-header {
   text-align: center;
-  margin-bottom: 40px;
+  margin-bottom: 20px;
+  flex-shrink: 0;
 }
 
 .credit-modal-header h1 {
-  font-size: 2.5rem;
+  font-size: 2rem;
   font-weight: 700;
   color: var(--text);
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 .credit-subtitle {
-  font-size: 1.1rem;
+  font-size: 1rem;
   color: var(--muted);
   margin: 0;
 }
@@ -2102,22 +2102,23 @@ body {
 .benefits-section {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  margin-bottom: 40px;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-shrink: 0;
 }
 
 .benefit-card {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 12px;
   background: #fef3c7;
-  padding: 20px;
-  border-radius: 12px;
+  padding: 12px 16px;
+  border-radius: 10px;
   border: 1px solid #fde68a;
 }
 
 .benefit-icon {
-  font-size: 2.5rem;
+  font-size: 2rem;
   flex-shrink: 0;
 }
 
@@ -2128,42 +2129,47 @@ body {
 }
 
 .benefit-text strong {
-  font-size: 1.1rem;
+  font-size: 1rem;
   color: var(--text);
 }
 
 .benefit-text span {
   color: var(--muted);
-  font-size: 0.95rem;
+  font-size: 0.85rem;
 }
 
 .packs-section {
-  margin-bottom: 40px;
+  margin-bottom: 20px;
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
 }
 
 .packs-title {
   text-align: center;
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-weight: 700;
   color: var(--text);
-  margin-bottom: 30px;
+  margin-bottom: 16px;
 }
 
 .packs-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
-  margin-bottom: 30px;
+  gap: 16px;
+  margin-bottom: 16px;
 }
 
 .pack-card {
   background: white;
   border: 2px solid var(--border);
-  border-radius: 16px;
-  padding: 24px;
+  border-radius: 12px;
+  padding: 16px;
   text-align: center;
   position: relative;
   transition: all 0.3s;
+  display: flex;
+  flex-direction: column;
 }
 
 .pack-card:hover {
@@ -2199,17 +2205,17 @@ body {
 }
 
 .pack-name {
-  font-size: 1.3rem;
+  font-size: 1.1rem;
   font-weight: 700;
   color: var(--text);
-  margin: 8px 0 12px;
+  margin: 4px 0 8px;
 }
 
 .pack-price {
-  font-size: 2rem;
+  font-size: 1.6rem;
   font-weight: 700;
   color: #3b82f6;
-  margin-bottom: 16px;
+  margin-bottom: 10px;
 }
 
 .price-label {
@@ -2290,8 +2296,10 @@ body {
 
 .credit-footer {
   text-align: center;
-  padding-top: 30px;
+  padding-top: 16px;
   border-top: 1px solid var(--border);
+  flex-shrink: 0;
+  margin-top: auto;
 }
 
 .secure-payment {
@@ -2300,8 +2308,8 @@ body {
   justify-content: center;
   gap: 8px;
   color: var(--muted);
-  font-size: 0.9rem;
-  margin-bottom: 20px;
+  font-size: 0.85rem;
+  margin-bottom: 12px;
 }
 
 .lock-icon {
@@ -2860,6 +2868,90 @@ body {
 
 @media (max-width: 768px) {
   .modal-content,
+  .credit-modal-content {
+    max-height: 98vh;
+    padding: 16px 20px;
+  }
+  
+  .credit-modal-header h1 {
+    font-size: 1.6rem;
+    margin-bottom: 6px;
+  }
+  
+  .credit-subtitle {
+    font-size: 0.9rem;
+  }
+  
+  .benefits-section {
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  
+  .benefit-card {
+    padding: 10px 12px;
+    gap: 10px;
+  }
+  
+  .benefit-icon {
+    font-size: 1.5rem;
+  }
+  
+  .benefit-text strong {
+    font-size: 0.9rem;
+  }
+  
+  .benefit-text span {
+    font-size: 0.8rem;
+  }
+  
+  .packs-title {
+    font-size: 1.2rem;
+    margin-bottom: 12px;
+  }
+  
+  .packs-grid {
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  
+  .pack-card {
+    padding: 12px;
+  }
+  
+  .pack-name {
+    font-size: 1rem;
+    margin: 4px 0 6px;
+  }
+  
+  .pack-price {
+    font-size: 1.4rem;
+    margin-bottom: 8px;
+  }
+  
+  .pack-credits-box {
+    padding: 10px;
+    margin-bottom: 8px;
+  }
+  
+  .pack-description {
+    font-size: 0.85rem;
+    margin-bottom: 6px;
+  }
+  
+  .pack-per-credit {
+    font-size: 0.75rem;
+    margin-bottom: 12px;
+  }
+  
+  .pack-button {
+    padding: 10px;
+    font-size: 0.9rem;
+  }
+  
+  .credit-footer {
+    padding-top: 12px;
+  }
+  
   .credit-modal-content,
   .support-modal-content {
     max-width: 100%;

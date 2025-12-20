@@ -1008,25 +1008,60 @@ Reassurance:
             }
 
             // Handle the event
+            context.Logger.LogInformation($"Processing Stripe webhook event: {stripeEvent.Type}, ID: {stripeEvent.Id}");
+            
             if (stripeEvent.Type == "checkout.session.completed")
             {
                 var session = stripeEvent.Data.Object as Session;
-                if (session?.Metadata != null && session.Metadata.ContainsKey("userId") && session.Metadata.ContainsKey("credits"))
+                context.Logger.LogInformation($"Checkout session completed: {session?.Id}, Payment status: {session?.PaymentStatus}");
+                
+                if (session?.Metadata != null)
                 {
-                    var userId = session.Metadata["userId"];
-                    var credits = int.Parse(session.Metadata["credits"]);
-                    var amountPaid = session.Metadata.ContainsKey("price") 
-                        ? decimal.Parse(session.Metadata["price"]) 
-                        : (decimal?)null;
+                    context.Logger.LogInformation($"Session metadata: {string.Join(", ", session.Metadata.Select(kv => $"{kv.Key}={kv.Value}"))}");
+                    
+                    if (session.Metadata.ContainsKey("userId") && session.Metadata.ContainsKey("credits"))
+                    {
+                        var userId = session.Metadata["userId"];
+                        var credits = int.Parse(session.Metadata["credits"]);
+                        var amountPaid = session.Metadata.ContainsKey("price") 
+                            ? decimal.Parse(session.Metadata["price"]) 
+                            : (decimal?)null;
 
-                    // Grant credits to user
-                    await CreditSystem.GrantCredits(userId, credits, _ddb, context.Logger);
-                    
-                    // Notify admin
-                    await CreditSystem.NotifyCreditPurchase(userId, credits, amountPaid, _ddb, _ses, _sesFromEmail, context.Logger);
-                    
-                    context.Logger.LogInformation($"Credits granted: {credits} to user {userId} from Stripe payment");
+                        context.Logger.LogInformation($"Granting {credits} credits to user {userId} from Stripe payment {session.Id}");
+
+                        // Grant credits to user
+                        await CreditSystem.GrantCredits(userId, credits, _ddb, context.Logger);
+                        
+                        // Verify credits were granted
+                        var newBalance = await CreditSystem.GetUserCredits(userId, _ddb, context.Logger);
+                        context.Logger.LogInformation($"Credits granted successfully. New balance for {userId}: {newBalance}");
+                        
+                        // Notify admin via email
+                        try
+                        {
+                            await CreditSystem.NotifyCreditPurchase(userId, credits, amountPaid, _ddb, _ses, _sesFromEmail, context.Logger);
+                            context.Logger.LogInformation($"✅ Admin notification sent for credit purchase: {credits} credits by {userId}");
+                        }
+                        catch (Exception notifyEx)
+                        {
+                            context.Logger.LogError($"⚠️ Failed to send admin notification (credits still granted): {notifyEx}");
+                        }
+                        
+                        context.Logger.LogInformation($"✅ Credits granted: {credits} to user {userId} from Stripe payment {session.Id}. New balance: {newBalance}");
+                    }
+                    else
+                    {
+                        context.Logger.LogWarning($"⚠️ Session metadata missing userId or credits. Metadata keys: {string.Join(", ", session.Metadata.Keys)}");
+                    }
                 }
+                else
+                {
+                    context.Logger.LogWarning($"⚠️ Session has no metadata. Session ID: {session?.Id}");
+                }
+            }
+            else
+            {
+                context.Logger.LogInformation($"Webhook event type '{stripeEvent.Type}' not handled (only processing checkout.session.completed)");
             }
 
             return JsonResponse(200, new { received = true });
