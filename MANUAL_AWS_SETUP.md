@@ -536,39 +536,44 @@ Stripe is required for users to purchase credits through the "Unlock Clarity" fe
 
 > **Important**: The webhook endpoint should **NOT** require authentication. Stripe will sign the requests.
 
-#### 5.6.3 Add OPTIONS Methods for CORS (IMPORTANT!)
+#### 5.6.3 Enable CORS for Stripe Endpoints (REQUIRED!)
 
 **⚠️ CORS errors will occur if you skip this step!**
 
-For both `/stripe/create-checkout-session` and `/stripe/webhook`:
+**Use API Gateway's built-in CORS (Recommended - Most Reliable):**
 
-**Option A: Use Lambda Proxy Integration (Recommended)**
+For `/stripe/create-checkout-session`:
 
-1. Select the resource (e.g., `/stripe/create-checkout-session`) → **Create method** → `OPTIONS`
-2. **Integration type**: **Lambda Function**
-3. ✅ Check **Use Lambda Proxy integration**
-4. **Lambda Function**: `LoveBehaviorTranslatorFunction`
-5. Click **Save** → **OK**
+1. API Gateway → Your API → **Resources**
+2. Select `/stripe/create-checkout-session` resource
+3. Click **Actions** → **Enable CORS**
+4. Configure:
+   - **Access-Control-Allow-Origin**: `*` (or `https://lovebehaviortranslator.com` for production)
+   - **Access-Control-Allow-Headers**: `Content-Type,Authorization,x-user-id`
+   - **Access-Control-Allow-Methods**: `POST,OPTIONS`
+   - Leave other fields as default
+5. Click **Enable CORS and replace existing CORS headers**
+6. Click **Yes, replace existing values** when prompted
+7. **IMPORTANT**: API Gateway will auto-create an OPTIONS method - this is correct!
 
-> **Note**: The Lambda function already handles OPTIONS requests and returns proper CORS headers, so this will work automatically once the method is created.
+For `/stripe/webhook`:
 
-**Option B: Use Mock Integration (Alternative if Lambda doesn't work)**
-
-If Option A doesn't work, you can use API Gateway's built-in CORS:
-
-1. Select the resource (e.g., `/stripe/create-checkout-session`)
+1. Select `/stripe/webhook` resource
 2. Click **Actions** → **Enable CORS**
-3. **Access-Control-Allow-Origin**: `*` (or your domain: `https://lovebehaviortranslator.com`)
-4. **Access-Control-Allow-Headers**: `Content-Type,Authorization,x-user-id`
-5. **Access-Control-Allow-Methods**: `POST,OPTIONS`
-6. Click **Enable CORS and replace existing CORS headers**
-7. Click **Yes, replace existing values**
+3. Configure:
+   - **Access-Control-Allow-Origin**: `*`
+   - **Access-Control-Allow-Headers**: `Content-Type,stripe-signature`
+   - **Access-Control-Allow-Methods**: `POST,OPTIONS`
+4. Click **Enable CORS and replace existing CORS headers**
+5. Click **Yes, replace existing values**
 
-**After creating all methods, make sure to:**
+**After enabling CORS:**
 1. **Deploy the API** (see Step 7.5) - **This is critical!**
-2. Wait a few seconds for the deployment to propagate
-3. Test the endpoint to ensure CORS is working
-4. Clear your browser cache if the error persists
+2. Wait 10-30 seconds for the deployment to propagate
+3. Clear your browser cache (Ctrl+Shift+R or Cmd+Shift+R)
+4. Test the endpoint again
+
+> **Note**: API Gateway's built-in CORS is more reliable than Lambda-based OPTIONS handling because it handles the preflight request at the API Gateway level, before it reaches Lambda.
 
 ### 5.7 Test Stripe Integration
 
