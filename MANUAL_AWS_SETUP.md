@@ -525,14 +525,28 @@ Stripe is required for users to purchase credits through the "Unlock Clarity" fe
 10. Click **Create resource**
 11. **Verify the full path**: You should now see `/stripe/create-checkout-session` in the resource tree
 12. Select `/stripe/create-checkout-session` → **Create method** → `POST`
-13. **Integration type**: **Lambda Function**
-14. ✅ Check **Use Lambda Proxy integration**
-15. **Lambda Function**: `LoveBehaviorTranslatorFunction`
-16. Click **Save** → **OK** (when prompted to grant permissions)
+13. **Integration type**: Select **Lambda Function** (from dropdown)
+14. ✅ **IMPORTANT**: Check the box **"Use Lambda Proxy integration"** (this is critical!)
+15. **Lambda Function**: Type or select `LoveBehaviorTranslatorFunction`
+16. **Lambda Region**: Should auto-detect (e.g., `us-east-1`)
+17. Click **Save**
+18. **If prompted**: Click **OK** to grant API Gateway permission to invoke Lambda
+19. **Verify the integration:**
+    - You should see the method execution flow showing:
+      - Method Request → Integration Request → Integration Response → Method Response
+    - Click on **Integration Request** - it should show:
+      - Integration type: **Lambda Function**
+      - Use Lambda Proxy integration: **Enabled** ✅
+      - Lambda Function: `LoveBehaviorTranslatorFunction`
 
-**Verify the endpoint:**
-- You should see `POST` method listed under `/stripe/create-checkout-session`
-- The integration should show "Lambda Proxy" and point to `LoveBehaviorTranslatorFunction`
+**If you see "No integration defined":**
+- Click on the `POST` method
+- Click **Integration Request** (or the integration section)
+- If it's empty, click **Edit** or **Create integration**
+- Set Integration type: **Lambda Function**
+- ✅ Check **Use Lambda Proxy integration**
+- Lambda Function: `LoveBehaviorTranslatorFunction`
+- Click **Save**
 
 **Option B: Use Proxy Resource (Easier - Catches All Stripe Routes)**
 
@@ -549,10 +563,25 @@ If Option A doesn't work or you want a simpler setup:
 7. Click **Create resource**
 8. You should now see `/stripe/{proxy+}` in the resource tree
 9. Select `/stripe/{proxy+}` → **Create method** → `ANY`
-10. **Integration type**: **Lambda Function**
-11. ✅ Check **Use Lambda Proxy integration**
-12. **Lambda Function**: `LoveBehaviorTranslatorFunction`
-13. Click **Save** → **OK**
+10. **Integration type**: Select **Lambda Function** (from dropdown)
+11. ✅ **IMPORTANT**: Check the box **"Use Lambda Proxy integration"** (this is critical!)
+12. **Lambda Function**: Type or select `LoveBehaviorTranslatorFunction`
+13. **Lambda Region**: Should auto-detect (e.g., `us-east-1`)
+14. Click **Save**
+15. **If prompted**: Click **OK** to grant API Gateway permission to invoke Lambda
+16. **Verify the integration:**
+    - Click on the `ANY` method
+    - You should see the method execution flow
+    - Click **Integration Request** - it should show Lambda Proxy integration is enabled
+
+**If you see "No integration defined":**
+- Click on the `ANY` method
+- Click **Integration Request**
+- Click **Edit** or **Create integration**
+- Set Integration type: **Lambda Function**
+- ✅ Check **Use Lambda Proxy integration**
+- Lambda Function: `LoveBehaviorTranslatorFunction`
+- Click **Save**
 
 > **Note**: Option B (proxy) will route ALL requests to `/stripe/*` to Lambda, which then handles routing internally. This is simpler but less explicit.
 
