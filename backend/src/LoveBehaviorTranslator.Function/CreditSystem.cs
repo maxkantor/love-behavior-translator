@@ -143,7 +143,7 @@ public static class CreditSystem
     /// <summary>
     /// Notify admin when credits are purchased (called from Stripe webhook or admin grant).
     /// </summary>
-    public static async Task NotifyCreditPurchase(string userId, int creditsPurchased, decimal? amount, IAmazonDynamoDB ddb, IAmazonSimpleEmailService ses, string fromEmail, ILambdaLogger logger, string? customerEmail = null, string? paymentId = null, string? sessionId = null)
+    public static async Task NotifyCreditPurchase(string userId, int creditsPurchased, decimal? amount, IAmazonDynamoDB ddb, IAmazonSimpleEmailService ses, string fromEmail, ILambdaLogger logger, string? customerEmail = null, string? paymentId = null, string? sessionId = null, string? adminEmail = null)
     {
         logger.LogInformation($"📧 NotifyCreditPurchase called: userId={userId}, credits={creditsPurchased}, amount={amount}, fromEmail='{fromEmail}'");
         
@@ -207,7 +207,8 @@ View in Stripe Dashboard: https://dashboard.stripe.com/payments
             var response = await ses.SendEmailAsync(request);
             
             logger.LogInformation($"✅ SES.SendEmailAsync succeeded! MessageId={response.MessageId}, HttpStatusCode={response.HttpStatusCode}");
-            logger.LogInformation($"✅ Payment notification email sent to {fromEmail} (MessageId: {response.MessageId})");
+            var adminEmailToUseForLog = string.IsNullOrWhiteSpace(adminEmail) ? fromEmail : adminEmail;
+            logger.LogInformation($"✅ Payment notification email sent to {adminEmailToUseForLog} (MessageId: {response.MessageId})");
         }
         catch (Amazon.SimpleEmail.Model.MessageRejectedException ex)
         {

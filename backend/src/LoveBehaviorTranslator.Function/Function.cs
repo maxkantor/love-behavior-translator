@@ -39,6 +39,7 @@ public sealed class Function
     private readonly int _rateLimitPerMinute;
     private readonly int _rateLimitBurst;
     private readonly string _sesFromEmail;
+    private readonly string _adminEmail;
     private readonly string _stripeSecretKey;
 
     public Function()
@@ -59,6 +60,7 @@ public sealed class Function
         _rateLimitPerMinute = int.TryParse(Environment.GetEnvironmentVariable("RATE_LIMIT_PER_MINUTE"), out var rpm) ? rpm : 10;
         _rateLimitBurst = int.TryParse(Environment.GetEnvironmentVariable("RATE_LIMIT_BURST"), out var burst) ? burst : 5;
         _sesFromEmail = Environment.GetEnvironmentVariable("SES_FROM_EMAIL") ?? "";
+        _adminEmail = Environment.GetEnvironmentVariable("ADMIN_EMAIL") ?? _sesFromEmail; // Fallback to SES_FROM_EMAIL if not set
         _stripeSecretKey = Environment.GetEnvironmentVariable("STRIPE_SECRET_KEY") ?? "";
         
         // Initialize Stripe if key is provided
@@ -400,7 +402,7 @@ public sealed class Function
         var newBalance = await CreditSystem.GetUserCredits(userId, _ddb, context.Logger);
         
         // Notify admin of credit grant (treat as purchase notification)
-        await CreditSystem.NotifyCreditPurchase(userId, creditsToAdd, null, _ddb, _ses, _sesFromEmail, context.Logger);
+        await CreditSystem.NotifyCreditPurchase(userId, creditsToAdd, null, _ddb, _ses, _sesFromEmail, context.Logger, adminEmail: _adminEmail);
 
         return JsonResponse(200, new { message = "Credits granted", userId, creditsAdded = creditsToAdd, newBalance });
     }
@@ -713,12 +715,13 @@ Reply to this contact at: {contact.Email}
 
         try
         {
-            context.Logger.LogInformation($"📧 Preparing contact notification email: From={_sesFromEmail}, To={_sesFromEmail}, Subject={subject}");
+            var adminEmailToUse = string.IsNullOrWhiteSpace(_adminEmail) ? _sesFromEmail : _adminEmail;
+            context.Logger.LogInformation($"📧 Preparing contact notification email: From={_sesFromEmail}, To={adminEmailToUse}, Subject={subject}");
             
             var request = new SendEmailRequest
             {
                 Source = _sesFromEmail,
-                Destination = new Destination { ToAddresses = new List<string> { _sesFromEmail } },
+                Destination = new Destination { ToAddresses = new List<string> { adminEmailToUse } },
                 Message = new Message
                 {
                     Subject = new Content(subject),
@@ -1236,7 +1239,8 @@ Reassurance:
                                 context.Logger,
                                 customerEmail: customerEmail,
                                 paymentId: paymentIntentId,
-                                sessionId: session.Id
+                                sessionId: session.Id,
+                                adminEmail: _adminEmail
                             );
                             context.Logger.LogInformation($"✅ Admin notification sent for credit purchase: {credits} credits by {userId}");
                         }
