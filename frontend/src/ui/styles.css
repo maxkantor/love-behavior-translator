@@ -228,8 +228,8 @@ body {
   flex-direction: column;
   gap: 16px;
   left: 50px;
-  top: 50%;
-  transform: translateY(-50%);
+  top: auto;
+  bottom: 100px;
   z-index: 1;
   pointer-events: auto;
   max-width: 180px;
@@ -256,6 +256,7 @@ body {
     left: 40px;
     max-width: 160px;
     width: 160px;
+    bottom: 80px;
   }
   
   .decorative-images-right {
@@ -270,6 +271,7 @@ body {
     max-width: 100px;
     width: 100px;
     gap: 12px;
+    bottom: 60px;
   }
   
   .decorative-images-right {
