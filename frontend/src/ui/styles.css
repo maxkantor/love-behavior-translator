@@ -2374,16 +2374,16 @@ body {
 .help-content-wrapper {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-auto-rows: minmax(550px, auto);
   gap: 30px;
   margin-bottom: 24px;
+  align-items: start;
 }
 
 .faq-section,
 .contact-section {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  width: 100%;
 }
 
 .section-title {
@@ -2399,9 +2399,9 @@ body {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  flex: 1;
   overflow-y: auto;
   padding-right: 8px;
+  max-height: 420px;
 }
 
 .faq-item {
