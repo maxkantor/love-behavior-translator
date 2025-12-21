@@ -235,80 +235,6 @@ export function App() {
       </header>
 
       <main className="app-main-wrapper">
-        {/* Decorative images - Left side (female images only) */}
-        <div className="decorative-images-left">
-          <img 
-            src={female1}
-            onError={(e) => {
-              const target = e.currentTarget as HTMLImageElement;
-              target.src = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&h=500&fit=crop&crop=face&auto=format&q=80";
-            }}
-            onClick={() => window.open(female1, '_blank')}
-            alt="Decorative" 
-            className="decorative-image"
-            style={{ cursor: 'pointer' }}
-          />
-          <img 
-            src={female2}
-            onError={(e) => {
-              const target = e.currentTarget as HTMLImageElement;
-              target.src = "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=500&h=500&fit=crop&crop=face&auto=format&q=80";
-            }}
-            onClick={() => window.open(female2, '_blank')}
-            alt="Decorative" 
-            className="decorative-image"
-            style={{ cursor: 'pointer' }}
-          />
-          <img 
-            src={female3}
-            onError={(e) => {
-              const target = e.currentTarget as HTMLImageElement;
-              target.src = "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=500&h=500&fit=crop&crop=face&auto=format&q=80";
-            }}
-            onClick={() => window.open(female3, '_blank')}
-            alt="Decorative" 
-            className="decorative-image"
-            style={{ cursor: 'pointer' }}
-          />
-        </div>
-        
-        {/* Decorative images - Right side (male images only) */}
-        <div className="decorative-images-right">
-          <img 
-            src={male1}
-            onError={(e) => {
-              const target = e.currentTarget as HTMLImageElement;
-              target.src = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&h=500&fit=crop&crop=face&auto=format&q=80";
-            }}
-            onClick={() => window.open(male1, '_blank')}
-            alt="Decorative" 
-            className="decorative-image"
-            style={{ cursor: 'pointer' }}
-          />
-          <img 
-            src={male2}
-            onError={(e) => {
-              const target = e.currentTarget as HTMLImageElement;
-              target.src = "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=500&h=500&fit=crop&crop=face&auto=format&q=80";
-            }}
-            onClick={() => window.open(male2, '_blank')}
-            alt="Decorative" 
-            className="decorative-image"
-            style={{ cursor: 'pointer' }}
-          />
-          <img 
-            src={male3}
-            onError={(e) => {
-              const target = e.currentTarget as HTMLImageElement;
-              target.src = "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=500&h=500&fit=crop&crop=face&auto=format&q=80";
-            }}
-            onClick={() => window.open(male3, '_blank')}
-            alt="Decorative" 
-            className="decorative-image"
-            style={{ cursor: 'pointer' }}
-          />
-        </div>
-        
         {/* Left Sidebar - on purple background */}
         <div className="main-sidebar main-sidebar-left">
           <div className="sidebar-section">
@@ -319,6 +245,32 @@ export function App() {
               <li><button type="button" onClick={() => handleQuickAction("I'm worried my partner is losing interest. They don't make plans anymore and our conversations feel surface-level.")}>Are they losing interest?</button></li>
               <li><button type="button" onClick={() => handleQuickAction("I'm at a crossroads in my relationship. Part of me wants to stay and work through our issues, but another part wonders if I'm wasting my time.")}>Should I stay or leave?</button></li>
             </ul>
+          </div>
+
+          <div className="sidebar-section">
+            <h3 className="sidebar-title">What This AI Can & Can't Do</h3>
+            <div className="can-cannot">
+              <div className="can-item">
+                <span className="check-icon-green">✓</span>
+                <span>Spot relationship patterns you might miss</span>
+              </div>
+              <div className="can-item">
+                <span className="check-icon-green">✓</span>
+                <span>Provide emotional insights and validation</span>
+              </div>
+              <div className="can-item">
+                <span className="check-icon-green">✓</span>
+                <span>Offer practical communication advice</span>
+              </div>
+              <div className="cannot-item">
+                <span className="x-icon">✗</span>
+                <span>Replace professional therapy or counseling</span>
+              </div>
+              <div className="cannot-item">
+                <span className="x-icon">✗</span>
+                <span>Diagnose mental health conditions</span>
+              </div>
+            </div>
           </div>
 
           <div className="sidebar-section how-it-works-sidebar">
@@ -498,29 +450,74 @@ export function App() {
 
         {/* Right Sidebar - on purple background */}
         <div className="main-sidebar main-sidebar-right">
-          <div className="sidebar-section">
-            <h3 className="sidebar-title">What This AI Can & Can't Do</h3>
-            <div className="can-cannot">
-              <div className="can-item">
-                <span className="check-icon-green">✓</span>
-                <span>Spot relationship patterns you might miss</span>
-              </div>
-              <div className="can-item">
-                <span className="check-icon-green">✓</span>
-                <span>Provide emotional insights and validation</span>
-              </div>
-              <div className="can-item">
-                <span className="check-icon-green">✓</span>
-                <span>Offer practical communication advice</span>
-              </div>
-              <div className="cannot-item">
-                <span className="x-icon">✗</span>
-                <span>Replace professional therapy or counseling</span>
-              </div>
-              <div className="cannot-item">
-                <span className="x-icon">✗</span>
-                <span>Diagnose mental health conditions</span>
-              </div>
+          <div className="sidebar-section decorative-images-section">
+            <div className="decorative-images-container">
+              <img 
+                src={female1}
+                onError={(e) => {
+                  const target = e.currentTarget as HTMLImageElement;
+                  target.src = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&h=500&fit=crop&crop=face&auto=format&q=80";
+                }}
+                onClick={() => window.open(female1, '_blank')}
+                alt="Decorative" 
+                className="decorative-image"
+                style={{ cursor: 'pointer' }}
+              />
+              <img 
+                src={female2}
+                onError={(e) => {
+                  const target = e.currentTarget as HTMLImageElement;
+                  target.src = "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=500&h=500&fit=crop&crop=face&auto=format&q=80";
+                }}
+                onClick={() => window.open(female2, '_blank')}
+                alt="Decorative" 
+                className="decorative-image"
+                style={{ cursor: 'pointer' }}
+              />
+              <img 
+                src={female3}
+                onError={(e) => {
+                  const target = e.currentTarget as HTMLImageElement;
+                  target.src = "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=500&h=500&fit=crop&crop=face&auto=format&q=80";
+                }}
+                onClick={() => window.open(female3, '_blank')}
+                alt="Decorative" 
+                className="decorative-image"
+                style={{ cursor: 'pointer' }}
+              />
+              <img 
+                src={male1}
+                onError={(e) => {
+                  const target = e.currentTarget as HTMLImageElement;
+                  target.src = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&h=500&fit=crop&crop=face&auto=format&q=80";
+                }}
+                onClick={() => window.open(male1, '_blank')}
+                alt="Decorative" 
+                className="decorative-image"
+                style={{ cursor: 'pointer' }}
+              />
+              <img 
+                src={male2}
+                onError={(e) => {
+                  const target = e.currentTarget as HTMLImageElement;
+                  target.src = "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=500&h=500&fit=crop&crop=face&auto=format&q=80";
+                }}
+                onClick={() => window.open(male2, '_blank')}
+                alt="Decorative" 
+                className="decorative-image"
+                style={{ cursor: 'pointer' }}
+              />
+              <img 
+                src={male3}
+                onError={(e) => {
+                  const target = e.currentTarget as HTMLImageElement;
+                  target.src = "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=500&h=500&fit=crop&crop=face&auto=format&q=80";
+                }}
+                onClick={() => window.open(male3, '_blank')}
+                alt="Decorative" 
+                className="decorative-image"
+                style={{ cursor: 'pointer' }}
+              />
             </div>
           </div>
 

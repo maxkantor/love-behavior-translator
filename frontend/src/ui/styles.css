@@ -222,33 +222,19 @@ body {
 }
 
 /* Decorative images container - left side (female images) - outside left column */
-.decorative-images-left {
-  position: absolute;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  left: 50px;
-  top: auto;
-  bottom: 100px;
-  z-index: 1;
-  pointer-events: auto;
-  max-width: 180px;
-  width: 180px;
+/* Hide old absolute positioned images */
+.decorative-images-left,
+.decorative-images-right {
+  display: none;
 }
 
-/* Decorative images container - right side (male images) - outside right column */
-.decorative-images-right {
-  position: absolute;
+/* New decorative images container in right sidebar */
+.decorative-images-container {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  right: 20px;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 1;
-  pointer-events: auto;
-  max-width: 180px;
-  width: 180px;
+  gap: 20px;
+  align-items: center;
+  width: 100%;
 }
 
 @media (max-width: 1600px) {
@@ -285,8 +271,8 @@ body {
   width: 100%;
   height: auto;
   aspect-ratio: 1;
-  max-width: 180px;
-  max-height: 180px;
+  max-width: 220px;
+  max-height: 220px;
   border-radius: 50%;
   object-fit: cover;
   border: 3px solid rgba(255, 255, 255, 0.4);
@@ -309,15 +295,22 @@ body {
 
 @media (max-width: 1600px) {
   .decorative-image {
-    max-width: 160px;
-    max-height: 160px;
+    max-width: 200px;
+    max-height: 200px;
   }
 }
 
 @media (max-width: 1400px) {
   .decorative-image {
-    max-width: 100px;
-    max-height: 100px;
+    max-width: 180px;
+    max-height: 180px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .decorative-image {
+    max-width: 150px;
+    max-height: 150px;
   }
 }
 
