@@ -127,6 +127,27 @@ export function AdminDashboard() {
     }
   }
 
+  async function fetchActivities() {
+    if (!adminToken) return;
+    try {
+      const resp = await fetch(`${apiBaseUrl}/admin/activities`, {
+        headers: { Authorization: `Bearer ${adminToken}` },
+      });
+      if (resp.ok) {
+        const data = await resp.json();
+        setActivities(data.activities || []);
+      } else {
+        const errorText = await resp.text();
+        console.error(`❌ Failed to load activities (${resp.status}):`, errorText);
+        if (resp.status === 404) {
+          console.error('⚠️ /admin/activities endpoint not found. Make sure Lambda function is uploaded.');
+        }
+      }
+    } catch (err) {
+      console.error('Error loading activities:', err);
+    }
+  }
+
   async function setUserCredits(userId: string, credits: number) {
     if (!adminToken) return;
     try {
