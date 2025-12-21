@@ -194,9 +194,9 @@ body {
 /* Main content wrapper - purple background */
 .app-main-wrapper {
   display: grid;
-  grid-template-columns: 200px 1fr 240px;
-  gap: 28px;
-  padding: 0 60px;
+  grid-template-columns: 240px 1fr 280px;
+  gap: 32px;
+  padding: 0 40px;
   max-width: 100%;
   margin: 0 auto;
   flex: 1;
@@ -210,20 +210,21 @@ body {
 
 @media (max-width: 1600px) {
   .app-main-wrapper {
-    padding: 0 50px;
-    gap: 24px;
+    grid-template-columns: 220px 1fr 260px;
+    padding: 0 30px;
+    gap: 28px;
   }
 }
 
 @media (max-width: 1400px) {
   .app-main-wrapper {
-    grid-template-columns: 180px 1fr 220px;
-    padding: 0 40px;
-    gap: 20px;
+    grid-template-columns: 200px 1fr 240px;
+    padding: 0 20px;
+    gap: 24px;
   }
   
   .main-sidebar-right {
-    max-width: 220px;
+    max-width: 240px;
   }
 }
 
@@ -238,9 +239,10 @@ body {
 .decorative-images-container {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 24px;
   align-items: center;
   width: 100%;
+  padding: 10px 0;
 }
 
 @media (max-width: 1600px) {
@@ -277,8 +279,8 @@ body {
   width: 100%;
   height: auto;
   aspect-ratio: 1;
-  max-width: 220px;
-  max-height: 220px;
+  max-width: 240px;
+  max-height: 240px;
   border-radius: 50%;
   object-fit: cover;
   border: 3px solid rgba(255, 255, 255, 0.4);
@@ -301,22 +303,22 @@ body {
 
 @media (max-width: 1600px) {
   .decorative-image {
-    max-width: 200px;
-    max-height: 200px;
+    max-width: 220px;
+    max-height: 220px;
   }
 }
 
 @media (max-width: 1400px) {
   .decorative-image {
-    max-width: 180px;
-    max-height: 180px;
+    max-width: 200px;
+    max-height: 200px;
   }
 }
 
 @media (max-width: 1200px) {
   .decorative-image {
-    max-width: 150px;
-    max-height: 150px;
+    max-width: 180px;
+    max-height: 180px;
   }
 }
 
@@ -351,18 +353,18 @@ body {
 .main-sidebar {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 20px;
   overflow: hidden;
   color: white;
   z-index: 2;
   width: 100%;
-  max-width: 200px;
+  max-width: 240px;
   position: relative;
   height: 100%;
 }
 
 .main-sidebar-right {
-  max-width: 240px;
+  max-width: 280px;
 }
 
 .sidebar-section {
@@ -380,9 +382,9 @@ body {
 }
 
 .sidebar-title {
-  font-size: 0.95rem;
+  font-size: 1rem;
   font-weight: 600;
-  margin: 0 0 6px 0;
+  margin: 0 0 8px 0;
   color: rgba(255, 255, 255, 0.95);
   letter-spacing: -0.01em;
 }
