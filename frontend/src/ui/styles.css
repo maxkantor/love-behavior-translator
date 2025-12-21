@@ -194,9 +194,9 @@ body {
 /* Main content wrapper - purple background */
 .app-main-wrapper {
   display: grid;
-  grid-template-columns: 200px 1fr 250px;
-  gap: 24px;
-  padding: 0 180px;
+  grid-template-columns: 220px 1fr 260px;
+  gap: 32px;
+  padding: 0 120px;
   max-width: 100%;
   margin: 0 auto;
   flex: 1;
@@ -210,18 +210,20 @@ body {
 
 @media (max-width: 1600px) {
   .app-main-wrapper {
-    padding: 0 160px;
+    padding: 0 100px;
+    gap: 28px;
   }
 }
 
 @media (max-width: 1400px) {
   .app-main-wrapper {
-    grid-template-columns: 180px 1fr 230px;
-    padding: 0 140px;
+    grid-template-columns: 200px 1fr 240px;
+    padding: 0 80px;
+    gap: 24px;
   }
   
   .main-sidebar-right {
-    max-width: 230px;
+    max-width: 240px;
   }
 }
 
@@ -322,7 +324,7 @@ body {
 .app-main {
   background: var(--white);
   border-radius: 20px;
-  padding: 40px 48px;
+  padding: 36px 44px;
   box-shadow: var(--shadow);
   position: relative;
   overflow: hidden;
@@ -349,18 +351,18 @@ body {
 .main-sidebar {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 20px;
   overflow: hidden;
   color: white;
   z-index: 2;
   width: 100%;
-  max-width: 200px;
+  max-width: 220px;
   position: relative;
   height: 100%;
 }
 
 .main-sidebar-right {
-  max-width: 250px;
+  max-width: 260px;
 }
 
 .sidebar-section {
