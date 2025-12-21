@@ -260,8 +260,9 @@ export function AdminDashboard() {
       </div>
 
       <div className="admin-content">
-        {/* Set Credits for Any User */}
-        <div className="admin-card">
+        <div className="admin-form-cards">
+          {/* Set Credits for Any User */}
+          <div className="admin-card">
           <h2>⚙️ Set Credits for Any User</h2>
           <div className="admin-form-group">
             <label>Select a user and set their credits:</label>
@@ -454,7 +455,7 @@ export function AdminDashboard() {
 
         {/* Purchase Activities */}
         {showActivities && (
-          <div className="admin-card">
+          <div className="admin-card admin-purchase-activities-card">
             <h2>💰 Purchase Activities ({activities.length})</h2>
             <div className="admin-contacts-list">
               {activities.length === 0 ? (

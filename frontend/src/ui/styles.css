@@ -1563,11 +1563,27 @@ body {
 }
 
 .admin-content {
-  max-width: 1400px;
+  max-width: 1600px;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  grid-template-columns: 2fr 1fr;
   gap: 20px;
+  align-items: start;
+}
+
+/* Form cards container - left column */
+.admin-form-cards {
+  grid-column: 1;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+/* Purchase Activities - right column, wider */
+.admin-purchase-activities-card {
+  grid-column: 2;
+  grid-row: 1 / span 20;
+  min-height: 600px;
 }
 
 .admin-card {
