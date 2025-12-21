@@ -70,6 +70,10 @@ export function AdminDashboard() {
       return;
     }
     loadData();
+    // Load activities by default
+    if (adminToken) {
+      fetchActivities();
+    }
   }, [adminToken, navigate]);
 
   async function loadData() {

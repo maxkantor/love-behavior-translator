@@ -1603,15 +1603,23 @@ body {
 }
 
 /* Purchase Activities - right column */
-.admin-purchase-activities-card {
+/* Right column container */
+.admin-right-column {
   grid-column: 3;
-  grid-row: 1 / span 20;
-  min-height: 600px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
   max-height: calc(100vh - 200px);
   overflow-y: auto;
+  padding-right: 8px;
+}
+
+/* Purchase Activities - right column */
+.admin-purchase-activities-card {
+  min-height: 400px;
+  max-height: none;
+  overflow-y: auto;
   width: 100%;
-  position: sticky;
-  top: 20px;
 }
 
 /* Purchase Activity Items - reuse contact item styles but enhance */
