@@ -458,6 +458,8 @@ public sealed class Function
         // Store contact message in DynamoDB
         try
         {
+            context.Logger.LogInformation($"📝 Storing contact form submission: contactId={contactId}, email={input.Email}, subject={input.Subject}");
+            
             await _ddb.PutItemAsync(new PutItemRequest
             {
                 TableName = "LoveBehaviorTranslatorContacts",
@@ -476,14 +478,27 @@ public sealed class Function
                 }
             });
 
+            context.Logger.LogInformation($"✅ Contact stored in DynamoDB. Now sending notification email...");
+
             // Send notification email to admin
-            await SendContactNotification(input, contactId, context);
+            try
+            {
+                await SendContactNotification(input, contactId, context);
+                context.Logger.LogInformation($"✅ Contact notification process completed.");
+            }
+            catch (Exception emailEx)
+            {
+                // Log email error but don't fail the request - contact is already stored
+                context.Logger.LogError($"⚠️ Contact stored successfully but email notification failed: {emailEx.GetType().Name}: {emailEx.Message}");
+                context.Logger.LogError($"⚠️ Email error details: {emailEx}");
+            }
 
             return JsonResponse(200, new { message = "Contact message received. We'll get back to you soon.", contactId });
         }
         catch (Exception ex)
         {
-            context.Logger.LogError($"Error storing contact: {ex}");
+            context.Logger.LogError($"❌ Error storing contact: {ex.GetType().Name}: {ex.Message}");
+            context.Logger.LogError($"❌ Stack trace: {ex.StackTrace}");
             return JsonResponse(500, new { error = "Failed to submit contact message. Please try again." });
         }
     }
