@@ -272,29 +272,6 @@ export function App() {
               </div>
             </div>
           </div>
-
-          <div className="sidebar-section trust-section-sidebar">
-            <div className="trust-stats-group">
-              <div className="stat-item">
-                <span className="stat-number">1,247</span>
-                <span className="stat-label">people found clarity this month</span>
-              </div>
-              <div className="stat-item">
-                <span className="stat-number">87%</span>
-                <span className="stat-label">say it helped them understand</span>
-              </div>
-            </div>
-            <div className="testimonials-group">
-              <div className="testimonial-item">
-                <span className="testimonial-quote">"This helped me finally understand why he shut down."</span>
-                <span className="testimonial-author">— Anonymous</span>
-              </div>
-              <div className="testimonial-item">
-                <span className="testimonial-quote">"I thought I was overthinking. Turns out I wasn't."</span>
-                <span className="testimonial-author">— Anonymous</span>
-              </div>
-            </div>
-          </div>
         </div>
 
         {/* Center White Form */}
