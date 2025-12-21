@@ -2401,7 +2401,8 @@ body {
   gap: 12px;
   overflow-y: auto;
   padding-right: 8px;
-  max-height: 420px;
+  flex: 1;
+  min-height: 0;
 }
 
 .faq-item {
