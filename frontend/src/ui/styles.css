@@ -1573,10 +1573,10 @@ body {
 }
 
 .admin-content {
-  max-width: 1800px;
+  max-width: 2000px;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
   gap: 24px;
   align-items: start;
   min-height: calc(100vh - 200px);
@@ -1593,9 +1593,20 @@ body {
   padding-right: 8px;
 }
 
-/* Purchase Activities - right column, wider */
-.admin-purchase-activities-card {
+/* Data cards container - middle column */
+.admin-data-cards {
   grid-column: 2;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+/* Purchase Activities - right column */
+.admin-purchase-activities-card {
+  grid-column: 3;
   grid-row: 1 / span 20;
   min-height: 600px;
   max-height: calc(100vh - 200px);
