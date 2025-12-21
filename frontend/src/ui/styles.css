@@ -1588,9 +1588,7 @@ body {
   display: grid;
   grid-template-columns: 1fr;
   gap: 24px;
-  max-height: calc(100vh - 200px);
-  overflow-y: auto;
-  padding-right: 8px;
+  overflow: visible;
 }
 
 /* Data cards container - middle column */

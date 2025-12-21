@@ -51,7 +51,7 @@ export function AdminDashboard() {
   const [dashboard, setDashboard] = useState<DashboardSummary | null>(null);
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [activities, setActivities] = useState<PurchaseActivity[]>([]);
-  const [showActivities, setShowActivities] = useState(false);
+  const [showActivities, setShowActivities] = useState(true);
   const [selectedUserId, setSelectedUserId] = useState('');
   const [creditAmount, setCreditAmount] = useState('');
   const [grantAmount, setGrantAmount] = useState('100');
@@ -381,31 +381,6 @@ export function AdminDashboard() {
 
         {/* Middle Column - Data Views */}
         <div className="admin-data-cards">
-          {/* Dashboard Summary */}
-          {dashboard && (
-            <div className="admin-card">
-              <h2>📊 Dashboard Summary</h2>
-              <div className="admin-stats">
-                <div className="admin-stat-box">
-                  <div className="admin-stat-label">Today's Translations</div>
-                  <div className="admin-stat-value">{dashboard.todaysTranslations}</div>
-                </div>
-                <div className="admin-stat-box">
-                  <div className="admin-stat-label">Today's Purchases</div>
-                  <div className="admin-stat-value">{dashboard.todaysPurchases}</div>
-                </div>
-                <div className="admin-stat-box">
-                  <div className="admin-stat-label">Active Tokens (Approx)</div>
-                  <div className="admin-stat-value">{dashboard.activeTokens}</div>
-                </div>
-                <div className="admin-stat-box">
-                  <div className="admin-stat-label">Free Search Limit</div>
-                  <div className="admin-stat-value">{dashboard.freeSearchLimit}</div>
-                </div>
-              </div>
-            </div>
-          )}
-
           {/* All Users */}
           <div className="admin-card">
             <h2>👥 All Users ({users.length})</h2>
@@ -457,8 +432,34 @@ export function AdminDashboard() {
           </div>
         </div>
 
-        {/* Purchase Activities */}
-        {showActivities && (
+        {/* Right Column - Dashboard Summary and Purchase Activities */}
+        <div className="admin-right-column">
+          {/* Dashboard Summary */}
+          {dashboard && (
+            <div className="admin-card">
+              <h2>📊 Dashboard Summary</h2>
+              <div className="admin-stats">
+                <div className="admin-stat-box">
+                  <div className="admin-stat-label">Today's Translations</div>
+                  <div className="admin-stat-value">{dashboard.todaysTranslations}</div>
+                </div>
+                <div className="admin-stat-box">
+                  <div className="admin-stat-label">Today's Purchases</div>
+                  <div className="admin-stat-value">{dashboard.todaysPurchases}</div>
+                </div>
+                <div className="admin-stat-box">
+                  <div className="admin-stat-label">Active Tokens (Approx)</div>
+                  <div className="admin-stat-value">{dashboard.activeTokens}</div>
+                </div>
+                <div className="admin-stat-box">
+                  <div className="admin-stat-label">Free Search Limit</div>
+                  <div className="admin-stat-value">{dashboard.freeSearchLimit}</div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Purchase Activities */}
           <div className="admin-card admin-purchase-activities-card">
             <h2>💰 Purchase Activities ({activities.length})</h2>
             <div className="admin-contacts-list">
@@ -489,7 +490,7 @@ export function AdminDashboard() {
               )}
             </div>
           </div>
-        )}
+        </div>
       </div>
 
       {/* Reply Modal */}
