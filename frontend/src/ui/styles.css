@@ -2376,7 +2376,7 @@ body {
   grid-template-columns: 1fr 1fr;
   gap: 30px;
   margin-bottom: 24px;
-  align-items: stretch;
+  align-items: start;
 }
 
 .faq-section,
@@ -2384,7 +2384,7 @@ body {
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 100%;
+  overflow: hidden;
 }
 
 .section-title {
@@ -2432,11 +2432,10 @@ body {
 }
 
 .support-form {
-  margin-bottom: 20px;
-  flex: 1;
+  margin-bottom: 0;
+  flex: 0 0 auto;
   display: flex;
   flex-direction: column;
-  min-height: 0;
 }
 
 .form-field {
@@ -2535,7 +2534,7 @@ body {
   background: #d1fae5;
   padding: 16px;
   border-radius: 10px;
-  margin-top: auto;
+  margin-top: 0;
   flex-shrink: 0;
 }
 
