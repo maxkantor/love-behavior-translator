@@ -143,7 +143,7 @@ public static class CreditSystem
     /// <summary>
     /// Notify admin when credits are purchased (called from Stripe webhook or admin grant).
     /// </summary>
-    public static async Task NotifyCreditPurchase(string userId, int creditsPurchased, decimal? amount, IAmazonDynamoDB ddb, IAmazonSimpleEmailService ses, string fromEmail, ILambdaLogger logger, string? customerEmail = null, string? paymentId = null, string? sessionId = null, string? adminEmail = null)
+    public static async Task NotifyCreditPurchase(string userId, int creditsPurchased, decimal? amount, IAmazonDynamoDB ddb, IAmazonSimpleEmailService ses, string fromEmail, ILambdaLogger logger, string? customerEmail = null, string? paymentId = null, string? sessionId = null, string? adminEmail = null, string? customerName = null, string? cardLast4 = null, DateTimeOffset? purchaseDate = null)
     {
         logger.LogInformation($"📧 NotifyCreditPurchase called: userId={userId}, credits={creditsPurchased}, amount={amount}, fromEmail='{fromEmail}'");
         
@@ -160,6 +160,7 @@ public static class CreditSystem
             var timestamp = DateTimeOffset.UtcNow;
             var subject = $"💰 New Payment: {creditsPurchased} credits - ${(amount ?? 0):F2}";
             
+            var purchaseDateTime = purchaseDate ?? timestamp;
             var body = $@"🎉 NEW CREDIT PURCHASE
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -169,22 +170,18 @@ PAYMENT DETAILS
 Amount Paid: ${(amount ?? 0):F2}
 Credits Purchased: {creditsPurchased}
 New User Balance: {userCredits}
+{(string.IsNullOrWhiteSpace(cardLast4) ? "" : $"Card: •••• {cardLast4}\n")}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 USER INFORMATION
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 User ID: {userId}
-{(string.IsNullOrWhiteSpace(customerEmail) ? "" : $"Customer Email: {customerEmail}\n")}
+{(string.IsNullOrWhiteSpace(customerName) ? "" : $"Name: {customerName}\n")}
+{(string.IsNullOrWhiteSpace(customerEmail) ? "" : $"Email: {customerEmail}\n")}
+Purchase Date: {purchaseDateTime:yyyy-MM-dd HH:mm:ss} UTC
 {(string.IsNullOrWhiteSpace(paymentId) ? "" : $"Payment ID: {paymentId}\n")}
 {(string.IsNullOrWhiteSpace(sessionId) ? "" : $"Checkout Session: {sessionId}\n")}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-TIMESTAMP
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-{timestamp:yyyy-MM-dd HH:mm:ss} UTC
-({timestamp:O})
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 

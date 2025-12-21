@@ -200,6 +200,56 @@ public static class AdminSystem
         }
     }
 
+    /// <summary>
+    /// Get all purchase activities from DynamoDB.
+    /// </summary>
+    public static async Task<List<Dictionary<string, object>>> GetPurchaseActivities(IAmazonDynamoDB ddb, ILambdaLogger logger)
+    {
+        try
+        {
+            var scanResp = await ddb.ScanAsync(new ScanRequest
+            {
+                TableName = "LoveBehaviorTranslatorActivities",
+                FilterExpression = "activityType = :type",
+                ExpressionAttributeValues = new Dictionary<string, AttributeValue>
+                {
+                    [":type"] = new AttributeValue { S = "purchase" }
+                }
+            });
+
+            var activities = new List<Dictionary<string, object>>();
+            foreach (var item in scanResp.Items)
+            {
+                var activity = new Dictionary<string, object>
+                {
+                    ["activityId"] = item["activityId"].S,
+                    ["userId"] = item["userId"].S,
+                    ["customerName"] = item.ContainsKey("customerName") ? item["customerName"].S : "",
+                    ["customerEmail"] = item.ContainsKey("customerEmail") ? item["customerEmail"].S : "",
+                    ["credits"] = int.Parse(item["credits"].N),
+                    ["amount"] = decimal.Parse(item["amount"].N),
+                    ["paymentId"] = item["paymentId"].S,
+                    ["sessionId"] = item["sessionId"].S,
+                    ["purchaseDate"] = item["purchaseDate"].S
+                };
+
+                if (item.ContainsKey("cardLast4"))
+                {
+                    activity["cardLast4"] = item["cardLast4"].S;
+                }
+
+                activities.Add(activity);
+            }
+
+            return activities.OrderByDescending(a => a["purchaseDate"].ToString()).ToList();
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Error getting purchase activities: {ex}");
+            return new List<Dictionary<string, object>>();
+        }
+    }
+
     private static string GenerateSimpleToken()
     {
         // Simple token generation (in production, use proper JWT)

@@ -33,10 +33,25 @@ type Contact = {
   repliedAt?: string;
 };
 
+type PurchaseActivity = {
+  activityId: string;
+  userId: string;
+  customerName: string;
+  customerEmail: string;
+  credits: number;
+  amount: number;
+  paymentId: string;
+  sessionId: string;
+  purchaseDate: string;
+  cardLast4?: string;
+};
+
 export function AdminDashboard() {
   const [users, setUsers] = useState<User[]>([]);
   const [dashboard, setDashboard] = useState<DashboardSummary | null>(null);
   const [contacts, setContacts] = useState<Contact[]>([]);
+  const [activities, setActivities] = useState<PurchaseActivity[]>([]);
+  const [showActivities, setShowActivities] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState('');
   const [creditAmount, setCreditAmount] = useState('');
   const [grantAmount, setGrantAmount] = useState('100');
@@ -326,7 +341,17 @@ export function AdminDashboard() {
           </div>
           <div className="admin-action-section">
             <p>View and manage user activities.</p>
-            <button className="admin-action-btn">Show Activities</button>
+            <button 
+              className="admin-action-btn" 
+              onClick={async () => {
+                if (!showActivities) {
+                  await fetchActivities();
+                }
+                setShowActivities(!showActivities);
+              }}
+            >
+              {showActivities ? 'Hide Activities' : 'Show Activities'}
+            </button>
             <button className="admin-action-btn admin-danger">Reset All</button>
           </div>
         </div>
@@ -405,6 +430,40 @@ export function AdminDashboard() {
             )}
           </div>
         </div>
+
+        {/* Purchase Activities */}
+        {showActivities && (
+          <div className="admin-card">
+            <h2>💰 Purchase Activities ({activities.length})</h2>
+            <div className="admin-contacts-list">
+              {activities.length === 0 ? (
+                <p style={{ color: 'var(--muted)', padding: '20px', textAlign: 'center' }}>No purchase activities yet.</p>
+              ) : (
+                activities.map((activity) => (
+                  <div key={activity.activityId} className="admin-contact-item">
+                    <div className="admin-contact-header">
+                      <div>
+                        <div className="admin-contact-email">{activity.customerName || 'Unknown'}</div>
+                        <div className="admin-contact-subject">{activity.customerEmail}</div>
+                        <div className="admin-contact-meta">
+                          {new Date(activity.purchaseDate).toLocaleString()} • 
+                          ${activity.amount.toFixed(2)} • {activity.credits} credits
+                          {activity.cardLast4 && ` • Card: •••• ${activity.cardLast4}`}
+                        </div>
+                        <div style={{ marginTop: '8px', fontSize: '0.85rem', color: 'var(--muted)' }}>
+                          User ID: {activity.userId}
+                        </div>
+                        <div style={{ fontSize: '0.75rem', color: 'var(--muted)', marginTop: '4px' }}>
+                          Payment: {activity.paymentId} | Session: {activity.sessionId}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Reply Modal */}

@@ -599,6 +599,16 @@ If Option A doesn't work or you want a simpler setup:
 8. **Lambda Function**: `LoveBehaviorTranslatorFunction`
 9. Click **Save** → **OK**
 
+**CRITICAL: Verify Header Passthrough**
+
+With Lambda Proxy integration, headers should pass through automatically, but verify:
+
+1. Select the `POST` method under `/stripe/webhook`
+2. Click **Integration Request**
+3. Scroll to **HTTP Headers** section
+4. Ensure **Header passthrough** is enabled (default with proxy integration)
+5. The `stripe-signature` header should NOT be mapped - it must pass through as-is from Stripe
+
 > **Important**: The webhook endpoint should **NOT** require authentication. Stripe will sign the requests.
 
 #### 5.6.3 Enable CORS for Stripe Endpoints (REQUIRED!)

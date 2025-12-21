@@ -151,6 +151,9 @@ public sealed class Function
                 if (method == "POST" && path.Contains("/admin/contacts/") && path.EndsWith("/reply"))
                     return await HandleAdminReplyContact(request, context);
 
+                if (method == "GET" && (path.EndsWith("/admin/activities") || path == "/admin/activities"))
+                    return await HandleAdminGetActivities(context);
+
                 // If we're in /admin but no route matched, return 404
                 context.Logger.LogWarning($"Admin route not found: {method} {path}");
                 return JsonResponse(404, new { error = $"Admin endpoint not found: {method} {path}" });
@@ -612,6 +615,20 @@ SES_FROM_EMAIL: {_sesFromEmail}
         }
     }
 
+    private async Task<APIGatewayProxyResponse> HandleAdminGetActivities(ILambdaContext context)
+    {
+        try
+        {
+            var activities = await AdminSystem.GetPurchaseActivities(_ddb, context.Logger);
+            return JsonResponse(200, new { activities });
+        }
+        catch (Exception ex)
+        {
+            context.Logger.LogError($"Error getting activities: {ex}");
+            return JsonResponse(500, new { error = "Failed to get activities" });
+        }
+    }
+
     private async Task<APIGatewayProxyResponse> HandleAdminReplyContact(APIGatewayProxyRequest request, ILambdaContext context)
     {
         var pathParts = request.Path?.Split('/') ?? Array.Empty<string>();
@@ -962,6 +979,48 @@ Love Behavior Translator Support
         }
     }
 
+    private async Task StorePurchaseActivity(string userId, string customerName, string customerEmail, int credits, decimal amount, string? cardLast4, string paymentId, string sessionId, DateTimeOffset purchaseDate, ILambdaContext context)
+    {
+        var activityId = $"PURCHASE#{sessionId}";
+        var ttl = purchaseDate.AddYears(2).ToUnixTimeSeconds(); // Keep for 2 years
+
+        var item = new Dictionary<string, AttributeValue>
+        {
+            ["activityId"] = new AttributeValue { S = activityId },
+            ["userId"] = new AttributeValue { S = userId },
+            ["activityType"] = new AttributeValue { S = "purchase" },
+            ["customerName"] = new AttributeValue { S = customerName },
+            ["customerEmail"] = new AttributeValue { S = customerEmail },
+            ["credits"] = new AttributeValue { N = credits.ToString() },
+            ["amount"] = new AttributeValue { N = amount.ToString("F2") },
+            ["paymentId"] = new AttributeValue { S = paymentId },
+            ["sessionId"] = new AttributeValue { S = sessionId },
+            ["purchaseDate"] = new AttributeValue { S = purchaseDate.ToString("O") },
+            ["createdAt"] = new AttributeValue { S = DateTimeOffset.UtcNow.ToString("O") },
+            ["ttl"] = new AttributeValue { N = ttl.ToString() }
+        };
+
+        if (!string.IsNullOrWhiteSpace(cardLast4))
+        {
+            item["cardLast4"] = new AttributeValue { S = cardLast4 };
+        }
+
+        try
+        {
+            await _ddb.PutItemAsync(new PutItemRequest
+            {
+                TableName = "LoveBehaviorTranslatorActivities",
+                Item = item
+            });
+            context.Logger.LogInformation($"✅ Stored purchase activity: {activityId} for user {userId}");
+        }
+        catch (Exception ex)
+        {
+            context.Logger.LogError($"Failed to store purchase activity in DynamoDB: {ex}");
+            throw;
+        }
+    }
+
     private async Task SendEmail(string toEmail, BehaviorAnalysisResponse output, ILambdaContext context)
     {
         if (string.IsNullOrWhiteSpace(_sesFromEmail))
@@ -1221,12 +1280,77 @@ Reassurance:
                         var newBalance = await CreditSystem.GetUserCredits(userId, _ddb, context.Logger);
                         context.Logger.LogInformation($"Credits granted successfully. New balance for {userId}: {newBalance}");
                         
+                        // Fetch additional customer details from Stripe
+                        string? customerName = null;
+                        string? cardLast4 = null;
+                        var purchaseDate = DateTimeOffset.UtcNow;
+                        
+                        try
+                        {
+                            // Get customer name from Stripe Customer if available
+                            if (!string.IsNullOrWhiteSpace(session.CustomerId))
+                            {
+                                var customerService = new Stripe.CustomerService();
+                                var customer = await customerService.GetAsync(session.CustomerId);
+                                customerName = customer.Name ?? customer.Email;
+                                context.Logger.LogInformation($"Retrieved customer from Stripe: {customerName}");
+                            }
+                            
+                            // Get payment method last 4 digits from PaymentIntent
+                            if (!string.IsNullOrWhiteSpace(session.PaymentIntentId))
+                            {
+                                var paymentIntentService = new Stripe.PaymentIntentService();
+                                var paymentIntent = await paymentIntentService.GetAsync(session.PaymentIntentId);
+                                
+                                if (paymentIntent.PaymentMethodId != null)
+                                {
+                                    var paymentMethodService = new Stripe.PaymentMethodService();
+                                    var paymentMethod = await paymentMethodService.GetAsync(paymentIntent.PaymentMethodId);
+                                    if (paymentMethod.Card != null)
+                                    {
+                                        cardLast4 = paymentMethod.Card.Last4;
+                                        context.Logger.LogInformation($"Retrieved card last 4: {cardLast4}");
+                                    }
+                                }
+                                
+                                // Use session created date if available
+                                if (session.Created != default)
+                                {
+                                    purchaseDate = new DateTimeOffset(session.Created, TimeSpan.Zero);
+                                }
+                            }
+                        }
+                        catch (Exception stripeEx)
+                        {
+                            context.Logger.LogWarning($"⚠️ Could not fetch additional Stripe details (continuing anyway): {stripeEx.Message}");
+                        }
+                        
+                        // Store purchase activity in DynamoDB
+                        try
+                        {
+                            await StorePurchaseActivity(
+                                userId,
+                                customerName ?? session.CustomerEmail ?? "Unknown",
+                                session.CustomerEmail ?? "",
+                                credits,
+                                amountPaid ?? 0,
+                                cardLast4,
+                                session.PaymentIntentId ?? session.Id,
+                                session.Id,
+                                purchaseDate,
+                                context
+                            );
+                            context.Logger.LogInformation($"✅ Purchase activity stored in DynamoDB");
+                        }
+                        catch (Exception storeEx)
+                        {
+                            context.Logger.LogError($"⚠️ Failed to store purchase activity (continuing): {storeEx}");
+                        }
+                        
                         // Notify admin via email
                         try
                         {
-                            // Get customer email and payment ID from Stripe session
                             var customerEmail = session.CustomerEmail;
-                            // PaymentIntentId is a string ID, not an object
                             var paymentIntentId = session.PaymentIntentId;
                             
                             await CreditSystem.NotifyCreditPurchase(
@@ -1240,7 +1364,10 @@ Reassurance:
                                 customerEmail: customerEmail,
                                 paymentId: paymentIntentId,
                                 sessionId: session.Id,
-                                adminEmail: _adminEmail
+                                adminEmail: _adminEmail,
+                                customerName: customerName,
+                                cardLast4: cardLast4,
+                                purchaseDate: purchaseDate
                             );
                             context.Logger.LogInformation($"✅ Admin notification sent for credit purchase: {credits} credits by {userId}");
                         }
