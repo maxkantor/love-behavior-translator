@@ -1282,18 +1282,46 @@ Reassurance:
                         
                         // Fetch additional customer details from Stripe
                         string? customerName = null;
+                        string? customerEmail = null;
                         string? cardLast4 = null;
                         var purchaseDate = DateTimeOffset.UtcNow;
                         
                         try
                         {
-                            // Get customer name from Stripe Customer if available
+                            // Get customer name and email from Stripe Customer if available
                             if (!string.IsNullOrWhiteSpace(session.CustomerId))
                             {
                                 var customerService = new Stripe.CustomerService();
                                 var customer = await customerService.GetAsync(session.CustomerId);
-                                customerName = customer.Name ?? customer.Email;
-                                context.Logger.LogInformation($"Retrieved customer from Stripe: {customerName}");
+                                customerName = customer.Name;
+                                customerEmail = customer.Email;
+                                context.Logger.LogInformation($"Retrieved customer from Stripe: Name={customerName}, Email={customerEmail}");
+                            }
+                            
+                            // Fallback to session email if customer email not available
+                            if (string.IsNullOrWhiteSpace(customerEmail))
+                            {
+                                customerEmail = session.CustomerEmail;
+                                context.Logger.LogInformation($"Using session email: {customerEmail}");
+                            }
+                            
+                            // If we still don't have email, try to get it from payment intent
+                            if (string.IsNullOrWhiteSpace(customerEmail) && !string.IsNullOrWhiteSpace(session.PaymentIntentId))
+                            {
+                                try
+                                {
+                                    var paymentIntentService = new Stripe.PaymentIntentService();
+                                    var paymentIntent = await paymentIntentService.GetAsync(session.PaymentIntentId);
+                                    if (paymentIntent.ReceiptEmail != null)
+                                    {
+                                        customerEmail = paymentIntent.ReceiptEmail;
+                                        context.Logger.LogInformation($"Using payment intent receipt email: {customerEmail}");
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    context.Logger.LogWarning($"Could not get email from payment intent: {ex.Message}");
+                                }
                             }
                             
                             // Get payment method last 4 digits from PaymentIntent
@@ -1328,10 +1356,17 @@ Reassurance:
                         // Store purchase activity in DynamoDB
                         try
                         {
+                            // Use customer name, or fallback to email, or "Unknown"
+                            var finalCustomerName = customerName ?? customerEmail ?? "Unknown";
+                            // Use customer email from any source, or empty string
+                            var finalCustomerEmail = customerEmail ?? session.CustomerEmail ?? "";
+                            
+                            context.Logger.LogInformation($"Storing purchase activity: Name={finalCustomerName}, Email={finalCustomerEmail}");
+                            
                             await StorePurchaseActivity(
                                 userId,
-                                customerName ?? session.CustomerEmail ?? "Unknown",
-                                session.CustomerEmail ?? "",
+                                finalCustomerName,
+                                finalCustomerEmail,
                                 credits,
                                 amountPaid ?? 0,
                                 cardLast4,
@@ -1350,7 +1385,7 @@ Reassurance:
                         // Notify admin via email
                         try
                         {
-                            var customerEmail = session.CustomerEmail;
+                            var emailForNotification = customerEmail ?? session.CustomerEmail;
                             var paymentIntentId = session.PaymentIntentId;
                             
                             await CreditSystem.NotifyCreditPurchase(
@@ -1361,7 +1396,7 @@ Reassurance:
                                 _ses, 
                                 _sesFromEmail, 
                                 context.Logger,
-                                customerEmail: customerEmail,
+                                customerEmail: emailForNotification,
                                 paymentId: paymentIntentId,
                                 sessionId: session.Id,
                                 adminEmail: _adminEmail,
