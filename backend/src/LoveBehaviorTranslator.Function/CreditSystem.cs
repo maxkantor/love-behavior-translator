@@ -191,12 +191,13 @@ TIMESTAMP
 View in Stripe Dashboard: https://dashboard.stripe.com/payments
 ";
 
-            logger.LogInformation($"📧 Calling SES.SendEmailAsync: From={fromEmail}, To={fromEmail}, Subject={subject}");
+            var adminEmailToUse = string.IsNullOrWhiteSpace(adminEmail) ? fromEmail : adminEmail;
+            logger.LogInformation($"📧 Calling SES.SendEmailAsync: From={fromEmail}, To={adminEmailToUse}, Subject={subject}");
             
             var request = new Amazon.SimpleEmail.Model.SendEmailRequest
             {
                 Source = fromEmail,
-                Destination = new Amazon.SimpleEmail.Model.Destination { ToAddresses = new List<string> { fromEmail } },
+                Destination = new Amazon.SimpleEmail.Model.Destination { ToAddresses = new List<string> { adminEmailToUse } },
                 Message = new Amazon.SimpleEmail.Model.Message
                 {
                     Subject = new Amazon.SimpleEmail.Model.Content(subject),
@@ -207,8 +208,7 @@ View in Stripe Dashboard: https://dashboard.stripe.com/payments
             var response = await ses.SendEmailAsync(request);
             
             logger.LogInformation($"✅ SES.SendEmailAsync succeeded! MessageId={response.MessageId}, HttpStatusCode={response.HttpStatusCode}");
-            var adminEmailToUseForLog = string.IsNullOrWhiteSpace(adminEmail) ? fromEmail : adminEmail;
-            logger.LogInformation($"✅ Payment notification email sent to {adminEmailToUseForLog} (MessageId: {response.MessageId})");
+            logger.LogInformation($"✅ Payment notification email sent to {adminEmailToUse} (MessageId: {response.MessageId})");
         }
         catch (Amazon.SimpleEmail.Model.MessageRejectedException ex)
         {
