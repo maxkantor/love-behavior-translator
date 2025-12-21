@@ -355,6 +355,10 @@ body {
   height: 100%;
 }
 
+.main-sidebar-right {
+  max-width: 250px;
+}
+
 .sidebar-section {
   display: flex;
   flex-direction: column;
