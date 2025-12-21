@@ -29,8 +29,25 @@ export function HelpModal({ isOpen, onClose }: HelpModalProps) {
 
   useEffect(() => {
     if (isOpen && faqSectionRef.current && contactSectionRef.current) {
-      const contactHeight = contactSectionRef.current.offsetHeight;
-      faqSectionRef.current.style.height = `${contactHeight}px`;
+      // Use setTimeout to ensure DOM is fully rendered
+      const updateHeight = () => {
+        if (faqSectionRef.current && contactSectionRef.current) {
+          const contactHeight = contactSectionRef.current.offsetHeight;
+          faqSectionRef.current.style.height = `${contactHeight}px`;
+        }
+      };
+      
+      // Update immediately and after a short delay
+      updateHeight();
+      const timeoutId = setTimeout(updateHeight, 100);
+      
+      // Also update on window resize
+      window.addEventListener('resize', updateHeight);
+      
+      return () => {
+        clearTimeout(timeoutId);
+        window.removeEventListener('resize', updateHeight);
+      };
     }
   }, [isOpen]);
 
