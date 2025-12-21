@@ -1461,7 +1461,11 @@ body {
 }
 
 .admin-form-group {
-  margin-bottom: 20px;
+  margin-bottom: 24px;
+  padding: 16px;
+  background: #f9fafb;
+  border-radius: 10px;
+  border: 1px solid var(--border-light);
 }
 
 .admin-form-group label {
@@ -1469,8 +1473,9 @@ body {
   align-items: center;
   gap: 8px;
   font-weight: 600;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
   color: var(--text);
+  font-size: 1rem;
 }
 
 .admin-icon-small {
@@ -1542,10 +1547,13 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: rgba(255, 255, 255, 0.1);
-  padding: 16px 24px;
-  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  padding: 18px 28px;
+  border-radius: 16px;
   color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .admin-logout-btn {
@@ -1597,39 +1605,93 @@ body {
   top: 20px;
 }
 
+/* Purchase Activity Items - reuse contact item styles but enhance */
+.admin-purchase-activities-card .admin-contact-item {
+  background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
+  border-left: 4px solid var(--teal);
+}
+
+.admin-purchase-activities-card .admin-contact-item:hover {
+  border-left-width: 5px;
+  background: white;
+}
+
+.admin-purchase-activities-card .admin-contact-email {
+  color: var(--text);
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+}
+
+.admin-purchase-activities-card .admin-contact-subject {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.admin-purchase-activities-card .admin-contact-meta {
+  font-size: 0.9rem;
+  color: var(--text-soft);
+  font-weight: 500;
+}
+
 .admin-card {
   background: white;
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: var(--shadow-sm);
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   animation: fadeInUp 0.4s ease-out;
   width: 100%;
   box-sizing: border-box;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.admin-card:hover {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
 }
 
 .admin-card h2 {
-  margin: 0 0 16px;
+  margin: 0 0 20px;
   color: var(--text);
-  font-size: 1.4rem;
+  font-size: 1.5rem;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+  font-weight: 700;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--border-light);
 }
 
 .admin-select {
   width: 100%;
-  padding: 12px;
+  padding: 14px;
   border: 2px solid var(--border);
   border-radius: 10px;
   font-size: 1rem;
   margin-bottom: 16px;
+  background: white;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.admin-select:hover {
+  border-color: var(--pink);
+}
+
+.admin-select:focus {
+  outline: none;
+  border-color: var(--pink);
+  box-shadow: 0 0 0 3px rgba(255, 107, 157, 0.1);
 }
 
 .admin-quick-buttons {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 20px;
+  gap: 10px;
+  margin-bottom: 24px;
+  padding: 12px;
+  background: #f9fafb;
+  border-radius: 10px;
 }
 
 .admin-quick-btn {
@@ -1762,22 +1824,34 @@ body {
 }
 
 .admin-stat-box {
-  background: #f9fafb;
-  padding: 16px;
-  border-radius: 10px;
+  background: linear-gradient(135deg, #f9fafb 0%, #ffffff 100%);
+  padding: 20px;
+  border-radius: 12px;
   border-left: 4px solid #667eea;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+.admin-stat-box:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-left-width: 5px;
 }
 
 .admin-stat-label {
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   color: var(--muted);
-  margin-bottom: 8px;
+  margin-bottom: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .admin-stat-value {
-  font-size: 2rem;
+  font-size: 2.2rem;
   font-weight: 700;
   color: #667eea;
+  line-height: 1;
 }
 
 .admin-users-list {
@@ -1789,16 +1863,45 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px;
+  padding: 14px 16px;
   border-bottom: 1px solid var(--border);
+  transition: all 0.2s ease;
+  border-radius: 8px;
+  margin-bottom: 4px;
+}
+
+.admin-user-item:hover {
+  background: #f9fafb;
+  transform: translateX(4px);
 }
 
 .admin-user-item:last-child {
   border-bottom: none;
+  margin-bottom: 0;
 }
 
 .admin-user-id {
   font-weight: 600;
+  color: var(--text);
+  font-size: 0.95rem;
+  font-family: 'Courier New', monospace;
+}
+
+.admin-user-credits {
+  font-weight: 700;
+  color: var(--teal);
+  font-size: 0.95rem;
+  padding: 4px 12px;
+  background: #d1fae5;
+  border-radius: 6px;
+}
+
+.admin-user-stats {
+  font-size: 0.85rem;
+  color: var(--muted);
+  padding: 4px 10px;
+  background: #f3f4f6;
+  border-radius: 6px;
 }
 
 /* Contact Messages */
@@ -1808,13 +1911,48 @@ body {
   gap: 16px;
   max-height: 600px;
   overflow-y: auto;
+  padding-right: 4px;
+}
+
+.admin-contacts-list::-webkit-scrollbar,
+.admin-users-list::-webkit-scrollbar,
+.admin-purchase-activities-card::-webkit-scrollbar {
+  width: 8px;
+}
+
+.admin-contacts-list::-webkit-scrollbar-track,
+.admin-users-list::-webkit-scrollbar-track,
+.admin-purchase-activities-card::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.admin-contacts-list::-webkit-scrollbar-thumb,
+.admin-users-list::-webkit-scrollbar-thumb,
+.admin-purchase-activities-card::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.admin-contacts-list::-webkit-scrollbar-thumb:hover,
+.admin-users-list::-webkit-scrollbar-thumb:hover,
+.admin-purchase-activities-card::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
 }
 
 .admin-contact-item {
   border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 16px;
-  background: #f9fafb;
+  border-radius: 12px;
+  padding: 20px;
+  background: white;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+.admin-contact-item:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+  border-color: var(--teal);
 }
 
 .admin-contact-header {
@@ -1827,42 +1965,62 @@ body {
 .admin-contact-email {
   font-weight: 700;
   color: var(--text);
+  font-size: 1.05rem;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-contact-email::before {
+  content: "✉";
   font-size: 1rem;
-  margin-bottom: 4px;
 }
 
 .admin-contact-subject {
   font-weight: 600;
   color: var(--text-soft);
-  font-size: 0.95rem;
-  margin-bottom: 6px;
+  font-size: 1rem;
+  margin-bottom: 8px;
+  padding-left: 24px;
 }
 
 .admin-contact-meta {
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   color: var(--muted);
+  padding-left: 24px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .contact-status {
   font-weight: 600;
-  padding: 2px 8px;
-  border-radius: 4px;
+  padding: 4px 10px;
+  border-radius: 6px;
   font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: inline-block;
 }
 
 .contact-status.new {
   background: #dbeafe;
   color: #1e40af;
+  border: 1px solid #93c5fd;
 }
 
 .contact-status.replied {
   background: #d1fae5;
   color: #065f46;
+  border: 1px solid #6ee7b7;
 }
 
 .contact-status.closed {
   background: #e5e7eb;
   color: #374151;
+  border: 1px solid #d1d5db;
 }
 
 .admin-reply-btn {
