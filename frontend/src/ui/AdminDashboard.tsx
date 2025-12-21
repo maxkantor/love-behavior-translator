@@ -455,27 +455,47 @@ export function AdminDashboard() {
               {activities.length === 0 ? (
                 <p style={{ color: 'var(--muted)', padding: '20px', textAlign: 'center' }}>No purchase activities yet.</p>
               ) : (
-                activities.map((activity) => (
-                  <div key={activity.activityId} className="admin-contact-item">
-                    <div className="admin-contact-header">
-                      <div>
-                        <div className="admin-contact-email">{activity.customerName || 'Unknown'}</div>
-                        <div className="admin-contact-subject">{activity.customerEmail}</div>
-                        <div className="admin-contact-meta">
-                          {new Date(activity.purchaseDate).toLocaleString()} • 
-                          ${activity.amount.toFixed(2)} • {activity.credits} credits
-                          {activity.cardLast4 && ` • Card: •••• ${activity.cardLast4}`}
-                        </div>
-                        <div style={{ marginTop: '8px', fontSize: '0.85rem', color: 'var(--muted)' }}>
-                          User ID: {activity.userId}
-                        </div>
-                        <div style={{ fontSize: '0.75rem', color: 'var(--muted)', marginTop: '4px' }}>
-                          Payment: {activity.paymentId} | Session: {activity.sessionId}
+                activities.map((activity) => {
+                  // Try to find user info from users list
+                  const user = users.find(u => u.userId === activity.userId);
+                  const displayName = activity.customerName && activity.customerName !== 'Unknown' 
+                    ? activity.customerName 
+                    : (user ? `User: ${activity.userId}` : 'Unknown User');
+                  const displayEmail = activity.customerEmail || 'No email provided';
+                  
+                  return (
+                    <div key={activity.activityId} className="admin-contact-item">
+                      <div className="admin-contact-header">
+                        <div>
+                          <div className="admin-contact-email">
+                            {displayName}
+                            {activity.customerName && activity.customerName !== 'Unknown' && (
+                              <span style={{ marginLeft: '8px', fontSize: '0.9rem', fontWeight: 'normal', color: 'var(--muted)' }}>
+                                ({activity.userId})
+                              </span>
+                            )}
+                          </div>
+                          <div className="admin-contact-subject" style={{ fontWeight: '600', color: 'var(--text-soft)' }}>
+                            📧 {displayEmail}
+                          </div>
+                          <div className="admin-contact-meta">
+                            {new Date(activity.purchaseDate).toLocaleString()} • 
+                            ${activity.amount.toFixed(2)} • {activity.credits} credits
+                            {activity.cardLast4 && ` • Card: •••• ${activity.cardLast4}`}
+                          </div>
+                          {!activity.customerName || activity.customerName === 'Unknown' ? (
+                            <div style={{ marginTop: '8px', fontSize: '0.85rem', color: 'var(--muted)' }}>
+                              User ID: {activity.userId}
+                            </div>
+                          ) : null}
+                          <div style={{ fontSize: '0.75rem', color: 'var(--muted)', marginTop: '4px' }}>
+                            Payment: {activity.paymentId} | Session: {activity.sessionId}
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
           </div>
