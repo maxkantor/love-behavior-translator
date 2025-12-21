@@ -2376,15 +2376,14 @@ body {
   grid-template-columns: 1fr 1fr;
   gap: 30px;
   margin-bottom: 24px;
-  align-items: start;
+  align-items: end;
 }
 
 .faq-section {
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-height: 100%;
-  overflow: hidden;
+  height: 100%;
 }
 
 .contact-section {
