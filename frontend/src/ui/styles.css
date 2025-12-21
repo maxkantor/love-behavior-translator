@@ -2402,7 +2402,8 @@ body {
   gap: 12px;
   overflow-y: auto;
   padding-right: 8px;
-  max-height: calc(100vh - 500px);
+  flex: 1;
+  min-height: 0;
 }
 
 .faq-item {
@@ -2517,7 +2518,7 @@ body {
   gap: 8px;
   transition: all 0.3s;
   margin-top: 8px;
-  margin-bottom: 0;
+  margin-bottom: 16px;
 }
 
 .send-message-button:hover {
@@ -2536,6 +2537,7 @@ body {
   border-radius: 10px;
   margin-top: 0;
   flex-shrink: 0;
+  margin-bottom: 0;
 }
 
 .response-times-title {
