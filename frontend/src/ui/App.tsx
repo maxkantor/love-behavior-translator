@@ -37,6 +37,10 @@ export function App() {
   const { credits, setCredits, userId, refreshCredits } = useCredits();
   const [behavior, setBehavior] = useState('');
   const [emailTo, setEmailTo] = useState('');
+  const [relationshipType, setRelationshipType] = useState<RelationshipType | ''>('');
+  const [relationshipLength, setRelationshipLength] = useState('');
+  const [emotionalState, setEmotionalState] = useState<EmotionalState | ''>('');
+  const [mode, setMode] = useState<AnalysisMode>('gentle');
   const [selectedChips, setSelectedChips] = useState<Set<string>>(new Set());
 
   const [loading, setLoading] = useState(false);
@@ -213,7 +217,7 @@ export function App() {
             <div className="credits-explanation-text">
               1 credit = 1 behavior analysis
             </div>
-            {process.env.NODE_ENV === 'development' && (
+            {import.meta.env.MODE === 'development' && (
               <div style={{ fontSize: '0.7rem', opacity: 0.7, marginTop: '4px' }}>
                 User ID: {userId}
               </div>

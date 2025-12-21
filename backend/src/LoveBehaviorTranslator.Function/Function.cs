@@ -1288,21 +1288,47 @@ Reassurance:
                         
                         try
                         {
-                            // Get customer name and email from Stripe Customer if available
-                            if (!string.IsNullOrWhiteSpace(session.CustomerId))
+                            // First, try to get email and name from session directly (most reliable)
+                            customerEmail = session.CustomerEmail;
+                            context.Logger.LogInformation($"Session CustomerEmail: {customerEmail}");
+                            
+                            // Check CustomerDetails on session (contains name and email from checkout)
+                            if (session.CustomerDetails != null)
                             {
-                                var customerService = new Stripe.CustomerService();
-                                var customer = await customerService.GetAsync(session.CustomerId);
-                                customerName = customer.Name;
-                                customerEmail = customer.Email;
-                                context.Logger.LogInformation($"Retrieved customer from Stripe: Name={customerName}, Email={customerEmail}");
+                                if (!string.IsNullOrWhiteSpace(session.CustomerDetails.Email))
+                                {
+                                    customerEmail = session.CustomerDetails.Email;
+                                    context.Logger.LogInformation($"Using CustomerDetails.Email: {customerEmail}");
+                                }
+                                if (!string.IsNullOrWhiteSpace(session.CustomerDetails.Name))
+                                {
+                                    customerName = session.CustomerDetails.Name;
+                                    context.Logger.LogInformation($"Using CustomerDetails.Name: {customerName}");
+                                }
                             }
                             
-                            // Fallback to session email if customer email not available
-                            if (string.IsNullOrWhiteSpace(customerEmail))
+                            // Get customer name and email from Stripe Customer object if available
+                            if (!string.IsNullOrWhiteSpace(session.CustomerId))
                             {
-                                customerEmail = session.CustomerEmail;
-                                context.Logger.LogInformation($"Using session email: {customerEmail}");
+                                try
+                                {
+                                    var customerService = new Stripe.CustomerService();
+                                    var customer = await customerService.GetAsync(session.CustomerId);
+                                    if (!string.IsNullOrWhiteSpace(customer.Name))
+                                    {
+                                        customerName = customer.Name;
+                                        context.Logger.LogInformation($"Retrieved customer name from Customer object: {customerName}");
+                                    }
+                                    if (!string.IsNullOrWhiteSpace(customer.Email))
+                                    {
+                                        customerEmail = customer.Email;
+                                        context.Logger.LogInformation($"Retrieved customer email from Customer object: {customerEmail}");
+                                    }
+                                }
+                                catch (Exception customerEx)
+                                {
+                                    context.Logger.LogWarning($"Could not fetch customer object: {customerEx.Message}");
+                                }
                             }
                             
                             // If we still don't have email, try to get it from payment intent
@@ -1312,7 +1338,7 @@ Reassurance:
                                 {
                                     var paymentIntentService = new Stripe.PaymentIntentService();
                                     var paymentIntent = await paymentIntentService.GetAsync(session.PaymentIntentId);
-                                    if (paymentIntent.ReceiptEmail != null)
+                                    if (!string.IsNullOrWhiteSpace(paymentIntent.ReceiptEmail))
                                     {
                                         customerEmail = paymentIntent.ReceiptEmail;
                                         context.Logger.LogInformation($"Using payment intent receipt email: {customerEmail}");
@@ -1323,6 +1349,8 @@ Reassurance:
                                     context.Logger.LogWarning($"Could not get email from payment intent: {ex.Message}");
                                 }
                             }
+                            
+                            context.Logger.LogInformation($"Final customer info - Name: {customerName ?? "null"}, Email: {customerEmail ?? "null"}");
                             
                             // Get payment method last 4 digits from PaymentIntent
                             if (!string.IsNullOrWhiteSpace(session.PaymentIntentId))
