@@ -243,8 +243,10 @@ export function App() {
               const target = e.currentTarget as HTMLImageElement;
               target.src = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&h=500&fit=crop&crop=face&auto=format&q=80";
             }}
+            onClick={() => window.open(female1, '_blank')}
             alt="Decorative" 
             className="decorative-image"
+            style={{ cursor: 'pointer' }}
           />
           <img 
             src={female2}
@@ -252,8 +254,10 @@ export function App() {
               const target = e.currentTarget as HTMLImageElement;
               target.src = "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=500&h=500&fit=crop&crop=face&auto=format&q=80";
             }}
+            onClick={() => window.open(female2, '_blank')}
             alt="Decorative" 
             className="decorative-image"
+            style={{ cursor: 'pointer' }}
           />
           <img 
             src={female3}
@@ -261,8 +265,10 @@ export function App() {
               const target = e.currentTarget as HTMLImageElement;
               target.src = "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=500&h=500&fit=crop&crop=face&auto=format&q=80";
             }}
+            onClick={() => window.open(female3, '_blank')}
             alt="Decorative" 
             className="decorative-image"
+            style={{ cursor: 'pointer' }}
           />
         </div>
         
@@ -274,8 +280,10 @@ export function App() {
               const target = e.currentTarget as HTMLImageElement;
               target.src = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&h=500&fit=crop&crop=face&auto=format&q=80";
             }}
+            onClick={() => window.open(male1, '_blank')}
             alt="Decorative" 
             className="decorative-image"
+            style={{ cursor: 'pointer' }}
           />
           <img 
             src={male2}
@@ -283,8 +291,10 @@ export function App() {
               const target = e.currentTarget as HTMLImageElement;
               target.src = "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=500&h=500&fit=crop&crop=face&auto=format&q=80";
             }}
+            onClick={() => window.open(male2, '_blank')}
             alt="Decorative" 
             className="decorative-image"
+            style={{ cursor: 'pointer' }}
           />
           <img 
             src={male3}
@@ -292,8 +302,10 @@ export function App() {
               const target = e.currentTarget as HTMLImageElement;
               target.src = "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=500&h=500&fit=crop&crop=face&auto=format&q=80";
             }}
+            onClick={() => window.open(male3, '_blank')}
             alt="Decorative" 
             className="decorative-image"
+            style={{ cursor: 'pointer' }}
           />
         </div>
         
