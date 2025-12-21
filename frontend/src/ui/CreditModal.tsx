@@ -23,24 +23,24 @@ export function CreditModal({ isOpen, onClose, currentCredits }: CreditModalProp
     { 
       name: 'Starter Pack', 
       credits: 20, 
-      price: 4.99, 
-      perCredit: 0.249, 
+      price: 1.99, 
+      perCredit: 0.100, 
       description: 'Perfect for occasional use',
       popular: false 
     },
     { 
       name: 'Pro Pack', 
       credits: 50, 
-      price: 9.99, 
-      perCredit: 0.200, 
+      price: 3.99, 
+      perCredit: 0.080, 
       description: 'Best value for regular users',
       popular: true 
     },
     { 
       name: 'Ultra Pack', 
       credits: 120, 
-      price: 19.99, 
-      perCredit: 0.167, 
+      price: 7.99, 
+      perCredit: 0.067, 
       description: 'For power users',
       popular: false 
     },
