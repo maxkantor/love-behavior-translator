@@ -148,6 +148,9 @@ export function HelpModal({ isOpen, onClose }: HelpModalProps) {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="support-modal-content" onClick={(e) => e.stopPropagation()}>
+        <button className="help-modal-close-top" onClick={onClose} title="Close">
+          ✕
+        </button>
         <div className="support-modal-header">
           <div className="headset-icon">🎧</div>
           <h1>Need Help?</h1>
@@ -269,10 +272,12 @@ export function HelpModal({ isOpen, onClose }: HelpModalProps) {
           </section>
         </div>
 
-        <button className="back-button support-back" onClick={onClose}>
-          <span className="heart-icon-back">💕</span>
-          Back to Translator
-        </button>
+        <div style={{ marginTop: '32px', paddingTop: '24px', borderTop: '1px solid #e5e7eb' }}>
+          <button className="back-button support-back" onClick={onClose}>
+            <span className="heart-icon-back">💕</span>
+            Back to Translator
+          </button>
+        </div>
       </div>
     </div>
   );
