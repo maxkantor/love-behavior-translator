@@ -4,6 +4,14 @@ import { Link } from 'react-router-dom';
 import { CreditModal } from './CreditModal';
 import { HelpModal } from './HelpModal';
 
+// Import images from assets
+import female1 from '../assets/images/female-1.jpg';
+import female2 from '../assets/images/female-2.jpg';
+import female3 from '../assets/images/female-3.jpg';
+import male1 from '../assets/images/male-1.jpg';
+import male2 from '../assets/images/male-2.jpg';
+import male3 from '../assets/images/male-3.jpg';
+
 type AnalysisMode = 'gentle' | 'analytical' | 'brutally_honest' | 'light_funny';
 type RelationshipType = 'dating' | 'married' | 'situationship' | 'friendship' | 'other';
 type EmotionalState = 'anxious' | 'confused' | 'hurt' | 'hopeful' | 'neutral' | 'frustrated';
@@ -230,7 +238,7 @@ export function App() {
         {/* Decorative images - Left side (female images only) */}
         <div className="decorative-images-left">
           <img 
-            src="/assets/images/female-1.jpg"
+            src={female1}
             onError={(e) => {
               const target = e.currentTarget as HTMLImageElement;
               target.src = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&h=500&fit=crop&crop=face&auto=format&q=80";
@@ -239,7 +247,7 @@ export function App() {
             className="decorative-image"
           />
           <img 
-            src="/assets/images/female-2.jpg"
+            src={female2}
             onError={(e) => {
               const target = e.currentTarget as HTMLImageElement;
               target.src = "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=500&h=500&fit=crop&crop=face&auto=format&q=80";
@@ -248,7 +256,7 @@ export function App() {
             className="decorative-image"
           />
           <img 
-            src="/assets/images/female-3.jpg"
+            src={female3}
             onError={(e) => {
               const target = e.currentTarget as HTMLImageElement;
               target.src = "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=500&h=500&fit=crop&crop=face&auto=format&q=80";
@@ -261,7 +269,7 @@ export function App() {
         {/* Decorative images - Right side (male images only) */}
         <div className="decorative-images-right">
           <img 
-            src="/assets/images/male-1.jpg"
+            src={male1}
             onError={(e) => {
               const target = e.currentTarget as HTMLImageElement;
               target.src = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&h=500&fit=crop&crop=face&auto=format&q=80";
@@ -270,7 +278,7 @@ export function App() {
             className="decorative-image"
           />
           <img 
-            src="/assets/images/male-2.jpg"
+            src={male2}
             onError={(e) => {
               const target = e.currentTarget as HTMLImageElement;
               target.src = "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=500&h=500&fit=crop&crop=face&auto=format&q=80";
@@ -279,7 +287,7 @@ export function App() {
             className="decorative-image"
           />
           <img 
-            src="/assets/images/male-3.jpg"
+            src={male3}
             onError={(e) => {
               const target = e.currentTarget as HTMLImageElement;
               target.src = "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=500&h=500&fit=crop&crop=face&auto=format&q=80";
