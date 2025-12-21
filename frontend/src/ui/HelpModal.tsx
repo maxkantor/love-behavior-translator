@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 function getApiBaseUrl(): string {
   const envUrl = import.meta.env.VITE_API_BASE_URL as string | undefined;
@@ -24,6 +24,15 @@ export function HelpModal({ isOpen, onClose }: HelpModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [emailError, setEmailError] = useState('');
+  const faqSectionRef = useRef<HTMLElement>(null);
+  const contactSectionRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    if (isOpen && faqSectionRef.current && contactSectionRef.current) {
+      const contactHeight = contactSectionRef.current.offsetHeight;
+      faqSectionRef.current.style.height = `${contactHeight}px`;
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -129,7 +138,7 @@ export function HelpModal({ isOpen, onClose }: HelpModalProps) {
 
         <div className="help-content-wrapper">
           {/* FAQ Section */}
-          <section className="faq-section">
+          <section ref={faqSectionRef} className="faq-section">
             <h2 className="section-title">Frequently Asked Questions</h2>
             <div className="faq-list">
               {faqs.map((faq, index) => (
@@ -142,7 +151,7 @@ export function HelpModal({ isOpen, onClose }: HelpModalProps) {
           </section>
 
           {/* Contact Form Section */}
-          <section className="contact-section">
+          <section ref={contactSectionRef} className="contact-section">
             <h2 className="section-title">Contact Support</h2>
             <form className="support-form" onSubmit={handleSubmit}>
               <div className="form-field">

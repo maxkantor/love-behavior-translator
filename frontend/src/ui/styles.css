@@ -2382,7 +2382,7 @@ body {
   align-items: start;
   flex: 1;
   min-height: 0;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .faq-section {
@@ -2390,8 +2390,6 @@ body {
   flex-direction: column;
   width: 100%;
   overflow: hidden;
-  min-height: 0;
-  max-height: 100%;
 }
 
 .contact-section {
@@ -2399,7 +2397,6 @@ body {
   flex-direction: column;
   width: 100%;
   overflow: visible;
-  height: fit-content;
 }
 
 .section-title {
