@@ -143,28 +143,57 @@ public static class CreditSystem
     /// <summary>
     /// Notify admin when credits are purchased (called from Stripe webhook or admin grant).
     /// </summary>
-    public static async Task NotifyCreditPurchase(string userId, int creditsPurchased, decimal? amount, IAmazonDynamoDB ddb, IAmazonSimpleEmailService ses, string fromEmail, ILambdaLogger logger)
+    public static async Task NotifyCreditPurchase(string userId, int creditsPurchased, decimal? amount, IAmazonDynamoDB ddb, IAmazonSimpleEmailService ses, string fromEmail, ILambdaLogger logger, string? customerEmail = null, string? paymentId = null, string? sessionId = null)
     {
+        logger.LogInformation($"📧 NotifyCreditPurchase called: userId={userId}, credits={creditsPurchased}, amount={amount}, fromEmail='{fromEmail}'");
+        
         if (string.IsNullOrWhiteSpace(fromEmail))
         {
-            logger.LogWarning("SES_FROM_EMAIL not set; skipping credit purchase notification.");
+            logger.LogWarning("❌ SES_FROM_EMAIL not set; skipping credit purchase notification.");
             return;
         }
 
         try
         {
+            logger.LogInformation($"📧 Preparing email notification to {fromEmail}");
             var userCredits = await GetUserCredits(userId, ddb, logger);
-            var subject = $"Credit Purchase: {creditsPurchased} credits";
-            var body = $@"New credit purchase:
+            var timestamp = DateTimeOffset.UtcNow;
+            var subject = $"💰 New Payment: {creditsPurchased} credits - ${(amount ?? 0):F2}";
+            
+            var body = $@"🎉 NEW CREDIT PURCHASE
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PAYMENT DETAILS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Amount Paid: ${(amount ?? 0):F2}
+Credits Purchased: {creditsPurchased}
+New User Balance: {userCredits}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+USER INFORMATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 User ID: {userId}
-Credits Purchased: {creditsPurchased}
-New Balance: {userCredits}
-Amount: {(amount.HasValue ? $"${amount.Value:F2}" : "N/A")}
-Timestamp: {DateTimeOffset.UtcNow:O}
+{(string.IsNullOrWhiteSpace(customerEmail) ? "" : $"Customer Email: {customerEmail}\n")}
+{(string.IsNullOrWhiteSpace(paymentId) ? "" : $"Payment ID: {paymentId}\n")}
+{(string.IsNullOrWhiteSpace(sessionId) ? "" : $"Checkout Session: {sessionId}\n")}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TIMESTAMP
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+{timestamp:yyyy-MM-dd HH:mm:ss} UTC
+({timestamp:O})
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+View in Stripe Dashboard: https://dashboard.stripe.com/payments
 ";
 
-            await ses.SendEmailAsync(new Amazon.SimpleEmail.Model.SendEmailRequest
+            logger.LogInformation($"📧 Calling SES.SendEmailAsync: From={fromEmail}, To={fromEmail}, Subject={subject}");
+            
+            var request = new Amazon.SimpleEmail.Model.SendEmailRequest
             {
                 Source = fromEmail,
                 Destination = new Amazon.SimpleEmail.Model.Destination { ToAddresses = new List<string> { fromEmail } },
@@ -173,11 +202,30 @@ Timestamp: {DateTimeOffset.UtcNow:O}
                     Subject = new Amazon.SimpleEmail.Model.Content(subject),
                     Body = new Amazon.SimpleEmail.Model.Body { Text = new Amazon.SimpleEmail.Model.Content(body) }
                 }
-            });
+            };
+            
+            var response = await ses.SendEmailAsync(request);
+            
+            logger.LogInformation($"✅ SES.SendEmailAsync succeeded! MessageId={response.MessageId}, HttpStatusCode={response.HttpStatusCode}");
+            logger.LogInformation($"✅ Payment notification email sent to {fromEmail} (MessageId: {response.MessageId})");
+        }
+        catch (Amazon.SimpleEmail.Model.MessageRejectedException ex)
+        {
+            logger.LogError($"❌ SES MessageRejectedException: {ex.Message}");
+            logger.LogError($"❌ Error Code: {ex.ErrorCode}, Status Code: {ex.StatusCode}");
+            if (ex.InnerException != null)
+            {
+                logger.LogError($"❌ Inner Exception: {ex.InnerException}");
+            }
         }
         catch (Exception ex)
         {
-            logger.LogError($"Failed to send credit purchase notification: {ex}");
+            logger.LogError($"❌ Failed to send credit purchase notification: {ex.GetType().Name}: {ex.Message}");
+            logger.LogError($"❌ Stack trace: {ex.StackTrace}");
+            if (ex.InnerException != null)
+            {
+                logger.LogError($"❌ Inner exception: {ex.InnerException.GetType().Name}: {ex.InnerException.Message}");
+            }
         }
     }
 

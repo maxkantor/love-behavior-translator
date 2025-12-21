@@ -109,6 +109,14 @@ public sealed class Function
             if (method == "GET" && (path.EndsWith("/health") || path == "/health"))
                 return JsonResponse(200, new { status = "healthy" });
 
+            // Test email endpoint (admin only, for debugging)
+            if (method == "POST" && (path.EndsWith("/admin/test-email") || path == "/admin/test-email"))
+            {
+                if (!AdminSystem.VerifyAdminToken(request, _secrets))
+                    return JsonResponse(401, new { error = "Unauthorized" });
+                return await HandleTestEmail(context);
+            }
+
             // Admin login (no auth required)
             if (method == "POST" && (path.EndsWith("/admin/login") || path == "/admin/login"))
                 return await HandleAdminLogin(request, context);
@@ -523,6 +531,70 @@ public sealed class Function
         }
     }
 
+    private async Task<APIGatewayProxyResponse> HandleTestEmail(ILambdaContext context)
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(_sesFromEmail))
+            {
+                return JsonResponse(400, new { error = "SES_FROM_EMAIL not set in Lambda environment variables" });
+            }
+
+            context.Logger.LogInformation($"📧 Test email: Sending test email to {_sesFromEmail}");
+
+            var subject = "🧪 Test Email - Love Behavior Translator";
+            var body = $@"This is a test email from Love Behavior Translator.
+
+If you received this, SES email sending is working correctly!
+
+Timestamp: {DateTimeOffset.UtcNow:O}
+SES_FROM_EMAIL: {_sesFromEmail}
+";
+
+            var request = new SendEmailRequest
+            {
+                Source = _sesFromEmail,
+                Destination = new Destination { ToAddresses = new List<string> { _sesFromEmail } },
+                Message = new Message
+                {
+                    Subject = new Content(subject),
+                    Body = new Body { Text = new Content(body) }
+                }
+            };
+
+            context.Logger.LogInformation($"📧 Test email: Calling SES.SendEmailAsync");
+            var response = await _ses.SendEmailAsync(request);
+            context.Logger.LogInformation($"✅ Test email: SES.SendEmailAsync succeeded! MessageId={response.MessageId}");
+
+            return JsonResponse(200, new { 
+                success = true, 
+                message = "Test email sent successfully",
+                messageId = response.MessageId,
+                to = _sesFromEmail
+            });
+        }
+        catch (Amazon.SimpleEmail.Model.MessageRejectedException ex)
+        {
+            context.Logger.LogError($"❌ Test email: MessageRejectedException: {ex.Message}");
+            return JsonResponse(400, new { 
+                error = "Email rejected by SES", 
+                message = ex.Message,
+                errorCode = ex.ErrorCode,
+                statusCode = ex.StatusCode
+            });
+        }
+        catch (Exception ex)
+        {
+            context.Logger.LogError($"❌ Test email: Exception: {ex.GetType().Name}: {ex.Message}");
+            context.Logger.LogError($"❌ Test email: Stack trace: {ex.StackTrace}");
+            return JsonResponse(500, new { 
+                error = "Failed to send test email", 
+                message = ex.Message,
+                type = ex.GetType().Name
+            });
+        }
+    }
+
     private async Task<APIGatewayProxyResponse> HandleAdminReplyContact(APIGatewayProxyRequest request, ILambdaContext context)
     {
         var pathParts = request.Path?.Split('/') ?? Array.Empty<string>();
@@ -602,9 +674,11 @@ public sealed class Function
 
     private async Task SendContactNotification(ContactRequest contact, string contactId, ILambdaContext context)
     {
+        context.Logger.LogInformation($"📧 SendContactNotification called: contactId={contactId}, email={contact.Email}, subject={contact.Subject}");
+        
         if (string.IsNullOrWhiteSpace(_sesFromEmail))
         {
-            context.Logger.LogWarning("SES_FROM_EMAIL not set; skipping contact notification.");
+            context.Logger.LogWarning("❌ SES_FROM_EMAIL not set; skipping contact notification.");
             return;
         }
 
@@ -624,7 +698,9 @@ Reply to this contact at: {contact.Email}
 
         try
         {
-            await _ses.SendEmailAsync(new SendEmailRequest
+            context.Logger.LogInformation($"📧 Preparing contact notification email: From={_sesFromEmail}, To={_sesFromEmail}, Subject={subject}");
+            
+            var request = new SendEmailRequest
             {
                 Source = _sesFromEmail,
                 Destination = new Destination { ToAddresses = new List<string> { _sesFromEmail } },
@@ -633,11 +709,30 @@ Reply to this contact at: {contact.Email}
                     Subject = new Content(subject),
                     Body = new Body { Text = new Content(body) }
                 }
-            });
+            };
+            
+            context.Logger.LogInformation($"📧 Calling SES.SendEmailAsync for contact notification");
+            var response = await _ses.SendEmailAsync(request);
+            
+            context.Logger.LogInformation($"✅ Contact notification email sent successfully! MessageId={response.MessageId}, HttpStatusCode={response.HttpStatusCode}");
+        }
+        catch (Amazon.SimpleEmail.Model.MessageRejectedException ex)
+        {
+            context.Logger.LogError($"❌ Contact notification: SES MessageRejectedException: {ex.Message}");
+            context.Logger.LogError($"❌ Error Code: {ex.ErrorCode}, Status Code: {ex.StatusCode}");
+            if (ex.InnerException != null)
+            {
+                context.Logger.LogError($"❌ Inner Exception: {ex.InnerException}");
+            }
         }
         catch (Exception ex)
         {
-            context.Logger.LogError($"Failed to send contact notification: {ex}");
+            context.Logger.LogError($"❌ Failed to send contact notification: {ex.GetType().Name}: {ex.Message}");
+            context.Logger.LogError($"❌ Stack trace: {ex.StackTrace}");
+            if (ex.InnerException != null)
+            {
+                context.Logger.LogError($"❌ Inner exception: {ex.InnerException.GetType().Name}: {ex.InnerException.Message}");
+            }
         }
     }
 
@@ -994,6 +1089,24 @@ Reassurance:
         context.Logger.LogInformation($"Request body length: {request.Body?.Length ?? 0}");
         context.Logger.LogInformation($"Headers: {string.Join(", ", request.Headers?.Keys ?? Array.Empty<string>())}");
         
+        // Log all header keys for debugging
+        if (request.Headers != null)
+        {
+            foreach (var header in request.Headers)
+            {
+                context.Logger.LogInformation($"Header: {header.Key} = {header.Value?.Substring(0, Math.Min(50, header.Value?.Length ?? 0))}...");
+            }
+        }
+        
+        // Also check MultiValueHeaders (API Gateway sometimes uses this)
+        if (request.MultiValueHeaders != null)
+        {
+            foreach (var header in request.MultiValueHeaders)
+            {
+                context.Logger.LogInformation($"MultiValueHeader: {header.Key} = {string.Join(", ", header.Value ?? Array.Empty<string>())}");
+            }
+        }
+        
         if (string.IsNullOrWhiteSpace(_stripeSecretKey))
         {
             context.Logger.LogError("❌ STRIPE_SECRET_KEY not configured");
@@ -1007,13 +1120,39 @@ Reassurance:
         }
 
         var body = request.Body ?? "";
-        var signature = request.Headers?.ContainsKey("stripe-signature") == true 
-            ? request.Headers["stripe-signature"] 
-            : null;
+        
+        // Try to get signature from headers (case-insensitive)
+        string? signature = null;
+        if (request.Headers != null)
+        {
+            // Check case-insensitively
+            var headerKey = request.Headers.Keys.FirstOrDefault(k => 
+                k.Equals("stripe-signature", StringComparison.OrdinalIgnoreCase) ||
+                k.Equals("Stripe-Signature", StringComparison.OrdinalIgnoreCase));
+            
+            if (headerKey != null)
+            {
+                signature = request.Headers[headerKey];
+            }
+        }
+        
+        // Also check MultiValueHeaders (API Gateway sometimes uses this)
+        if (signature == null && request.MultiValueHeaders != null)
+        {
+            var multiHeaderKey = request.MultiValueHeaders.Keys.FirstOrDefault(k => 
+                k.Equals("stripe-signature", StringComparison.OrdinalIgnoreCase) ||
+                k.Equals("Stripe-Signature", StringComparison.OrdinalIgnoreCase));
+            
+            if (multiHeaderKey != null && request.MultiValueHeaders[multiHeaderKey]?.Count > 0)
+            {
+                signature = request.MultiValueHeaders[multiHeaderKey][0];
+            }
+        }
 
         if (string.IsNullOrWhiteSpace(signature))
         {
             context.Logger.LogError("❌ Missing stripe-signature header");
+            context.Logger.LogError($"Available headers: {string.Join(", ", request.Headers?.Keys ?? Array.Empty<string>())}");
             return JsonResponse(400, new { error = "Missing stripe-signature header" });
         }
         
@@ -1067,7 +1206,23 @@ Reassurance:
                         // Notify admin via email
                         try
                         {
-                            await CreditSystem.NotifyCreditPurchase(userId, credits, amountPaid, _ddb, _ses, _sesFromEmail, context.Logger);
+                            // Get customer email and payment ID from Stripe session
+                            var customerEmail = session.CustomerEmail;
+                            // PaymentIntentId is a string ID, not an object
+                            var paymentIntentId = session.PaymentIntentId;
+                            
+                            await CreditSystem.NotifyCreditPurchase(
+                                userId, 
+                                credits, 
+                                amountPaid, 
+                                _ddb, 
+                                _ses, 
+                                _sesFromEmail, 
+                                context.Logger,
+                                customerEmail: customerEmail,
+                                paymentId: paymentIntentId,
+                                sessionId: session.Id
+                            );
                             context.Logger.LogInformation($"✅ Admin notification sent for credit purchase: {credits} credits by {userId}");
                         }
                         catch (Exception notifyEx)

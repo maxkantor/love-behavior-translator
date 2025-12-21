@@ -2374,6 +2374,7 @@ body {
 .help-content-wrapper {
   display: grid;
   grid-template-columns: 1fr 1fr;
+  grid-auto-rows: minmax(550px, auto);
   gap: 30px;
   margin-bottom: 24px;
 }
@@ -2382,6 +2383,7 @@ body {
 .contact-section {
   display: flex;
   flex-direction: column;
+  height: 100%;
 }
 
 .section-title {
@@ -2397,7 +2399,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  max-height: 400px;
+  flex: 1;
   overflow-y: auto;
   padding-right: 8px;
 }
@@ -2429,6 +2431,10 @@ body {
 
 .support-form {
   margin-bottom: 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
 .form-field {
@@ -2527,7 +2533,8 @@ body {
   background: #d1fae5;
   padding: 16px;
   border-radius: 10px;
-  margin-bottom: 20px;
+  margin-top: auto;
+  flex-shrink: 0;
 }
 
 .response-times-title {
@@ -2966,6 +2973,7 @@ body {
 
   .faq-list {
     max-height: none;
+    flex: 1;
   }
 
   .packs-grid {
