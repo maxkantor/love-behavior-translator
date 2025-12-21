@@ -51,7 +51,6 @@ export function AdminDashboard() {
   const [dashboard, setDashboard] = useState<DashboardSummary | null>(null);
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [activities, setActivities] = useState<PurchaseActivity[]>([]);
-  const [showActivities, setShowActivities] = useState(true);
   const [selectedUserId, setSelectedUserId] = useState('');
   const [creditAmount, setCreditAmount] = useState('');
   const [grantAmount, setGrantAmount] = useState('100');
@@ -356,31 +355,6 @@ export function AdminDashboard() {
             </div>
           </div>
 
-          {/* Quick Actions */}
-          <div className="admin-card">
-            <h2>⚡ Quick Actions</h2>
-            <div className="admin-action-section">
-              <p>Pull all user data from the server.</p>
-              <button onClick={loadData} className="admin-action-btn" disabled={loading}>
-                Refresh Users
-              </button>
-            </div>
-            <div className="admin-action-section">
-              <p>View and manage user activities.</p>
-              <button 
-                className="admin-action-btn" 
-                onClick={async () => {
-                  if (!showActivities) {
-                    await fetchActivities();
-                  }
-                  setShowActivities(!showActivities);
-                }}
-              >
-                {showActivities ? 'Hide Activities' : 'Show Activities'}
-              </button>
-              <button className="admin-action-btn admin-danger">Reset All</button>
-            </div>
-          </div>
         </div>
 
         {/* Middle Column - Data Views */}
