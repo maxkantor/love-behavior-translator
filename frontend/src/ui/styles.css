@@ -194,7 +194,7 @@ body {
 /* Main content wrapper - purple background */
 .app-main-wrapper {
   display: grid;
-  grid-template-columns: 200px 1fr 200px;
+  grid-template-columns: 200px 1fr 250px;
   gap: 24px;
   padding: 0 180px;
   max-width: 100%;
