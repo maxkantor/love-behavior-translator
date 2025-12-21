@@ -335,46 +335,47 @@ export function AdminDashboard() {
           </div>
         </div>
 
-        {/* Set Your Credits */}
-        <div className="admin-card">
-          <h2>⚙️ Set Your Credits</h2>
-          <p>Choose your credit tier or set unlimited admin access.</p>
-          <div className="admin-quick-buttons">
-            {myCredits.map((amt) => (
-              <button
-                key={amt}
-                onClick={() => setMyCredits(amt)}
-                className="admin-quick-btn admin-purple"
-              >
-                {amt === -1 ? 'Set to Admin (Unlimited)' : `Set to ${amt} Credits`}
-              </button>
-            ))}
+          {/* Set Your Credits */}
+          <div className="admin-card">
+            <h2>⚙️ Set Your Credits</h2>
+            <p>Choose your credit tier or set unlimited admin access.</p>
+            <div className="admin-quick-buttons">
+              {myCredits.map((amt) => (
+                <button
+                  key={amt}
+                  onClick={() => setMyCredits(amt)}
+                  className="admin-quick-btn admin-purple"
+                >
+                  {amt === -1 ? 'Set to Admin (Unlimited)' : `Set to ${amt} Credits`}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
 
-        {/* Quick Actions */}
-        <div className="admin-card">
-          <h2>⚡ Quick Actions</h2>
-          <div className="admin-action-section">
-            <p>Pull all user data from the server.</p>
-            <button onClick={loadData} className="admin-action-btn" disabled={loading}>
-              Refresh Users
-            </button>
-          </div>
-          <div className="admin-action-section">
-            <p>View and manage user activities.</p>
-            <button 
-              className="admin-action-btn" 
-              onClick={async () => {
-                if (!showActivities) {
-                  await fetchActivities();
-                }
-                setShowActivities(!showActivities);
-              }}
-            >
-              {showActivities ? 'Hide Activities' : 'Show Activities'}
-            </button>
-            <button className="admin-action-btn admin-danger">Reset All</button>
+          {/* Quick Actions */}
+          <div className="admin-card">
+            <h2>⚡ Quick Actions</h2>
+            <div className="admin-action-section">
+              <p>Pull all user data from the server.</p>
+              <button onClick={loadData} className="admin-action-btn" disabled={loading}>
+                Refresh Users
+              </button>
+            </div>
+            <div className="admin-action-section">
+              <p>View and manage user activities.</p>
+              <button 
+                className="admin-action-btn" 
+                onClick={async () => {
+                  if (!showActivities) {
+                    await fetchActivities();
+                  }
+                  setShowActivities(!showActivities);
+                }}
+              >
+                {showActivities ? 'Hide Activities' : 'Show Activities'}
+              </button>
+              <button className="admin-action-btn admin-danger">Reset All</button>
+            </div>
           </div>
         </div>
 
