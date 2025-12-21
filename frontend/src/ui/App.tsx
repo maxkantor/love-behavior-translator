@@ -226,17 +226,26 @@ export function App() {
         {/* Decorative images - Left side (female images only) */}
         <div className="decorative-images-left">
           <img 
-            src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&h=500&fit=crop&crop=face&auto=format&q=80" 
+            src={new URL('../assets/images/female-1.jpg', import.meta.url).href}
+            onError={(e) => {
+              e.currentTarget.src = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&h=500&fit=crop&crop=face&auto=format&q=80";
+            }}
             alt="Decorative" 
             className="decorative-image"
           />
           <img 
-            src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=500&h=500&fit=crop&crop=face&auto=format&q=80" 
+            src={new URL('../assets/images/female-2.jpg', import.meta.url).href}
+            onError={(e) => {
+              e.currentTarget.src = "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=500&h=500&fit=crop&crop=face&auto=format&q=80";
+            }}
             alt="Decorative" 
             className="decorative-image"
           />
           <img 
-            src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=500&h=500&fit=crop&crop=face&auto=format&q=80" 
+            src={new URL('../assets/images/female-3.jpg', import.meta.url).href}
+            onError={(e) => {
+              e.currentTarget.src = "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=500&h=500&fit=crop&crop=face&auto=format&q=80";
+            }}
             alt="Decorative" 
             className="decorative-image"
           />
@@ -245,17 +254,26 @@ export function App() {
         {/* Decorative images - Right side (male images only) */}
         <div className="decorative-images-right">
           <img 
-            src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&h=500&fit=crop&crop=face&auto=format&q=80" 
+            src={new URL('../assets/images/male-1.jpg', import.meta.url).href}
+            onError={(e) => {
+              e.currentTarget.src = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&h=500&fit=crop&crop=face&auto=format&q=80";
+            }}
             alt="Decorative" 
             className="decorative-image"
           />
           <img 
-            src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=500&h=500&fit=crop&crop=face&auto=format&q=80" 
+            src={new URL('../assets/images/male-2.jpg', import.meta.url).href}
+            onError={(e) => {
+              e.currentTarget.src = "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=500&h=500&fit=crop&crop=face&auto=format&q=80";
+            }}
             alt="Decorative" 
             className="decorative-image"
           />
           <img 
-            src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=500&h=500&fit=crop&crop=face&auto=format&q=80" 
+            src={new URL('../assets/images/male-3.jpg', import.meta.url).href}
+            onError={(e) => {
+              e.currentTarget.src = "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=500&h=500&fit=crop&crop=face&auto=format&q=80";
+            }}
             alt="Decorative" 
             className="decorative-image"
           />
