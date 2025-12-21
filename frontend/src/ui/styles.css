@@ -216,8 +216,12 @@ body {
 
 @media (max-width: 1400px) {
   .app-main-wrapper {
-    grid-template-columns: 180px 1fr 180px;
+    grid-template-columns: 180px 1fr 230px;
     padding: 0 140px;
+  }
+  
+  .main-sidebar-right {
+    max-width: 230px;
   }
 }
 
