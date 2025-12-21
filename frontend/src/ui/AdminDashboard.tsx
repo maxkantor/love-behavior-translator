@@ -437,6 +437,17 @@ export function AdminDashboard() {
             </div>
           )}
 
+          {/* Quick Actions */}
+          <div className="admin-card">
+            <h2>⚡ Quick Actions</h2>
+            <div className="admin-action-section">
+              <p>Pull all user data from the server.</p>
+              <button onClick={loadData} className="admin-action-btn" disabled={loading}>
+                Refresh Users
+              </button>
+            </div>
+          </div>
+
           {/* Purchase Activities */}
           <div className="admin-card admin-purchase-activities-card">
             <h2>💰 Purchase Activities ({activities.length})</h2>
