@@ -2376,7 +2376,7 @@ body {
   grid-template-columns: 1fr 1fr;
   gap: 30px;
   margin-bottom: 24px;
-  align-items: start;
+  align-items: stretch;
 }
 
 .faq-section,
@@ -2384,7 +2384,7 @@ body {
   display: flex;
   flex-direction: column;
   width: 100%;
-  overflow: hidden;
+  height: 100%;
 }
 
 .section-title {
