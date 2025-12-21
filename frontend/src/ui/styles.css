@@ -2383,14 +2383,15 @@ body {
   display: flex;
   flex-direction: column;
   width: 100%;
-  min-height: 0;
+  height: 100%;
+  overflow: hidden;
 }
 
 .contact-section {
   display: flex;
   flex-direction: column;
   width: 100%;
-  min-height: 0;
+  height: 100%;
 }
 
 .section-title {
