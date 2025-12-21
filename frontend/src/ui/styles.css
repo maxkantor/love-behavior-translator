@@ -370,9 +370,10 @@ body {
 .sidebar-section {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
   flex-shrink: 0;
   overflow: visible;
+  padding: 4px 0;
 }
 
 .how-it-works-sidebar {
