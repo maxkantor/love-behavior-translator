@@ -135,14 +135,14 @@ body {
 
 .credits-display-pill {
   background: var(--yellow);
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  padding: 12px 24px;
-  border-radius: 50px;
+  border: clamp(1px, 0.125vw, 2px) solid rgba(255, 255, 255, 0.3);
+  padding: clamp(0.6rem, 0.75vw, 0.75rem) clamp(1.25rem, 1.5vw, 1.5rem);
+  border-radius: clamp(2rem, 3.125vw, 3.125rem);
   display: flex;
   align-items: center;
-  gap: 10px;
-  box-shadow: 0 4px 16px rgba(251, 191, 36, 0.3);
-  min-width: 180px;
+  gap: clamp(0.5rem, 0.625vw, 0.625rem);
+  box-shadow: 0 clamp(0.2rem, 0.25vw, 0.25rem) clamp(0.875rem, 1vw, 1rem) rgba(251, 191, 36, 0.3);
+  min-width: clamp(140px, 11.25vw, 180px);
   justify-content: center;
 }
 
@@ -595,10 +595,10 @@ body {
   width: 100%;
   min-height: clamp(80px, 6.25vw, 100px);
   max-height: clamp(100px, 7.5vw, 120px);
-  padding: 14px 16px;
-  border: 2.5px solid var(--border);
-  border-radius: 12px;
-  font-size: 1.05rem;
+  padding: clamp(0.75rem, 0.875vw, 0.875rem) clamp(0.875rem, 1vw, 1rem);
+  border: clamp(1.5px, 0.156vw, 2.5px) solid var(--border);
+  border-radius: clamp(0.6rem, 0.75vw, 0.75rem);
+  font-size: clamp(0.9rem, 1.05vw, 1.05rem);
   font-family: inherit;
   resize: none;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -848,7 +848,7 @@ body {
   background: linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 100%);
   color: white;
   border: none;
-  padding: 16px 28px;
+  padding: clamp(0.875rem, 1vw, 1rem) clamp(1.5rem, 1.75vw, 1.75rem);
   border-radius: 12px;
   font-size: 1.1rem;
   font-weight: 700;
@@ -1064,14 +1064,14 @@ body {
 }
 
 .footer-title {
-  font-size: 1rem;
+  font-size: clamp(0.875rem, 1vw, 1rem);
   font-weight: 700;
   margin: 0;
   color: white;
 }
 
 .footer-text {
-  font-size: 0.85rem;
+  font-size: clamp(0.75rem, 0.85vw, 0.85rem);
   line-height: 1.5;
   color: rgba(255, 255, 255, 0.9);
   margin: 0;
