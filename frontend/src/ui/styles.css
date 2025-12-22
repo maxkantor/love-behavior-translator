@@ -94,6 +94,7 @@ body {
   flex-direction: column;
   width: 100%;
   min-width: 0;
+  justify-content: space-between;
 }
 
 /* Header */
@@ -492,12 +493,18 @@ body {
     font-size: clamp(0.8rem, 0.9vw, 1rem) !important;
   }
   
-  /* Footer fixes for MacBook Air - ensure buttons are visible */
+  /* Footer fixes for MacBook Air - ensure buttons are visible at 100% zoom */
   .app-footer {
     overflow: visible !important;
     padding: clamp(0.5rem, 0.8vw, 0.75rem) clamp(0.75rem, 1.2vw, 1.25rem) clamp(0.5rem, 0.7vw, 0.625rem) !important;
     position: relative !important;
-    z-index: 2 !important;
+    z-index: 10 !important;
+    margin-top: auto !important;
+    flex-shrink: 0 !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    min-height: auto !important;
   }
   
   .footer-bottom {
@@ -505,6 +512,8 @@ body {
     visibility: visible !important;
     opacity: 1 !important;
     padding-top: clamp(0.4rem, 0.5vw, 0.5rem) !important;
+    position: relative !important;
+    z-index: 11 !important;
   }
   
   .footer-buttons {
@@ -513,16 +522,27 @@ body {
     opacity: 1 !important;
     gap: clamp(0.4rem, 0.6vw, 0.625rem) !important;
     margin-bottom: clamp(0.4rem, 0.5vw, 0.5rem) !important;
+    position: relative !important;
+    z-index: 12 !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    align-items: center !important;
   }
   
   .footer-btn {
     display: inline-flex !important;
     visibility: visible !important;
     opacity: 1 !important;
-    padding: clamp(0.45rem, 0.6vw, 0.625rem) clamp(0.75rem, 1vw, 1.25rem) !important;
-    font-size: clamp(0.7rem, 0.8vw, 0.9rem) !important;
-    min-width: clamp(100px, 9vw, 150px) !important;
+    padding: clamp(0.5rem, 0.65vw, 0.625rem) clamp(0.875rem, 1.1vw, 1.25rem) !important;
+    font-size: clamp(0.75rem, 0.85vw, 0.9rem) !important;
+    min-width: clamp(110px, 9.5vw, 150px) !important;
     white-space: nowrap !important;
+    position: relative !important;
+    z-index: 13 !important;
+    background: var(--yellow) !important;
+    color: #000 !important;
+    border: none !important;
+    cursor: pointer !important;
   }
   
   .copyright,
@@ -532,6 +552,7 @@ body {
     margin: clamp(0.25rem, 0.3vw, 0.375rem) 0 !important;
     visibility: visible !important;
     opacity: 1 !important;
+    display: block !important;
   }
   
   /* Admin Login fixes for MacBook Air - optimized for higher zoom */
@@ -1296,10 +1317,15 @@ body {
   color: white;
   max-width: 1200px;
   margin: 0 auto;
+  margin-top: auto;
   flex-shrink: 0;
   overflow: visible;
   position: relative;
-  z-index: 2;
+  z-index: 10;
+  display: block;
+  visibility: visible;
+  opacity: 1;
+  min-height: fit-content;
 }
 
 .footer-content {
