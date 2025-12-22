@@ -2915,7 +2915,7 @@ body {
   z-index: 1000;
   padding: 20px;
   animation: fadeIn 0.3s ease-out;
-  overflow-y: auto;
+  overflow: hidden;
 }
 
 @keyframes fadeIn {
@@ -2945,7 +2945,7 @@ body {
   max-width: 1000px;
   width: 95%;
   max-height: 95vh;
-  overflow: hidden;
+  overflow: visible;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   animation: slideUp 0.3s ease-out;
   padding: 24px 32px;
@@ -3014,7 +3014,7 @@ body {
 .packs-section {
   margin-bottom: 20px;
   flex: 1;
-  overflow-y: auto;
+  overflow: visible;
   min-height: 0;
 }
 
@@ -3833,6 +3833,15 @@ body {
   .credit-modal-content {
     max-height: 98vh;
     padding: 16px 20px;
+    overflow: visible !important;
+  }
+  
+  .packs-section {
+    overflow: visible !important;
+  }
+  
+  .packs-grid {
+    overflow: visible !important;
   }
   
   .credit-modal-header h1 {
