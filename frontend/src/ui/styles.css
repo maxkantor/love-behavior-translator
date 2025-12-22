@@ -488,8 +488,8 @@ body {
 
 .quick-chip {
   background: white;
-  border: 2px solid var(--border);
-  border-radius: 20px;
+  border: clamp(1px, 0.125vw, 2px) solid var(--border);
+  border-radius: clamp(1rem, 1.25vw, 1.25rem);
   padding: clamp(0.5rem, 0.625vw, 0.625rem) clamp(0.9rem, 1.125vw, 1.125rem);
   font-size: clamp(0.875rem, 1vw, 1rem);
   font-weight: 500;
