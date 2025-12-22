@@ -272,7 +272,7 @@ export function HelpModal({ isOpen, onClose }: HelpModalProps) {
           </section>
         </div>
 
-        <div style={{ marginTop: '32px', paddingTop: '24px', borderTop: '1px solid #e5e7eb' }}>
+        <div className="help-modal-footer">
           <button className="back-button support-back" onClick={onClose}>
             <span className="heart-icon-back">💕</span>
             Back to Translator
