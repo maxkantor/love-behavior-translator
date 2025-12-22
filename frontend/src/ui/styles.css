@@ -430,17 +430,27 @@ body {
     font-size: clamp(0.8rem, 0.95vw, 1.1rem) !important;
   }
   
-  /* Help Modal fixes for MacBook Air */
+  /* Help Modal fixes for MacBook Air - optimized for higher zoom */
   .support-modal-content {
-    max-width: 800px !important;
-    width: calc(100% - 80px) !important;
-    max-height: 90vh !important;
-    padding: 12px !important;
+    max-width: 750px !important;
+    width: calc(100% - 100px) !important;
+    max-height: 88vh !important;
+    padding: 10px !important;
   }
   
   .help-content-wrapper {
-    gap: 12px !important;
-    margin-bottom: 16px !important;
+    gap: 10px !important;
+    margin-bottom: 12px !important;
+  }
+  
+  .section-title {
+    font-size: clamp(0.95rem, 1.1vw, 1.2rem) !important;
+    margin-bottom: clamp(0.5rem, 0.75vw, 0.75rem) !important;
+  }
+  
+  .faq-item {
+    padding: clamp(0.5rem, 0.75vw, 0.625rem) !important;
+    font-size: clamp(0.8rem, 0.9vw, 1rem) !important;
   }
   
   .contact-section {
@@ -449,21 +459,38 @@ body {
   }
   
   .support-form {
-    margin-bottom: 10px !important;
+    margin-bottom: 8px !important;
+  }
+  
+  .support-input,
+  .support-textarea {
+    padding: clamp(0.5rem, 0.65vw, 0.75rem) !important;
+    font-size: clamp(0.8rem, 0.9vw, 1rem) !important;
+  }
+  
+  .send-message-button {
+    padding: clamp(0.6rem, 0.75vw, 0.75rem) !important;
+    font-size: clamp(0.8rem, 0.9vw, 0.95rem) !important;
   }
   
   .response-times-box {
-    margin-top: 8px !important;
+    margin-top: 6px !important;
     margin-bottom: 0 !important;
-    padding: 8px !important;
+    padding: 6px !important;
+    font-size: clamp(0.75rem, 0.85vw, 0.9rem) !important;
   }
   
   .help-modal-footer {
-    margin-top: 20px !important;
-    padding-top: 12px !important;
+    margin-top: 16px !important;
+    padding-top: 10px !important;
   }
   
-  /* Admin Login fixes for MacBook Air */
+  .back-button {
+    padding: clamp(0.6rem, 0.75vw, 0.875rem) clamp(1.25rem, 1.5vw, 1.75rem) !important;
+    font-size: clamp(0.8rem, 0.9vw, 1rem) !important;
+  }
+  
+  /* Admin Login fixes for MacBook Air - optimized for higher zoom */
   .admin-login-card {
     padding: 20px 16px !important;
     max-width: 350px !important;
