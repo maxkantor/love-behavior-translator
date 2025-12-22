@@ -237,13 +237,19 @@ body {
 
 @media (max-width: 1400px) {
   .app-main-wrapper {
-    grid-template-columns: clamp(140px, 14.3vw, 200px) 1fr clamp(160px, 17.1vw, 240px);
+    grid-template-columns: clamp(140px, 14.3vw, 200px) 1fr clamp(150px, 15vw, 200px);
     padding: 0 clamp(0.75rem, 1.43vw, 1.25rem);
     gap: clamp(0.75rem, 1.7vw, 1.5rem);
   }
   
   .main-sidebar-right {
-    max-width: clamp(160px, 17.1vw, 240px);
+    max-width: clamp(150px, 15vw, 200px);
+    overflow: visible !important;
+  }
+  
+  .decorative-images-container {
+    padding: clamp(0.25rem, 0.5vw, 0.5rem) clamp(0.125rem, 0.25vw, 0.25rem) !important;
+    gap: clamp(0.75rem, 1vw, 1rem) !important;
   }
 }
 
@@ -297,11 +303,13 @@ body {
 }
 
 .decorative-image {
-  width: 100%;
-  height: auto;
+  width: clamp(140px, 14vw, 200px);
+  height: clamp(140px, 14vw, 200px);
   aspect-ratio: 1;
-  max-width: clamp(140px, 14vw, 220px);
-  max-height: clamp(140px, 14vw, 220px);
+  max-width: clamp(140px, 14vw, 200px);
+  max-height: clamp(140px, 14vw, 200px);
+  min-width: 0;
+  min-height: 0;
   border-radius: 50%;
   object-fit: cover;
   border: clamp(2px, 0.2vw, 3px) solid rgba(255, 255, 255, 0.4);
@@ -332,8 +340,10 @@ body {
 
 @media (max-width: 1400px) {
   .decorative-image {
-    max-width: clamp(120px, 14.3vw, 200px);
-    max-height: clamp(120px, 14.3vw, 200px);
+    max-width: clamp(100px, 12vw, 160px) !important;
+    max-height: clamp(100px, 12vw, 160px) !important;
+    width: clamp(100px, 12vw, 160px) !important;
+    height: clamp(100px, 12vw, 160px) !important;
   }
 }
 
@@ -1469,17 +1479,18 @@ body {
 .admin-login-card {
   background: white;
   border-radius: clamp(0.75rem, 1vw, 1rem);
-  padding: clamp(1.5rem, 2.5vw, 2.5rem);
-  max-width: clamp(320px, 26.25vw, 420px);
-  width: 100%;
+  padding: clamp(1.25rem, 2vw, 2rem) clamp(1.25rem, 2vw, 2rem) !important;
+  max-width: clamp(300px, 25vw, 400px) !important;
+  width: calc(100% - clamp(1rem, 2vw, 2rem)) !important;
   box-shadow: var(--shadow);
   animation: fadeInUp 0.4s ease-out;
-  margin: clamp(0.5rem, 1vw, 1rem);
+  margin: clamp(0.5rem, 1vw, 1rem) auto !important;
+  box-sizing: border-box;
 }
 
 .admin-login-header {
   text-align: center;
-  margin-bottom: clamp(1.5rem, 2vw, 2rem);
+  margin-bottom: clamp(1rem, 1.5vw, 1.5rem) !important;
 }
 
 .admin-icon {
@@ -1500,8 +1511,8 @@ body {
 }
 
 .admin-form-group {
-  margin-bottom: clamp(1rem, 1.5vw, 1.5rem);
-  padding: clamp(0.75rem, 1vw, 1rem);
+  margin-bottom: clamp(0.75rem, 1.25vw, 1.25rem) !important;
+  padding: clamp(0.625rem, 0.875vw, 0.875rem) !important;
   background: #f9fafb;
   border-radius: clamp(0.5rem, 0.625vw, 0.625rem);
   border: 1px solid var(--border-light);
@@ -2675,7 +2686,8 @@ body {
   width: 100%;
   overflow: visible;
   min-height: 0;
-  padding-bottom: clamp(1rem, 1.5vw, 1.5rem);
+  padding-bottom: clamp(2rem, 3vw, 3rem) !important;
+  margin-bottom: clamp(1rem, 1.5vw, 1.5rem) !important;
 }
 
 .section-title {
@@ -2853,12 +2865,14 @@ body {
 }
 
 .help-modal-footer {
-  margin-top: clamp(1.5rem, 2vw, 2rem);
-  padding-top: clamp(1rem, 1.25vw, 1.25rem);
+  margin-top: clamp(2rem, 3vw, 3rem) !important;
+  padding-top: clamp(1.5rem, 2vw, 2rem) !important;
   border-top: 1px solid #e5e7eb;
   flex-shrink: 0;
   width: 100%;
   clear: both;
+  position: relative;
+  z-index: 1;
 }
 
 .support-back {
