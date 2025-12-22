@@ -2582,17 +2582,18 @@ body {
   left: 16px;
   background: transparent;
   border: none;
-  font-size: 1.5rem;
+  font-size: 1.8rem;
   color: var(--muted);
   cursor: pointer;
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
   transition: all 0.2s;
   z-index: 10;
+  font-weight: 600;
 }
 
 .help-modal-close-top:hover {
@@ -2815,6 +2816,18 @@ body {
 
 .response-time-item:last-child {
   margin-bottom: 0;
+}
+
+.help-modal-footer {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid #e5e7eb;
+  flex-shrink: 0;
+}
+
+.support-back {
+  width: 100%;
+  justify-content: center;
 }
 
 .premium-icon {

@@ -149,7 +149,7 @@ export function HelpModal({ isOpen, onClose }: HelpModalProps) {
     <div className="modal-overlay" onClick={onClose}>
       <div className="support-modal-content" onClick={(e) => e.stopPropagation()}>
         <button className="help-modal-close-top" onClick={onClose} title="Close">
-          ✕
+          ←
         </button>
         <div className="support-modal-header">
           <div className="headset-icon">🎧</div>
