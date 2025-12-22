@@ -30,9 +30,9 @@ export function CreditModal({ isOpen, onClose, currentCredits }: CreditModalProp
     },
     { 
       name: 'Pro Pack', 
-      credits: 60, 
+      credits: 50, 
       price: 3.99, 
-      perCredit: 0.067, 
+      perCredit: 0.080, 
       description: 'Best value for regular users',
       popular: true 
     },
