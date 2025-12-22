@@ -84,17 +84,19 @@ body {
   position: relative;
   z-index: 1;
   min-height: 100vh;
-  height: auto;
+  height: 100vh;
+  max-height: 100vh;
   padding: clamp(0.25rem, 0.5vw, 0.5rem);
+  padding-bottom: 0;
   max-width: 100%;
   margin: 0 auto;
   overflow-x: hidden;
-  overflow-y: auto;
+  overflow-y: hidden;
   display: flex;
   flex-direction: column;
   width: 100%;
   min-width: 0;
-  justify-content: space-between;
+  justify-content: flex-start;
 }
 
 /* Header */
@@ -224,15 +226,14 @@ body {
   padding-bottom: clamp(0.5rem, 0.75vw, 0.75rem);
   max-width: 100%;
   margin: 0 auto;
-  flex: 1 1 auto;
-  overflow: visible;
+  flex: 1 1 0;
+  overflow-y: auto;
+  overflow-x: hidden;
   min-height: 0;
   align-items: start;
   position: relative;
   width: 100%;
-  height: auto;
-  min-height: fit-content;
-  max-height: none;
+  height: 0;
 }
 
 @media (max-width: 1600px) {
@@ -575,33 +576,39 @@ body {
   /* Footer fixes for MacBook Air - ensure buttons are visible at 100% zoom */
   .app-container {
     min-height: 100vh !important;
-    height: auto !important;
-    padding-bottom: clamp(0.5rem, 0.75vw, 0.75rem) !important;
+    height: 100vh !important;
+    max-height: 100vh !important;
+    padding-bottom: 0 !important;
+    overflow-y: hidden !important;
   }
   
   .app-header {
-    padding: clamp(0.2rem, 0.4vw, 0.35rem) clamp(0.5rem, 1vw, 0.9rem) clamp(0.15rem, 0.3vw, 0.25rem) !important;
-    max-height: 16vh !important;
+    padding: clamp(0.15rem, 0.3vw, 0.3rem) clamp(0.4rem, 0.9vw, 0.8rem) clamp(0.1rem, 0.25vw, 0.2rem) !important;
+    max-height: 15vh !important;
     flex-shrink: 0 !important;
+    min-height: fit-content !important;
   }
   
   .app-main-wrapper {
-    flex: 1 1 auto !important;
+    flex: 1 1 0 !important;
     min-height: 0 !important;
     max-height: none !important;
+    height: 0 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
   }
   
   .app-main {
     max-height: none !important;
-    padding: clamp(0.4rem, 0.8vw, 1rem) clamp(0.4rem, 1vw, 1.5rem) !important;
+    padding: clamp(0.35rem, 0.7vw, 0.9rem) clamp(0.35rem, 0.9vw, 1.4rem) !important;
   }
   
   .app-footer {
     overflow: visible !important;
-    padding: clamp(0.25rem, 0.4vw, 0.4rem) clamp(0.5rem, 0.9vw, 0.9rem) clamp(0.25rem, 0.4vw, 0.35rem) !important;
+    padding: clamp(0.2rem, 0.35vw, 0.35rem) clamp(0.45rem, 0.8vw, 0.8rem) clamp(0.2rem, 0.35vw, 0.3rem) !important;
     position: relative !important;
     z-index: 10 !important;
-    margin-top: auto !important;
+    margin-top: 0 !important;
     flex-shrink: 0 !important;
     display: block !important;
     visibility: visible !important;
@@ -609,6 +616,7 @@ body {
     min-height: fit-content !important;
     max-height: none !important;
     margin-bottom: 0 !important;
+    width: 100% !important;
   }
   
   .footer-bottom {
@@ -1425,12 +1433,11 @@ body {
 
 /* Footer */
 .app-footer {
-  padding: 0 clamp(0.75rem, 1.2vw, 1rem) clamp(0.4rem, 0.6vw, 0.5rem);
-  padding-top: clamp(0.4rem, 0.6vw, 0.6rem);
+  padding: clamp(0.3rem, 0.5vw, 0.5rem) clamp(0.75rem, 1.2vw, 1rem) clamp(0.3rem, 0.5vw, 0.4rem);
   color: white;
   max-width: 1200px;
   margin: 0 auto;
-  margin-top: clamp(-0.25rem, -0.4vw, -0.2rem);
+  margin-top: 0;
   flex-shrink: 0;
   overflow: visible;
   position: relative;
@@ -1439,7 +1446,7 @@ body {
   visibility: visible;
   opacity: 1;
   min-height: fit-content;
-  max-height: 15vh;
+  width: 100%;
 }
 
 .footer-content {
