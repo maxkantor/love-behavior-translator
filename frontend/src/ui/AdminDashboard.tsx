@@ -192,8 +192,12 @@ export function AdminDashboard() {
   }
 
   async function setMyCredits(credits: number) {
-    if (!adminToken) return;
+    if (!adminToken) {
+      alert('Admin token not found. Please log in again.');
+      return;
+    }
     try {
+      console.log(`Setting my credits to: ${credits}`);
       const resp = await fetch(`${apiBaseUrl}/admin/me/credits`, {
         method: 'PUT',
         headers: {
@@ -202,11 +206,29 @@ export function AdminDashboard() {
         },
         body: JSON.stringify({ credits }),
       });
+      
+      console.log(`Response status: ${resp.status}`);
+      
       if (resp.ok) {
+        const data = await resp.json();
+        console.log('Credits updated successfully:', data);
         await loadData();
+        alert(`Your credits have been set to ${credits === -1 ? 'Unlimited (Admin)' : credits}`);
+      } else {
+        let errorMessage = 'Unknown error';
+        try {
+          const error = await resp.json();
+          errorMessage = error.error || error.message || 'Unknown error';
+        } catch {
+          const text = await resp.text();
+          errorMessage = text || `HTTP ${resp.status}: ${resp.statusText}`;
+        }
+        console.error(`Failed to set credits (${resp.status}):`, errorMessage);
+        alert(`Failed to set credits: ${errorMessage}`);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error setting my credits:', err);
+      alert(`Failed to set credits: ${err?.message || 'Network error'}`);
     }
   }
 
