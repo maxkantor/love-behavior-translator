@@ -364,6 +364,24 @@ body {
     height: auto !important;
   }
   
+  /* Main content fixes for MacBook Air */
+  .app-main {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+  
+  .main-content-center {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    min-height: auto !important;
+  }
+  
+  .entry-points-section {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+  
   /* Help Modal fixes for MacBook Air */
   .support-modal-content {
     max-width: 800px !important;
@@ -451,7 +469,8 @@ body {
   padding: clamp(1.5rem, 2vw, 2rem) clamp(1.5rem, 2.5vw, 2.5rem);
   box-shadow: var(--shadow);
   position: relative;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
   min-height: 0;
   width: 100%;
   max-width: 100%;
@@ -469,7 +488,9 @@ body {
   width: 100%;
   min-width: 0;
   height: 100%;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex: 1;
 }
 
 .main-sidebar {
