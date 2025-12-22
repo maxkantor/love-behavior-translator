@@ -55,8 +55,10 @@ body {
   color: var(--text);
   background: var(--purple-gradient);
   position: relative;
-  overflow: hidden;
-  height: 100vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  min-height: 100vh;
+  height: auto;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   width: 100%;
@@ -219,12 +221,12 @@ body {
   max-width: 100%;
   margin: 0 auto;
   flex: 1;
-  overflow: hidden;
+  overflow: visible;
   min-height: 0;
   align-items: start;
   position: relative;
   width: 100%;
-  height: 100%;
+  height: auto;
 }
 
 @media (max-width: 1600px) {
@@ -366,13 +368,14 @@ body {
   
   /* Main content fixes for MacBook Air */
   .app-main {
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
+    overflow: visible !important;
+    height: auto !important;
+    min-height: fit-content !important;
   }
   
   .main-content-center {
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
+    overflow: visible !important;
+    height: auto !important;
     min-height: auto !important;
   }
   
@@ -380,6 +383,16 @@ body {
     display: block !important;
     visibility: visible !important;
     opacity: 1 !important;
+  }
+  
+  .entry-points-title {
+    display: block !important;
+    visibility: visible !important;
+  }
+  
+  .entry-points-grid {
+    display: grid !important;
+    visibility: visible !important;
   }
   
   /* Help Modal fixes for MacBook Air */
@@ -469,8 +482,7 @@ body {
   padding: clamp(1.5rem, 2vw, 2rem) clamp(1.5rem, 2.5vw, 2.5rem);
   box-shadow: var(--shadow);
   position: relative;
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: visible;
   min-height: 0;
   width: 100%;
   max-width: 100%;
@@ -487,9 +499,8 @@ body {
   gap: 16px;
   width: 100%;
   min-width: 0;
-  height: 100%;
-  overflow-y: auto;
-  overflow-x: hidden;
+  height: auto;
+  overflow: visible;
   flex: 1;
 }
 
