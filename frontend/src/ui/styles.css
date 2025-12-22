@@ -2757,7 +2757,7 @@ body {
 }
 
 .support-form {
-  margin-bottom: 0;
+  margin-bottom: 12px !important;
   flex: 0 0 auto;
   display: flex;
   flex-direction: column;
