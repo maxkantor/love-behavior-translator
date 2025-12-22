@@ -633,11 +633,13 @@ body {
   }
   
   /* Left sidebar fixes for MacBook Air */
+  .main-sidebar,
   .main-sidebar-left {
     overflow-y: auto !important;
     overflow-x: visible !important;
     max-height: none !important;
     height: auto !important;
+    overflow: visible !important;
   }
   
   .sidebar-section {
