@@ -1581,6 +1581,31 @@ body::-webkit-scrollbar {
   overflow: hidden;
 }
 
+/* Windows and larger screens - adjust spacing to prevent scrollbar */
+@media (min-width: 1600px) {
+  .cta-section {
+    margin-top: clamp(0.3rem, 0.5vw, 0.5rem) !important;
+  }
+  
+  .analyze-button {
+    margin-top: clamp(0.1rem, 0.15vw, 0.15rem) !important;
+    margin-bottom: 0 !important;
+  }
+  
+  .cta-microcopy {
+    margin-top: clamp(0.2rem, 0.3vw, 0.3rem) !important;
+    margin-bottom: clamp(0.05rem, 0.1vw, 0.1rem) !important;
+  }
+  
+  .app-main {
+    padding-bottom: clamp(0.4rem, 0.6vw, 0.7rem) !important;
+  }
+  
+  .main-content-center {
+    padding-bottom: clamp(0.2rem, 0.3vw, 0.3rem) !important;
+  }
+}
+
 .analyze-button::before {
   content: '';
   position: absolute;
