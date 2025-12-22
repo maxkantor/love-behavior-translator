@@ -2945,12 +2945,24 @@ body {
   max-width: 1000px;
   width: 95%;
   max-height: 95vh;
-  overflow: visible;
+  overflow-y: auto;
+  overflow-x: hidden;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   animation: slideUp 0.3s ease-out;
   padding: 24px 32px;
   display: flex;
   flex-direction: column;
+}
+
+/* Hide scrollbar but allow scrolling */
+.credit-modal-content::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
+}
+
+.credit-modal-content {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
 }
 
 .credit-modal-header {
@@ -3016,6 +3028,7 @@ body {
   flex: 1;
   overflow: visible;
   min-height: 0;
+  flex-shrink: 1;
 }
 
 .packs-title {
@@ -3173,6 +3186,9 @@ body {
   border-top: 1px solid var(--border);
   flex-shrink: 0;
   margin-top: auto;
+  position: relative;
+  z-index: 1;
+  background: white;
 }
 
 .secure-payment {
@@ -3833,15 +3849,33 @@ body {
   .credit-modal-content {
     max-height: 98vh;
     padding: 16px 20px;
-    overflow: visible !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+  
+  /* Hide scrollbar on iOS/mobile */
+  .credit-modal-content::-webkit-scrollbar {
+    width: 0px !important;
+    background: transparent !important;
   }
   
   .packs-section {
     overflow: visible !important;
+    margin-bottom: 16px !important;
   }
   
   .packs-grid {
     overflow: visible !important;
+    margin-bottom: 12px !important;
+  }
+  
+  .credit-footer {
+    flex-shrink: 0 !important;
+    margin-top: auto !important;
+    padding-top: 12px !important;
+    position: relative !important;
+    z-index: 2 !important;
+    background: white !important;
   }
   
   .credit-modal-header h1 {
