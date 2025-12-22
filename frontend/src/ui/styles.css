@@ -2674,6 +2674,8 @@ body {
   flex-direction: column;
   width: 100%;
   overflow: visible;
+  min-height: 0;
+  padding-bottom: clamp(1rem, 1.5vw, 1.5rem);
 }
 
 .section-title {
