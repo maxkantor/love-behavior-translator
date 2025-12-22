@@ -222,7 +222,7 @@ body {
   padding: 0 clamp(0.75rem, 2vw, 2.5rem);
   max-width: 100%;
   margin: 0 auto;
-  flex: 1;
+  flex: 1 1 auto;
   overflow: visible;
   min-height: 0;
   align-items: start;
@@ -230,6 +230,7 @@ body {
   width: 100%;
   height: auto;
   min-height: fit-content;
+  max-height: none;
 }
 
 @media (max-width: 1600px) {
