@@ -2646,11 +2646,11 @@ body {
 }
 
 .section-title {
-  font-size: 1.3rem;
+  font-size: 1.2rem;
   font-weight: 700;
   color: var(--text);
-  margin-bottom: 16px;
-  padding-bottom: 8px;
+  margin-bottom: 12px;
+  padding-bottom: 6px;
   border-bottom: 2px solid var(--border);
   flex-shrink: 0;
 }
@@ -2698,7 +2698,7 @@ body {
 }
 
 .form-field {
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .form-field label {
@@ -2792,9 +2792,9 @@ body {
 
 .response-times-box {
   background: #d1fae5;
-  padding: 16px;
+  padding: 12px;
   border-radius: 10px;
-  margin-top: 0;
+  margin-top: 12px;
   flex-shrink: 0;
   margin-bottom: 0;
 }
