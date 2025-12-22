@@ -2,6 +2,10 @@
 
 React (AWS Amplify) + .NET 8 Lambda + API Gateway + DynamoDB + Secrets Manager + SES + S3.
 
+## Stripe Live Mode
+
+To switch to Stripe live mode for production, see [STRIPE_LIVE_SETUP.md](./STRIPE_LIVE_SETUP.md) for detailed instructions.
+
 This repo mirrors the **pet-behavior-translator** AWS architecture, but adapts prompts/models for **romantic + interpersonal behavior analysis**.
 
 ### Safety disclaimer
