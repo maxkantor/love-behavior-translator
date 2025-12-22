@@ -40,6 +40,47 @@ function getApiBaseUrl(): string {
   return '';
 }
 
+// Check if the input is relationship-related
+function isRelationshipRelated(text: string): boolean {
+  const lowerText = text.toLowerCase();
+  
+  // Relationship-related keywords
+  const relationshipKeywords = [
+    'partner', 'boyfriend', 'girlfriend', 'spouse', 'husband', 'wife',
+    'relationship', 'dating', 'marriage', 'couple', 'romantic',
+    'love', 'loved', 'loving', 'affection', 'intimacy',
+    'breakup', 'divorce', 'separated', 'together', 'commitment',
+    'communication', 'trust', 'jealous', 'jealousy', 'cheating',
+    'text', 'texting', 'message', 'calling', 'contact',
+    'distant', 'pulling away', 'losing interest', 'lose interest',
+    'attachment', 'anxious', 'avoidant', 'secure',
+    'stay', 'leave', 'break up', 'breakup', 'separate',
+    'emotional', 'feelings', 'hurt', 'confused', 'frustrated',
+    'plans', 'cancel', 'canceling', 'initiate', 'initiation',
+    'defensive', 'argument', 'fight', 'disagreement', 'conflict',
+    'engagement', 'proposal', 'wedding', 'marry', 'married'
+  ];
+  
+  // Check if text contains relationship-related keywords
+  const hasRelationshipKeyword = relationshipKeywords.some(keyword => 
+    lowerText.includes(keyword)
+  );
+  
+  // Check for relationship context indicators
+  const relationshipContext = [
+    'my partner', 'my boyfriend', 'my girlfriend', 'my spouse',
+    'my husband', 'my wife', 'we are', 'we were', 'us',
+    'our relationship', 'our marriage', 'our dating'
+  ];
+  
+  const hasRelationshipContext = relationshipContext.some(context => 
+    lowerText.includes(context)
+  );
+  
+  // Must have at least one relationship keyword or context
+  return hasRelationshipKeyword || hasRelationshipContext;
+}
+
 export function App() {
   const apiBaseUrl = useMemo(() => getApiBaseUrl(), []);
   const { credits, setCredits, userId, refreshCredits } = useCredits();
@@ -110,6 +151,12 @@ export function App() {
     const trimmed = behavior.trim();
     if (trimmed.length < 10) {
       setError('Please describe the behavior in at least 10 characters.');
+      return;
+    }
+
+    // Check if the input is relationship-related
+    if (!isRelationshipRelated(trimmed)) {
+      setError('This tool is designed for relationship-related questions only. Please describe a situation involving your partner, dating, marriage, or romantic relationship.');
       return;
     }
 
