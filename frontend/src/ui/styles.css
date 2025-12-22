@@ -1898,7 +1898,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 14px 16px;
+  padding: 10px 12px;
   border-bottom: 1px solid var(--border);
   transition: all 0.2s ease;
   border-radius: 8px;
@@ -2062,12 +2062,12 @@ body {
   background: var(--teal);
   color: white;
   border: none;
-  padding: 8px 16px;
+  padding: 6px 12px;
   border-radius: 6px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
 }
 
 .admin-reply-btn:hover {
