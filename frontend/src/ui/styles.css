@@ -2837,11 +2837,11 @@ body {
 
 .response-times-box {
   background: #d1fae5;
-  padding: 12px;
-  border-radius: 10px;
-  margin-top: 12px;
+  padding: clamp(0.625rem, 0.75vw, 0.75rem);
+  border-radius: clamp(0.5rem, 0.625vw, 0.625rem);
+  margin-top: clamp(0.75rem, 1vw, 1rem);
   flex-shrink: 0;
-  margin-bottom: 0;
+  margin-bottom: clamp(1rem, 1.5vw, 1.5rem) !important;
 }
 
 .response-times-title {
