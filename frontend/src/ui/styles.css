@@ -29,6 +29,10 @@ html {
   -moz-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
   text-size-adjust: 100%;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  height: 100%;
+  max-height: 100vh;
 }
 
 @media (min-resolution: 120dpi) {
@@ -46,8 +50,11 @@ html {
 html,
 body {
   height: 100%;
+  max-height: 100vh;
   margin: 0;
   padding: 0;
+  overflow-x: hidden;
+  overflow-y: hidden;
 }
 
 body {
@@ -56,8 +63,10 @@ body {
   background: var(--purple-gradient);
   position: relative;
   overflow-x: hidden;
-  overflow-y: auto;
+  overflow-y: hidden;
   min-height: 100vh;
+  max-height: 100vh;
+  height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   width: 100%;
