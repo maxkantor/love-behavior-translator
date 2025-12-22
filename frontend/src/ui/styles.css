@@ -1583,25 +1583,69 @@ body::-webkit-scrollbar {
 
 /* Windows and larger screens - adjust spacing to prevent scrollbar */
 @media (min-width: 1600px) {
+  /* Aggressively hide scrollbars on Windows */
+  html, body {
+    overflow-y: hidden !important;
+    overflow-x: hidden !important;
+  }
+  
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+  
+  .app-container {
+    overflow-y: hidden !important;
+    max-height: 100vh !important;
+    height: 100vh !important;
+  }
+  
+  .app-main-wrapper {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+  
+  /* Hide scrollbar but allow scrolling */
+  .app-main-wrapper::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+  }
+  
+  .app-main-wrapper {
+    -ms-overflow-style: none !important;
+    scrollbar-width: none !important;
+  }
+  
   .cta-section {
-    margin-top: clamp(0.3rem, 0.5vw, 0.5rem) !important;
+    margin-top: clamp(0.25rem, 0.4vw, 0.4rem) !important;
   }
   
   .analyze-button {
-    margin-top: clamp(0.1rem, 0.15vw, 0.15rem) !important;
+    margin-top: clamp(0.08rem, 0.12vw, 0.12rem) !important;
     margin-bottom: 0 !important;
   }
   
   .cta-microcopy {
-    margin-top: clamp(0.2rem, 0.3vw, 0.3rem) !important;
-    margin-bottom: clamp(0.05rem, 0.1vw, 0.1rem) !important;
+    margin-top: clamp(0.15rem, 0.25vw, 0.25rem) !important;
+    margin-bottom: clamp(0.03rem, 0.05vw, 0.05rem) !important;
   }
   
   .app-main {
-    padding-bottom: clamp(0.4rem, 0.6vw, 0.7rem) !important;
+    padding-bottom: clamp(0.3rem, 0.5vw, 0.6rem) !important;
   }
   
   .main-content-center {
+    padding-bottom: clamp(0.15rem, 0.25vw, 0.25rem) !important;
+  }
+  
+  .app-footer {
+    padding-top: clamp(0.25rem, 0.4vw, 0.4rem) !important;
+    padding-bottom: clamp(0.2rem, 0.3vw, 0.3rem) !important;
+  }
+  
+  .app-header {
     padding-bottom: clamp(0.2rem, 0.3vw, 0.3rem) !important;
   }
 }
