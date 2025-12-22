@@ -212,8 +212,16 @@ export function AdminDashboard() {
       if (resp.ok) {
         const data = await resp.json();
         console.log('Credits updated successfully:', data);
-        await loadData();
-        alert(`Your credits have been set to ${credits === -1 ? 'Unlimited (Admin)' : credits}`);
+        
+        // Refresh all data to show updated credits
+        await Promise.all([
+          loadData(),
+          fetchActivities()
+        ]);
+        
+        // Show success message with current credits
+        const creditsDisplay = credits === -1 ? 'Unlimited (Admin)' : `${credits} credits`;
+        alert(`✅ Success! Your credits have been set to ${creditsDisplay}.\n\nThe users list has been refreshed. Look for user "admin" in the All Users section to verify.`);
       } else {
         let errorMessage = 'Unknown error';
         try {
@@ -224,11 +232,11 @@ export function AdminDashboard() {
           errorMessage = text || `HTTP ${resp.status}: ${resp.statusText}`;
         }
         console.error(`Failed to set credits (${resp.status}):`, errorMessage);
-        alert(`Failed to set credits: ${errorMessage}`);
+        alert(`❌ Failed to set credits: ${errorMessage}`);
       }
     } catch (err: any) {
       console.error('Error setting my credits:', err);
-      alert(`Failed to set credits: ${err?.message || 'Network error'}`);
+      alert(`❌ Failed to set credits: ${err?.message || 'Network error'}\n\nPlease check the browser console for details.`);
     }
   }
 
@@ -364,6 +372,21 @@ export function AdminDashboard() {
           <div className="admin-card">
             <h2>⚙️ Set Your Credits</h2>
             <p>Choose your credit tier or set unlimited admin access.</p>
+            {(() => {
+              const adminUser = users.find(u => u.userId === 'admin');
+              return adminUser && (
+                <p style={{ 
+                  marginBottom: '12px', 
+                  padding: '8px', 
+                  background: '#f0f0f0', 
+                  borderRadius: '4px',
+                  fontSize: '0.9rem',
+                  fontWeight: '600'
+                }}>
+                  Current: {adminUser.credits === -1 ? 'Unlimited (Admin)' : `${adminUser.credits} credits`}
+                </p>
+              );
+            })()}
             <div className="admin-quick-buttons">
               {myCredits.map((amt) => (
                 <button
