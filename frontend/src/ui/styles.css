@@ -1497,10 +1497,10 @@ body {
 
 .admin-input {
   width: 100%;
-  padding: 12px;
+  padding: 8px;
   border: 2px solid var(--border);
-  border-radius: 10px;
-  font-size: 1rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
   transition: var(--transition);
 }
 
@@ -1549,21 +1549,21 @@ body {
 .admin-dashboard {
   min-height: 100vh;
   background: var(--purple-gradient);
-  padding: 20px;
+  padding: 12px;
   overflow-y: auto;
   overflow-x: hidden;
 }
 
 .admin-header-bar {
-  max-width: 1800px;
-  margin: 0 auto 24px;
+  max-width: 1600px;
+  margin: 0 auto 16px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   background: rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(10px);
-  padding: 18px 28px;
-  border-radius: 16px;
+  padding: 12px 20px;
+  border-radius: 12px;
   color: white;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -1586,14 +1586,14 @@ body {
 }
 
 .admin-content {
-  max-width: 1800px;
+  max-width: 1600px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0 12px;
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  gap: 20px;
+  gap: 12px;
   align-items: start;
-  min-height: calc(100vh - 200px);
+  min-height: calc(100vh - 180px);
 }
 
 /* Form cards container - left column */
@@ -1601,7 +1601,7 @@ body {
   grid-column: 1;
   display: grid;
   grid-template-columns: 1fr;
-  gap: 20px;
+  gap: 12px;
   overflow: visible;
 }
 
@@ -1610,10 +1610,10 @@ body {
   grid-column: 2;
   display: grid;
   grid-template-columns: 1fr;
-  gap: 20px;
-  max-height: calc(100vh - 200px);
+  gap: 12px;
+  max-height: calc(100vh - 180px);
   overflow-y: auto;
-  padding-right: 8px;
+  padding-right: 6px;
 }
 
 /* Purchase Activities - right column */
@@ -1622,10 +1622,10 @@ body {
   grid-column: 3;
   display: grid;
   grid-template-columns: 1fr;
-  gap: 20px;
-  max-height: calc(100vh - 200px);
+  gap: 12px;
+  max-height: calc(100vh - 180px);
   overflow-y: auto;
-  padding-right: 8px;
+  padding-right: 6px;
 }
 
 /* Purchase Activities - right column */
@@ -1666,8 +1666,8 @@ body {
 
 .admin-card {
   background: white;
-  border-radius: 16px;
-  padding: 28px;
+  border-radius: 12px;
+  padding: 16px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   animation: fadeInUp 0.4s ease-out;
   width: 100%;
@@ -1682,24 +1682,24 @@ body {
 }
 
 .admin-card h2 {
-  margin: 0 0 20px;
+  margin: 0 0 12px;
   color: var(--text);
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   font-weight: 700;
-  padding-bottom: 12px;
+  padding-bottom: 8px;
   border-bottom: 2px solid var(--border-light);
 }
 
 .admin-select {
   width: 100%;
-  padding: 14px;
+  padding: 10px;
   border: 2px solid var(--border);
-  border-radius: 10px;
-  font-size: 1rem;
-  margin-bottom: 16px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  margin-bottom: 12px;
   background: white;
   transition: all 0.3s ease;
   cursor: pointer;
@@ -1718,20 +1718,21 @@ body {
 .admin-quick-buttons {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 24px;
-  padding: 12px;
+  gap: 6px;
+  margin-bottom: 12px;
+  padding: 8px;
   background: #f9fafb;
-  border-radius: 10px;
+  border-radius: 8px;
 }
 
 .admin-quick-btn {
-  padding: 8px 16px;
+  padding: 6px 12px;
   border: 2px solid var(--border);
   background: white;
-  border-radius: 8px;
+  border-radius: 6px;
   cursor: pointer;
   font-weight: 600;
+  font-size: 0.85rem;
   transition: all 0.3s;
   color: var(--text);
 }
@@ -1761,8 +1762,8 @@ body {
 
 .admin-input-group {
   display: flex;
-  gap: 8px;
-  margin-bottom: 8px;
+  gap: 6px;
+  margin-bottom: 6px;
 }
 
 .admin-input-group .admin-input {
@@ -1771,10 +1772,11 @@ body {
 
 .admin-set-btn,
 .admin-grant-btn {
-  padding: 12px 20px;
+  padding: 8px 16px;
   border: none;
-  border-radius: 10px;
+  border-radius: 8px;
   font-weight: 600;
+  font-size: 0.9rem;
   cursor: pointer;
   transition: all 0.3s;
   white-space: nowrap;
@@ -1801,14 +1803,15 @@ body {
 }
 
 .admin-hint {
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   color: var(--muted);
   margin: 0;
+  margin-top: 4px;
 }
 
 .admin-action-section {
-  margin-bottom: 20px;
-  padding-bottom: 20px;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
   border-bottom: 1px solid var(--border);
 }
 
@@ -1819,14 +1822,15 @@ body {
 }
 
 .admin-action-btn {
-  padding: 10px 20px;
+  padding: 8px 16px;
   background: var(--purple-gradient);
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 6px;
   cursor: pointer;
   font-weight: 600;
-  margin-right: 8px;
+  font-size: 0.9rem;
+  margin-right: 6px;
   transition: all 0.3s;
 }
 
@@ -1850,15 +1854,15 @@ body {
 
 .admin-stats {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
 }
 
 .admin-stat-box {
   background: linear-gradient(135deg, #f9fafb 0%, #ffffff 100%);
-  padding: 20px;
-  border-radius: 12px;
-  border-left: 4px solid #667eea;
+  padding: 12px;
+  border-radius: 8px;
+  border-left: 3px solid #667eea;
   transition: all 0.3s ease;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
 }
@@ -1870,16 +1874,16 @@ body {
 }
 
 .admin-stat-label {
-  font-size: 0.9rem;
+  font-size: 0.75rem;
   color: var(--muted);
-  margin-bottom: 10px;
+  margin-bottom: 6px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .admin-stat-value {
-  font-size: 2.2rem;
+  font-size: 1.6rem;
   font-weight: 700;
   color: #667eea;
   line-height: 1;
@@ -1973,8 +1977,8 @@ body {
 
 .admin-contact-item {
   border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 20px;
+  border-radius: 8px;
+  padding: 12px;
   background: white;
   transition: all 0.3s ease;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
@@ -1990,17 +1994,17 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 .admin-contact-email {
   font-weight: 700;
   color: var(--text);
-  font-size: 1.05rem;
-  margin-bottom: 6px;
+  font-size: 0.95rem;
+  margin-bottom: 4px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .admin-contact-email::before {
@@ -2011,26 +2015,26 @@ body {
 .admin-contact-subject {
   font-weight: 600;
   color: var(--text-soft);
-  font-size: 1rem;
-  margin-bottom: 8px;
-  padding-left: 24px;
+  font-size: 0.85rem;
+  margin-bottom: 6px;
+  padding-left: 18px;
 }
 
 .admin-contact-meta {
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   color: var(--muted);
-  padding-left: 24px;
+  padding-left: 18px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   flex-wrap: wrap;
 }
 
 .contact-status {
   font-weight: 600;
-  padding: 4px 10px;
-  border-radius: 6px;
-  font-size: 0.8rem;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.7rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   display: inline-block;
