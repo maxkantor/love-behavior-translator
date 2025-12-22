@@ -1580,17 +1580,48 @@ body {
 
 @media (max-width: 1500px) {
   .admin-login-card {
-    padding: 20px 18px !important;
-    max-width: 360px !important;
+    padding: 20px 16px !important;
+    max-width: 350px !important;
+    width: calc(100% - 60px) !important;
   }
   
   .admin-login-header {
-    margin-bottom: 20px !important;
+    margin-bottom: 18px !important;
+  }
+  
+  .admin-icon {
+    font-size: 2.5rem !important;
+    margin-bottom: 12px !important;
+  }
+  
+  .admin-login-header h1 {
+    font-size: 1.75rem !important;
+    margin-bottom: 6px !important;
+  }
+  
+  .admin-login-header p {
+    font-size: 0.9rem !important;
   }
   
   .admin-form-group {
-    margin-bottom: 16px !important;
+    margin-bottom: 14px !important;
+    padding: 10px !important;
+  }
+  
+  .admin-form-group label {
+    font-size: 0.9rem !important;
+    margin-bottom: 8px !important;
+  }
+  
+  .admin-input {
+    padding: 8px !important;
+    font-size: 0.85rem !important;
+  }
+  
+  .admin-login-button {
     padding: 12px !important;
+    font-size: 0.95rem !important;
+    margin-top: 8px !important;
   }
 }
 
@@ -1668,16 +1699,16 @@ body {
 
 .admin-login-button {
   width: 100%;
-  padding: clamp(0.75rem, 0.875vw, 0.875rem);
+  padding: 12px !important;
   background: var(--purple-gradient);
   color: white;
   border: none;
-  border-radius: clamp(0.6rem, 0.75vw, 0.75rem);
-  font-size: clamp(0.95rem, 1.05vw, 1.05rem);
+  border-radius: 8px;
+  font-size: 0.95rem !important;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.3s;
-  margin-top: clamp(0.5rem, 0.75vw, 0.75rem);
+  margin-top: 8px !important;
 }
 
 .admin-login-button:hover:not(:disabled) {
