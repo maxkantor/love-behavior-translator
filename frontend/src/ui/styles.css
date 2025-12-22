@@ -58,7 +58,6 @@ body {
   overflow-x: hidden;
   overflow-y: auto;
   min-height: 100vh;
-  height: auto;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   width: 100%;
@@ -227,6 +226,7 @@ body {
   position: relative;
   width: 100%;
   height: auto;
+  min-height: fit-content;
 }
 
 @media (max-width: 1600px) {
@@ -488,7 +488,8 @@ body {
   max-width: 100%;
   margin: 0;
   z-index: 3;
-  height: 100%;
+  height: auto;
+  min-height: fit-content;
   display: flex;
   flex-direction: column;
 }
