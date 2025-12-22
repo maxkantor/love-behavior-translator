@@ -1478,14 +1478,30 @@ body {
 
 .admin-login-card {
   background: white;
-  border-radius: clamp(0.75rem, 1vw, 1rem);
-  padding: clamp(1.25rem, 2vw, 2rem) clamp(1.25rem, 2vw, 2rem) !important;
-  max-width: clamp(300px, 25vw, 400px) !important;
-  width: calc(100% - clamp(1rem, 2vw, 2rem)) !important;
+  border-radius: 12px;
+  padding: 24px 20px !important;
+  max-width: 380px !important;
+  width: calc(100% - 40px) !important;
   box-shadow: var(--shadow);
   animation: fadeInUp 0.4s ease-out;
-  margin: clamp(0.5rem, 1vw, 1rem) auto !important;
+  margin: 20px auto !important;
   box-sizing: border-box;
+}
+
+@media (max-width: 1500px) {
+  .admin-login-card {
+    padding: 20px 18px !important;
+    max-width: 360px !important;
+  }
+  
+  .admin-login-header {
+    margin-bottom: 20px !important;
+  }
+  
+  .admin-form-group {
+    margin-bottom: 16px !important;
+    padding: 12px !important;
+  }
 }
 
 .admin-login-header {
@@ -2605,16 +2621,16 @@ body {
 .support-modal-content {
   background: white;
   border-radius: 16px;
-  max-width: 1000px;
-  width: calc(100% - 40px);
-  max-height: 96vh;
+  max-width: 900px !important;
+  width: calc(100% - 60px) !important;
+  max-height: 94vh !important;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   animation: slideUp 0.3s ease-out;
-  padding: 16px;
-  margin: 20px;
+  padding: 14px !important;
+  margin: 20px auto !important;
   position: relative;
 }
 
@@ -2665,12 +2681,13 @@ body {
 .help-content-wrapper {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  margin-bottom: 12px;
+  gap: 14px !important;
+  margin-bottom: 20px !important;
   align-items: start;
   flex: 1;
   min-height: 0;
   overflow: visible;
+  padding-bottom: 0 !important;
 }
 
 .faq-section {
@@ -2686,8 +2703,12 @@ body {
   width: 100%;
   overflow: visible;
   min-height: 0;
-  padding-bottom: clamp(2rem, 3vw, 3rem) !important;
-  margin-bottom: clamp(1rem, 1.5vw, 1.5rem) !important;
+  padding-bottom: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+.support-form {
+  margin-bottom: 12px !important;
 }
 
 .section-title {
@@ -2837,11 +2858,11 @@ body {
 
 .response-times-box {
   background: #d1fae5;
-  padding: clamp(0.625rem, 0.75vw, 0.75rem);
-  border-radius: clamp(0.5rem, 0.625vw, 0.625rem);
-  margin-top: clamp(0.75rem, 1vw, 1rem);
+  padding: 10px !important;
+  border-radius: 8px;
+  margin-top: 10px !important;
   flex-shrink: 0;
-  margin-bottom: clamp(1rem, 1.5vw, 1.5rem) !important;
+  margin-bottom: 0 !important;
 }
 
 .response-times-title {
@@ -2865,8 +2886,8 @@ body {
 }
 
 .help-modal-footer {
-  margin-top: clamp(2rem, 3vw, 3rem) !important;
-  padding-top: clamp(1.5rem, 2vw, 2rem) !important;
+  margin-top: 24px !important;
+  padding-top: 16px !important;
   border-top: 1px solid #e5e7eb;
   flex-shrink: 0;
   width: 100%;
