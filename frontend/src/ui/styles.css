@@ -408,6 +408,120 @@ body {
     font-size: clamp(0.75rem, 0.85vw, 0.85rem) !important;
   }
   
+  /* Credit Modal fixes for MacBook Air */
+  .credit-modal-content {
+    max-width: 950px !important;
+    width: 92% !important;
+    padding: clamp(1rem, 1.5vw, 1.5rem) clamp(1.25rem, 2vw, 2rem) !important;
+    max-height: 94vh !important;
+  }
+  
+  .credit-modal-header {
+    margin-bottom: clamp(0.75rem, 1vw, 1rem) !important;
+  }
+  
+  .credit-modal-header h1 {
+    font-size: clamp(1.5rem, 2vw, 1.9rem) !important;
+    margin-bottom: clamp(0.3rem, 0.4vw, 0.4rem) !important;
+  }
+  
+  .credit-subtitle {
+    font-size: clamp(0.85rem, 0.95vw, 0.95rem) !important;
+  }
+  
+  .benefits-section {
+    gap: clamp(0.5rem, 0.7vw, 0.7rem) !important;
+    margin-bottom: clamp(0.75rem, 1vw, 1rem) !important;
+  }
+  
+  .benefit-card {
+    padding: clamp(0.6rem, 0.8vw, 0.75rem) clamp(0.75rem, 1vw, 1rem) !important;
+    gap: clamp(0.6rem, 0.8vw, 0.8rem) !important;
+  }
+  
+  .benefit-icon {
+    font-size: clamp(1.5rem, 1.8vw, 1.8rem) !important;
+  }
+  
+  .benefit-text strong {
+    font-size: clamp(0.85rem, 0.95vw, 0.95rem) !important;
+  }
+  
+  .benefit-text span {
+    font-size: clamp(0.75rem, 0.85vw, 0.85rem) !important;
+  }
+  
+  .packs-section {
+    margin-bottom: clamp(0.75rem, 1vw, 1rem) !important;
+  }
+  
+  .packs-title {
+    font-size: clamp(1.2rem, 1.4vw, 1.4rem) !important;
+    margin-bottom: clamp(0.75rem, 1vw, 1rem) !important;
+  }
+  
+  .packs-grid {
+    gap: clamp(0.75rem, 1vw, 1rem) !important;
+    margin-bottom: clamp(0.75rem, 1vw, 1rem) !important;
+  }
+  
+  .pack-card {
+    padding: clamp(0.75rem, 1vw, 1rem) !important;
+  }
+  
+  .pack-name {
+    font-size: clamp(0.95rem, 1.05vw, 1.05rem) !important;
+    margin: clamp(0.2rem, 0.3vw, 0.3rem) 0 clamp(0.4rem, 0.5vw, 0.5rem) !important;
+  }
+  
+  .pack-price {
+    font-size: clamp(1.3rem, 1.5vw, 1.5rem) !important;
+    margin-bottom: clamp(0.5rem, 0.6vw, 0.6rem) !important;
+  }
+  
+  .price-label {
+    font-size: clamp(0.75rem, 0.85vw, 0.85rem) !important;
+  }
+  
+  .pack-credits-box {
+    padding: clamp(0.5rem, 0.6vw, 0.6rem) !important;
+    margin-bottom: clamp(0.4rem, 0.5vw, 0.5rem) !important;
+  }
+  
+  .credits-amount {
+    font-size: clamp(0.85rem, 0.95vw, 0.95rem) !important;
+  }
+  
+  .pack-description {
+    font-size: clamp(0.8rem, 0.9vw, 0.9rem) !important;
+    margin-bottom: clamp(0.4rem, 0.5vw, 0.5rem) !important;
+  }
+  
+  .pack-per-credit {
+    font-size: clamp(0.75rem, 0.85vw, 0.85rem) !important;
+    margin-bottom: clamp(0.75rem, 1vw, 1rem) !important;
+  }
+  
+  .pack-button {
+    padding: clamp(0.6rem, 0.75vw, 0.75rem) clamp(0.75rem, 1vw, 1rem) !important;
+    font-size: clamp(0.85rem, 0.95vw, 0.95rem) !important;
+  }
+  
+  .credit-footer {
+    padding-top: clamp(0.75rem, 1vw, 1rem) !important;
+    margin-top: clamp(0.5rem, 0.75vw, 0.75rem) !important;
+  }
+  
+  .secure-payment {
+    margin-bottom: clamp(0.6rem, 0.75vw, 0.75rem) !important;
+    font-size: clamp(0.75rem, 0.85vw, 0.85rem) !important;
+  }
+  
+  .back-button {
+    padding: clamp(0.6rem, 0.75vw, 0.75rem) clamp(1.25rem, 1.5vw, 1.5rem) !important;
+    font-size: clamp(0.8rem, 0.9vw, 0.9rem) !important;
+  }
+  
   .app-main-wrapper {
     grid-template-columns: clamp(100px, 10vw, 200px) 1fr clamp(120px, 12vw, 200px) !important;
     gap: clamp(0.4rem, 1vw, 1.2rem) !important;
