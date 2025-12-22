@@ -258,10 +258,12 @@ body {
 .decorative-images-container {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: clamp(1rem, 1.5vw, 1.5rem);
   align-items: center;
   width: 100%;
-  padding: 10px 0;
+  padding: clamp(0.5rem, 0.625vw, 0.625rem) clamp(0.25rem, 0.5vw, 0.5rem);
+  overflow: visible;
+  min-height: 0;
 }
 
 @media (max-width: 1600px) {
@@ -298,8 +300,8 @@ body {
   width: 100%;
   height: auto;
   aspect-ratio: 1;
-  max-width: clamp(160px, 15vw, 240px);
-  max-height: clamp(160px, 15vw, 240px);
+  max-width: clamp(140px, 14vw, 220px);
+  max-height: clamp(140px, 14vw, 220px);
   border-radius: 50%;
   object-fit: cover;
   border: clamp(2px, 0.2vw, 3px) solid rgba(255, 255, 255, 0.4);
@@ -308,6 +310,7 @@ body {
   background: rgba(255, 255, 255, 0.08);
   opacity: 0.8;
   cursor: pointer;
+  flex-shrink: 0;
 }
 
 .decorative-image:hover {
@@ -384,6 +387,8 @@ body {
 
 .main-sidebar-right {
   max-width: clamp(200px, 17.5vw, 280px);
+  overflow: visible;
+  min-height: 0;
 }
 
 .sidebar-section {
@@ -1457,57 +1462,59 @@ body {
   align-items: center;
   justify-content: center;
   background: var(--purple-gradient);
-  padding: 20px;
+  padding: clamp(1rem, 1.25vw, 1.25rem);
+  overflow-y: auto;
 }
 
 .admin-login-card {
   background: white;
-  border-radius: 16px;
-  padding: 40px;
-  max-width: 420px;
+  border-radius: clamp(0.75rem, 1vw, 1rem);
+  padding: clamp(1.5rem, 2.5vw, 2.5rem);
+  max-width: clamp(320px, 26.25vw, 420px);
   width: 100%;
   box-shadow: var(--shadow);
   animation: fadeInUp 0.4s ease-out;
+  margin: clamp(0.5rem, 1vw, 1rem);
 }
 
 .admin-login-header {
   text-align: center;
-  margin-bottom: 32px;
+  margin-bottom: clamp(1.5rem, 2vw, 2rem);
 }
 
 .admin-icon {
-  font-size: 3rem;
-  margin-bottom: 16px;
+  font-size: clamp(2rem, 3vw, 3rem);
+  margin-bottom: clamp(0.75rem, 1vw, 1rem);
 }
 
 .admin-login-header h1 {
-  margin: 0 0 8px;
+  margin: 0 0 clamp(0.4rem, 0.5vw, 0.5rem);
   color: var(--text);
-  font-size: 2rem;
+  font-size: clamp(1.5rem, 2vw, 2rem);
 }
 
 .admin-login-header p {
   margin: 0;
   color: var(--muted);
-  font-size: 0.95rem;
+  font-size: clamp(0.85rem, 0.95vw, 0.95rem);
 }
 
 .admin-form-group {
-  margin-bottom: 24px;
-  padding: 16px;
+  margin-bottom: clamp(1rem, 1.5vw, 1.5rem);
+  padding: clamp(0.75rem, 1vw, 1rem);
   background: #f9fafb;
-  border-radius: 10px;
+  border-radius: clamp(0.5rem, 0.625vw, 0.625rem);
   border: 1px solid var(--border-light);
 }
 
 .admin-form-group label {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: clamp(0.4rem, 0.5vw, 0.5rem);
   font-weight: 600;
-  margin-bottom: 12px;
+  margin-bottom: clamp(0.6rem, 0.75vw, 0.75rem);
   color: var(--text);
-  font-size: 1rem;
+  font-size: clamp(0.875rem, 1vw, 1rem);
 }
 
 .admin-icon-small {
@@ -1544,15 +1551,16 @@ body {
 
 .admin-login-button {
   width: 100%;
-  padding: 14px;
+  padding: clamp(0.75rem, 0.875vw, 0.875rem);
   background: var(--purple-gradient);
   color: white;
   border: none;
-  border-radius: 12px;
-  font-size: 1.05rem;
+  border-radius: clamp(0.6rem, 0.75vw, 0.75rem);
+  font-size: clamp(0.95rem, 1.05vw, 1.05rem);
   font-weight: 700;
   cursor: pointer;
   transition: all 0.3s;
+  margin-top: clamp(0.5rem, 0.75vw, 0.75rem);
 }
 
 .admin-login-button:hover:not(:disabled) {
@@ -2843,16 +2851,19 @@ body {
 }
 
 .help-modal-footer {
-  margin-top: 16px;
-  padding-top: 12px;
+  margin-top: clamp(1.5rem, 2vw, 2rem);
+  padding-top: clamp(1rem, 1.25vw, 1.25rem);
   border-top: 1px solid #e5e7eb;
   flex-shrink: 0;
   width: 100%;
+  clear: both;
 }
 
 .support-back {
   width: 100%;
   justify-content: center;
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 .premium-icon {
