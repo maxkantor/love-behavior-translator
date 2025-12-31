@@ -164,13 +164,29 @@ public sealed class Function
                 return await HandleGetCredits(request, context);
 
             // Email verification endpoints
-            if (method == "POST" && (path.EndsWith("/email/send-verification") || path == "/email/send-verification"))
+            // Handle both exact match and endsWith for API Gateway proxy resources
+            var isSendVerification = method == "POST" && (
+                path == "/email/send-verification" || 
+                path.EndsWith("/email/send-verification") ||
+                rawPath.Contains("/email/send-verification", StringComparison.OrdinalIgnoreCase));
+            
+            if (isSendVerification)
                 return await HandleSendVerificationCode(request, context);
 
-            if (method == "POST" && (path.EndsWith("/email/verify") || path == "/email/verify"))
+            var isVerifyEmail = method == "POST" && (
+                path == "/email/verify" || 
+                path.EndsWith("/email/verify") ||
+                rawPath.Contains("/email/verify", StringComparison.OrdinalIgnoreCase));
+            
+            if (isVerifyEmail)
                 return await HandleVerifyEmail(request, context);
 
-            if (method == "POST" && (path.EndsWith("/credits/restore") || path == "/credits/restore"))
+            var isRestoreCredits = method == "POST" && (
+                path == "/credits/restore" || 
+                path.EndsWith("/credits/restore") ||
+                rawPath.Contains("/credits/restore", StringComparison.OrdinalIgnoreCase));
+            
+            if (isRestoreCredits)
                 return await HandleRestoreCredits(request, context);
 
             // Contact form endpoint
