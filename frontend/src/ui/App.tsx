@@ -1,6 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { useCredits } from './CreditContext';
-import { Link } from 'react-router-dom';
 import { CreditModal } from './CreditModal';
 import { HelpModal } from './HelpModal';
 
@@ -647,9 +646,6 @@ export function App() {
             >
               🔄 Restore Credits
             </button>
-          </div>
-          <div className="footer-links">
-            <Link to="/admin/login" className="admin-link-footer">Admin</Link>
           </div>
           <p className="copyright">© 2025 Love Behavior Translator. All rights reserved.</p>
           <p className="made-with">Made with ❤️ for couples</p>
