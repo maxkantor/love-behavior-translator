@@ -1290,21 +1290,6 @@ Reassurance:
                         var newBalance = await CreditSystem.GetUserCredits(userId, _ddb, context.Logger);
                         context.Logger.LogInformation($"Credits granted successfully. New balance for {userId}: {newBalance}");
                         
-                        // Link email to visitor ID if email is available (automatic linking on purchase)
-                        if (!string.IsNullOrWhiteSpace(customerEmail))
-                        {
-                            try
-                            {
-                                await CreditSystem.LinkEmailToVisitorId(customerEmail, userId, _ddb, context.Logger);
-                                context.Logger.LogInformation($"✅ Automatically linked email {customerEmail} to visitor {userId} after purchase");
-                            }
-                            catch (Exception linkEx)
-                            {
-                                // Log but don't fail - credits are already granted
-                                context.Logger.LogWarning($"⚠️ Failed to link email after purchase (non-critical): {linkEx.Message}");
-                            }
-                        }
-                        
                         // Fetch additional customer details from Stripe
                         string? customerName = null;
                         string? customerEmail = null;
@@ -1376,6 +1361,21 @@ Reassurance:
                             }
                             
                             context.Logger.LogInformation($"Final customer info - Name: {customerName ?? "null"}, Email: {customerEmail ?? "null"}");
+                            
+                            // Link email to visitor ID if email is available (automatic linking on purchase)
+                            if (!string.IsNullOrWhiteSpace(customerEmail))
+                            {
+                                try
+                                {
+                                    await CreditSystem.LinkEmailToVisitorId(customerEmail, userId, _ddb, context.Logger);
+                                    context.Logger.LogInformation($"✅ Automatically linked email {customerEmail} to visitor {userId} after purchase");
+                                }
+                                catch (Exception linkEx)
+                                {
+                                    // Log but don't fail - credits are already granted
+                                    context.Logger.LogWarning($"⚠️ Failed to link email after purchase (non-critical): {linkEx.Message}");
+                                }
+                            }
                             
                             // Get payment method last 4 digits from PaymentIntent
                             if (!string.IsNullOrWhiteSpace(session.PaymentIntentId))
