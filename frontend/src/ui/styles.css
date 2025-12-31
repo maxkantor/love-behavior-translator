@@ -3340,12 +3340,12 @@ body::-webkit-scrollbar {
   border-radius: 16px;
   max-width: 1000px;
   width: 95%;
-  max-height: 95vh;
+  max-height: 92vh;
   overflow-y: auto;
   overflow-x: hidden;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   animation: slideUp 0.3s ease-out;
-  padding: 20px 24px;
+  padding: 16px 20px;
   display: flex;
   flex-direction: column;
   min-height: 0;
@@ -3364,64 +3364,68 @@ body::-webkit-scrollbar {
 
 .credit-modal-header {
   text-align: center;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   flex-shrink: 0;
 }
 
 .credit-modal-header h1 {
-  font-size: 2rem;
+  font-size: 1.75rem;
   font-weight: 700;
   color: var(--text);
-  margin-bottom: 8px;
+  margin-bottom: 6px;
+  line-height: 1.2;
 }
 
 .credit-subtitle {
-  font-size: 1rem;
+  font-size: 0.9rem;
   color: var(--muted);
   margin: 0;
+  line-height: 1.3;
 }
 
 .benefits-section {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-bottom: 16px;
+  gap: 6px;
+  margin-bottom: 12px;
   flex-shrink: 0;
 }
 
 .benefit-card {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   background: #fef3c7;
-  padding: 12px 16px;
-  border-radius: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
   border: 1px solid #fde68a;
 }
 
 .benefit-icon {
-  font-size: 2rem;
+  font-size: 1.6rem;
   flex-shrink: 0;
 }
 
 .benefit-text {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
 }
 
 .benefit-text strong {
-  font-size: 1rem;
+  font-size: 0.9rem;
   color: var(--text);
+  line-height: 1.2;
 }
 
 .benefit-text span {
   color: var(--muted);
-  font-size: 0.85rem;
+  font-size: 0.8rem;
+  line-height: 1.3;
 }
 
 .packs-section {
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   flex: 1;
   overflow: visible;
   min-height: 0;
@@ -3432,26 +3436,44 @@ body::-webkit-scrollbar {
 
 .packs-title {
   text-align: center;
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   font-weight: 700;
   color: var(--text);
-  margin-bottom: 12px;
+  margin-bottom: 10px;
   flex-shrink: 0;
+  line-height: 1.2;
 }
 
 .packs-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-  margin-bottom: 12px;
+  gap: 10px;
+  margin-bottom: 10px;
   align-items: stretch;
+}
+
+/* Windows 100% zoom fix - ensure buttons are always visible */
+@media screen {
+  .pack-card {
+    overflow: visible !important;
+  }
+  
+  .pack-button {
+    overflow: visible !important;
+    clip: auto !important;
+    clip-path: none !important;
+  }
+  
+  .credit-modal-content {
+    overflow-y: auto !important;
+  }
 }
 
 .pack-card {
   background: white;
   border: 2px solid var(--border);
   border-radius: 12px;
-  padding: 16px;
+  padding: 12px;
   text-align: center;
   position: relative;
   transition: all 0.3s;
@@ -3459,6 +3481,7 @@ body::-webkit-scrollbar {
   flex-direction: column;
   min-height: fit-content;
   justify-content: space-between;
+  max-height: none;
 }
 
 .pack-card:hover {
@@ -3467,13 +3490,7 @@ body::-webkit-scrollbar {
   box-shadow: var(--shadow);
 }
 
-.pack-button {
-  position: relative;
-  z-index: 1;
-  visibility: visible !important;
-  opacity: 1 !important;
-  display: flex !important;
-}
+/* Removed duplicate - merged into main .pack-button rule */
 
 .popular-pack {
   background: #fef3c7;
@@ -3482,19 +3499,20 @@ body::-webkit-scrollbar {
 
 .popular-badge-top {
   position: absolute;
-  top: -16px;
+  top: -12px;
   left: 50%;
   transform: translateX(-50%);
   background: var(--yellow);
   color: #000;
-  padding: 6px 16px;
-  border-radius: 20px;
-  font-size: 0.85rem;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 0.75rem;
   font-weight: 700;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   white-space: nowrap;
+  z-index: 5;
 }
 
 .crown-icon {
@@ -3502,59 +3520,64 @@ body::-webkit-scrollbar {
 }
 
 .pack-name {
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 700;
   color: var(--text);
-  margin: 4px 0 8px;
+  margin: 2px 0 6px;
+  line-height: 1.2;
 }
 
 .pack-price {
-  font-size: 1.6rem;
+  font-size: 1.4rem;
   font-weight: 700;
   color: #3b82f6;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
+  line-height: 1.2;
 }
 
 .price-label {
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   font-weight: 400;
   color: var(--muted);
   display: block;
-  margin-top: 4px;
+  margin-top: 2px;
 }
 
 .pack-credits-box {
   background: #f3f4f6;
-  padding: 16px;
+  padding: 12px;
   border-radius: 8px;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .coin-icon {
-  font-size: 1.5rem;
+  font-size: 1.3rem;
 }
 
 .credits-amount {
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 600;
   color: var(--text);
+  line-height: 1.2;
 }
 
 .pack-description {
   color: var(--muted);
-  margin-bottom: 8px;
-  font-size: 0.95rem;
+  margin-bottom: 6px;
+  font-size: 0.85rem;
+  line-height: 1.3;
 }
 
 .pack-per-credit {
   color: var(--muted);
-  font-size: 0.85rem;
-  margin-bottom: 12px;
+  font-size: 0.8rem;
+  margin-bottom: 10px;
   flex-shrink: 0;
+  line-height: 1.2;
 }
 
 .pack-button {
@@ -3562,19 +3585,23 @@ body::-webkit-scrollbar {
   background: var(--purple-gradient);
   color: white;
   border: none;
-  padding: 14px;
-  border-radius: 10px;
+  padding: 12px;
+  border-radius: 8px;
   font-weight: 700;
-  font-size: 1rem;
+  font-size: 0.9rem;
   cursor: pointer;
-  display: flex;
+  display: flex !important;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 6px;
   transition: all 0.3s;
   flex-shrink: 0;
-  min-height: 48px;
+  min-height: 44px;
   margin-top: auto;
+  position: relative;
+  z-index: 10;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
 .pack-button:hover {
@@ -3597,7 +3624,7 @@ body::-webkit-scrollbar {
 
 .credit-footer {
   text-align: center;
-  padding-top: 16px;
+  padding-top: 12px;
   border-top: 1px solid var(--border);
   flex-shrink: 0;
   margin-top: auto;
