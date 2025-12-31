@@ -9,11 +9,16 @@ type CreditModalProps = {
 
 export function CreditModal({ isOpen, onClose, currentCredits }: CreditModalProps) {
   const { refreshCredits, userId } = useCredits();
+  const [email, setEmail] = React.useState('');
+  const [showEmailInput, setShowEmailInput] = React.useState(false);
   
   // Refresh credits when modal opens
   React.useEffect(() => {
     if (isOpen) {
       refreshCredits();
+      // Reset email input when modal opens
+      setEmail('');
+      setShowEmailInput(false);
     }
   }, [isOpen, refreshCredits]);
   
@@ -68,6 +73,7 @@ export function CreditModal({ isOpen, onClose, currentCredits }: CreditModalProp
           price: pack.price,
           successUrl: `${window.location.origin}/?payment=success&credits=${pack.credits}`,
           cancelUrl: `${window.location.origin}/?payment=cancelled`,
+          email: email.trim() || undefined, // Optional email for credit restoration
         }),
       });
 
@@ -145,6 +151,48 @@ export function CreditModal({ isOpen, onClose, currentCredits }: CreditModalProp
 
         <div className="packs-section">
           <h2 className="packs-title">Choose Your Relationship Insight Pack</h2>
+          
+          {/* Optional email input for credit restoration */}
+          <div style={{ marginBottom: '20px', padding: '15px', backgroundColor: '#f8f9fa', borderRadius: '8px', border: '1px solid #e0e0e0' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
+              <label style={{ fontSize: '14px', fontWeight: '500', color: '#333' }}>
+                💾 Optional: Add email to restore credits on new devices
+              </label>
+              <button
+                type="button"
+                onClick={() => setShowEmailInput(!showEmailInput)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#666',
+                  cursor: 'pointer',
+                  fontSize: '12px',
+                  textDecoration: 'underline'
+                }}
+              >
+                {showEmailInput ? 'Hide' : 'Show'}
+              </button>
+            </div>
+            {showEmailInput && (
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="your@email.com (optional)"
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px',
+                  fontSize: '14px'
+                }}
+              />
+            )}
+            <p style={{ fontSize: '12px', color: '#666', marginTop: '8px', marginBottom: '0' }}>
+              If you provide your email, you can restore credits on any device by verifying your email address.
+            </p>
+          </div>
+
           <div className="packs-grid">
             {creditPacks.map((pack) => (
               <div key={pack.name} className={`pack-card ${pack.popular ? 'popular-pack' : ''}`}>

@@ -244,5 +244,276 @@ View in Stripe Dashboard: https://dashboard.stripe.com/payments
         var ip = clientIp ?? "unknown";
         return $"ip_{ip.Replace(".", "_").Replace(":", "_")}";
     }
+
+    private const string EmailVerificationTableName = "LoveBehaviorTranslatorEmailVerification";
+    private const string EmailLinksTableName = "LoveBehaviorTranslatorEmailLinks";
+
+    /// <summary>
+    /// Generate a 6-digit verification code and store it with email.
+    /// </summary>
+    public static async Task<string> GenerateVerificationCode(string email, IAmazonDynamoDB ddb, ILambdaLogger logger)
+    {
+        var code = new Random().Next(100000, 999999).ToString(); // 6-digit code
+        var expiresAt = DateTimeOffset.UtcNow.AddMinutes(15).ToUnixTimeSeconds(); // 15 minute expiry
+
+        try
+        {
+            await ddb.PutItemAsync(new PutItemRequest
+            {
+                TableName = EmailVerificationTableName,
+                Item = new Dictionary<string, AttributeValue>
+                {
+                    ["email"] = new AttributeValue { S = email.ToLowerInvariant().Trim() },
+                    ["code"] = new AttributeValue { S = code },
+                    ["createdAt"] = new AttributeValue { S = DateTimeOffset.UtcNow.ToString("O") },
+                    ["ttl"] = new AttributeValue { N = expiresAt.ToString() }
+                }
+            });
+
+            logger.LogInformation($"Generated verification code for {email}");
+            return code;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Error generating verification code: {ex}");
+            throw;
+        }
+    }
+
+    /// <summary>
+    /// Verify the code for an email and link it to a visitor ID.
+    /// </summary>
+    public static async Task<bool> VerifyCodeAndLinkEmail(string email, string code, string visitorId, IAmazonDynamoDB ddb, ILambdaLogger logger)
+    {
+        try
+        {
+            var emailLower = email.ToLowerInvariant().Trim();
+            
+            // Get verification code
+            var resp = await ddb.GetItemAsync(new GetItemRequest
+            {
+                TableName = EmailVerificationTableName,
+                Key = new Dictionary<string, AttributeValue>
+                {
+                    ["email"] = new AttributeValue { S = emailLower }
+                }
+            });
+
+            if (resp.Item.Count == 0 || !resp.Item.ContainsKey("code"))
+            {
+                logger.LogWarning($"No verification code found for {email}");
+                return false;
+            }
+
+            var storedCode = resp.Item["code"].S;
+            if (storedCode != code)
+            {
+                logger.LogWarning($"Invalid verification code for {email}");
+                return false;
+            }
+
+            // Code is valid - link email to visitor ID
+            await LinkEmailToVisitorId(emailLower, visitorId, ddb, logger);
+
+            // Delete used verification code
+            await ddb.DeleteItemAsync(new DeleteItemRequest
+            {
+                TableName = EmailVerificationTableName,
+                Key = new Dictionary<string, AttributeValue>
+                {
+                    ["email"] = new AttributeValue { S = emailLower }
+                }
+            });
+
+            logger.LogInformation($"Email {emailLower} verified and linked to visitor {visitorId}");
+            return true;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Error verifying code: {ex}");
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Link an email to a visitor ID (add visitor ID to email's list).
+    /// </summary>
+    public static async Task LinkEmailToVisitorId(string email, string visitorId, IAmazonDynamoDB ddb, ILambdaLogger logger)
+    {
+        try
+        {
+            var emailLower = email.ToLowerInvariant().Trim();
+            
+            // Get existing visitor IDs for this email
+            var resp = await ddb.GetItemAsync(new GetItemRequest
+            {
+                TableName = EmailLinksTableName,
+                Key = new Dictionary<string, AttributeValue>
+                {
+                    ["email"] = new AttributeValue { S = emailLower }
+                }
+            });
+
+            var visitorIds = new HashSet<string> { visitorId };
+            
+            if (resp.Item.Count > 0 && resp.Item.ContainsKey("visitorIds"))
+            {
+                var existingIds = resp.Item["visitorIds"].SS ?? new List<string>();
+                foreach (var id in existingIds)
+                {
+                    visitorIds.Add(id);
+                }
+            }
+
+            // Update with merged list
+            await ddb.PutItemAsync(new PutItemRequest
+            {
+                TableName = EmailLinksTableName,
+                Item = new Dictionary<string, AttributeValue>
+                {
+                    ["email"] = new AttributeValue { S = emailLower },
+                    ["visitorIds"] = new AttributeValue { SS = visitorIds.ToList() },
+                    ["updatedAt"] = new AttributeValue { S = DateTimeOffset.UtcNow.ToString("O") }
+                }
+            });
+
+            logger.LogInformation($"Linked email {emailLower} to visitor {visitorId}. Total linked visitors: {visitorIds.Count}");
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Error linking email to visitor ID: {ex}");
+            throw;
+        }
+    }
+
+    /// <summary>
+    /// Get all visitor IDs linked to an email.
+    /// </summary>
+    public static async Task<List<string>> GetLinkedVisitorIds(string email, IAmazonDynamoDB ddb, ILambdaLogger logger)
+    {
+        try
+        {
+            var emailLower = email.ToLowerInvariant().Trim();
+            
+            var resp = await ddb.GetItemAsync(new GetItemRequest
+            {
+                TableName = EmailLinksTableName,
+                Key = new Dictionary<string, AttributeValue>
+                {
+                    ["email"] = new AttributeValue { S = emailLower }
+                }
+            });
+
+            if (resp.Item.Count == 0 || !resp.Item.ContainsKey("visitorIds"))
+            {
+                return new List<string>();
+            }
+
+            return resp.Item["visitorIds"].SS ?? new List<string>();
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Error getting linked visitor IDs: {ex}");
+            return new List<string>();
+        }
+    }
+
+    /// <summary>
+    /// Merge credits from all visitor IDs linked to an email and return total.
+    /// </summary>
+    public static async Task<int> MergeCreditsFromEmail(string email, string currentVisitorId, IAmazonDynamoDB ddb, ILambdaLogger logger)
+    {
+        try
+        {
+            var linkedVisitorIds = await GetLinkedVisitorIds(email, ddb, logger);
+            
+            // Always include current visitor ID
+            if (!linkedVisitorIds.Contains(currentVisitorId))
+            {
+                linkedVisitorIds.Add(currentVisitorId);
+            }
+
+            if (linkedVisitorIds.Count == 0)
+            {
+                return await GetUserCredits(currentVisitorId, ddb, logger);
+            }
+
+            // Sum credits from all linked visitor IDs
+            int totalCredits = 0;
+            foreach (var visitorId in linkedVisitorIds)
+            {
+                var credits = await GetUserCredits(visitorId, ddb, logger);
+                if (credits == -1)
+                {
+                    // Admin/unlimited - return unlimited
+                    return -1;
+                }
+                totalCredits += credits;
+            }
+
+            // Set merged credits to current visitor ID
+            await SetUserCredits(currentVisitorId, totalCredits, ddb, logger);
+
+            // Optionally zero out other visitor IDs (or leave them for audit)
+            // For now, we'll leave them but set current visitor to merged total
+
+            logger.LogInformation($"Merged credits from {linkedVisitorIds.Count} visitor IDs for email {email}. Total: {totalCredits}");
+            return totalCredits;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Error merging credits from email: {ex}");
+            // Fallback to current visitor's credits
+            return await GetUserCredits(currentVisitorId, ddb, logger);
+        }
+    }
+
+    /// <summary>
+    /// Send verification code email.
+    /// </summary>
+    public static async Task SendVerificationEmail(string email, string code, IAmazonSimpleEmailService ses, string fromEmail, ILambdaLogger logger)
+    {
+        if (string.IsNullOrWhiteSpace(fromEmail))
+        {
+            logger.LogWarning("SES_FROM_EMAIL not set; cannot send verification email.");
+            throw new Exception("Email service not configured");
+        }
+
+        var subject = "Your Love Behavior Translator Verification Code";
+        var body = $@"Hello,
+
+Please use this code to verify your email and restore your credits:
+
+{code}
+
+This code will expire in 15 minutes.
+
+If you didn't request this code, you can safely ignore this email.
+
+Best regards,
+Love Behavior Translator
+";
+
+        try
+        {
+            await ses.SendEmailAsync(new SendEmailRequest
+            {
+                Source = fromEmail,
+                Destination = new Destination { ToAddresses = new List<string> { email } },
+                Message = new Message
+                {
+                    Subject = new Content(subject),
+                    Body = new Body { Text = new Content(body) }
+                }
+            });
+
+            logger.LogInformation($"Verification email sent to {email}");
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Failed to send verification email: {ex}");
+            throw;
+        }
+    }
 }
 

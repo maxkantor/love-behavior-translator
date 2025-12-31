@@ -163,6 +163,16 @@ public sealed class Function
             if (method == "GET" && (path.EndsWith("/credits") || path == "/credits"))
                 return await HandleGetCredits(request, context);
 
+            // Email verification endpoints
+            if (method == "POST" && (path.EndsWith("/email/send-verification") || path == "/email/send-verification"))
+                return await HandleSendVerificationCode(request, context);
+
+            if (method == "POST" && (path.EndsWith("/email/verify") || path == "/email/verify"))
+                return await HandleVerifyEmail(request, context);
+
+            if (method == "POST" && (path.EndsWith("/credits/restore") || path == "/credits/restore"))
+                return await HandleRestoreCredits(request, context);
+
             // Contact form endpoint
             if (method == "POST" && (path.EndsWith("/contact") || path == "/contact"))
                 return await HandleContact(request, context);
@@ -1280,6 +1290,21 @@ Reassurance:
                         var newBalance = await CreditSystem.GetUserCredits(userId, _ddb, context.Logger);
                         context.Logger.LogInformation($"Credits granted successfully. New balance for {userId}: {newBalance}");
                         
+                        // Link email to visitor ID if email is available (automatic linking on purchase)
+                        if (!string.IsNullOrWhiteSpace(customerEmail))
+                        {
+                            try
+                            {
+                                await CreditSystem.LinkEmailToVisitorId(customerEmail, userId, _ddb, context.Logger);
+                                context.Logger.LogInformation($"✅ Automatically linked email {customerEmail} to visitor {userId} after purchase");
+                            }
+                            catch (Exception linkEx)
+                            {
+                                // Log but don't fail - credits are already granted
+                                context.Logger.LogWarning($"⚠️ Failed to link email after purchase (non-critical): {linkEx.Message}");
+                            }
+                        }
+                        
                         // Fetch additional customer details from Stripe
                         string? customerName = null;
                         string? customerEmail = null;
@@ -1489,6 +1514,146 @@ Reassurance:
             },
             Body = JsonSerializer.Serialize(body, Json)
         };
+
+    private async Task<APIGatewayProxyResponse> HandleSendVerificationCode(APIGatewayProxyRequest request, ILambdaContext context)
+    {
+        if (string.IsNullOrWhiteSpace(request.Body))
+            return JsonResponse(400, new { error = "Request body required" });
+
+        Dictionary<string, string>? body;
+        try
+        {
+            body = JsonSerializer.Deserialize<Dictionary<string, string>>(request.Body, Json);
+        }
+        catch
+        {
+            return JsonResponse(400, new { error = "Invalid JSON body" });
+        }
+
+        if (body == null || !body.ContainsKey("email") || string.IsNullOrWhiteSpace(body["email"]))
+            return JsonResponse(400, new { error = "Email is required" });
+
+        var email = body["email"].Trim();
+        
+        // Basic email validation
+        if (!email.Contains("@") || email.Length > 254)
+            return JsonResponse(400, new { error = "Invalid email address" });
+
+        try
+        {
+            var code = await CreditSystem.GenerateVerificationCode(email, _ddb, context.Logger);
+            await CreditSystem.SendVerificationEmail(email, code, _ses, _sesFromEmail, context.Logger);
+            
+            return JsonResponse(200, new { message = "Verification code sent to your email" });
+        }
+        catch (Exception ex)
+        {
+            context.Logger.LogError($"Error sending verification code: {ex}");
+            if (ex.Message.Contains("not verified") || ex.Message.Contains("verification"))
+                return JsonResponse(400, new { error = "Email service not configured. Please contact support." });
+            return JsonResponse(500, new { error = "Failed to send verification code" });
+        }
+    }
+
+    private async Task<APIGatewayProxyResponse> HandleVerifyEmail(APIGatewayProxyRequest request, ILambdaContext context)
+    {
+        if (string.IsNullOrWhiteSpace(request.Body))
+            return JsonResponse(400, new { error = "Request body required" });
+
+        Dictionary<string, string>? body;
+        try
+        {
+            body = JsonSerializer.Deserialize<Dictionary<string, string>>(request.Body, Json);
+        }
+        catch
+        {
+            return JsonResponse(400, new { error = "Invalid JSON body" });
+        }
+
+        if (body == null || !body.ContainsKey("email") || !body.ContainsKey("code"))
+            return JsonResponse(400, new { error = "Email and code are required" });
+
+        var email = body["email"].Trim();
+        var code = body["code"].Trim();
+        var ip = GetClientIp(request) ?? "unknown";
+        var visitorId = CreditSystem.GetUserId(request, ip);
+
+        try
+        {
+            var verified = await CreditSystem.VerifyCodeAndLinkEmail(email, code, visitorId, _ddb, context.Logger);
+            if (!verified)
+                return JsonResponse(400, new { error = "Invalid or expired verification code" });
+
+            // After verification, merge credits from all linked visitor IDs
+            var mergedCredits = await CreditSystem.MergeCreditsFromEmail(email, visitorId, _ddb, context.Logger);
+
+            return JsonResponse(200, new { 
+                message = "Email verified successfully", 
+                credits = mergedCredits,
+                userId = visitorId
+            });
+        }
+        catch (Exception ex)
+        {
+            context.Logger.LogError($"Error verifying email: {ex}");
+            return JsonResponse(500, new { error = "Failed to verify email" });
+        }
+    }
+
+    private async Task<APIGatewayProxyResponse> HandleRestoreCredits(APIGatewayProxyRequest request, ILambdaContext context)
+    {
+        if (string.IsNullOrWhiteSpace(request.Body))
+            return JsonResponse(400, new { error = "Request body required" });
+
+        Dictionary<string, string>? body;
+        try
+        {
+            body = JsonSerializer.Deserialize<Dictionary<string, string>>(request.Body, Json);
+        }
+        catch
+        {
+            return JsonResponse(400, new { error = "Invalid JSON body" });
+        }
+
+        if (body == null || !body.ContainsKey("email") || string.IsNullOrWhiteSpace(body["email"]))
+            return JsonResponse(400, new { error = "Email is required" });
+
+        var email = body["email"].Trim();
+        var ip = GetClientIp(request) ?? "unknown";
+        var visitorId = CreditSystem.GetUserId(request, ip);
+
+        try
+        {
+            // Check if email is already linked (user might have verified before)
+            var linkedVisitorIds = await CreditSystem.GetLinkedVisitorIds(email, _ddb, context.Logger);
+            
+            if (linkedVisitorIds.Count == 0)
+            {
+                // Email not linked - need to verify first
+                return JsonResponse(400, new { 
+                    error = "Email not verified", 
+                    requiresVerification = true 
+                });
+            }
+
+            // Link current visitor ID if not already linked
+            await CreditSystem.LinkEmailToVisitorId(email, visitorId, _ddb, context.Logger);
+
+            // Merge credits from all linked visitor IDs
+            var mergedCredits = await CreditSystem.MergeCreditsFromEmail(email, visitorId, _ddb, context.Logger);
+
+            return JsonResponse(200, new { 
+                message = "Credits restored successfully", 
+                credits = mergedCredits,
+                userId = visitorId
+            });
+        }
+        catch (Exception ex)
+        {
+            context.Logger.LogError($"Error restoring credits: {ex}");
+            return JsonResponse(500, new { error = "Failed to restore credits" });
+        }
+    }
 
     private static string GetEnv(string name)
         => Environment.GetEnvironmentVariable(name) ?? throw new Exception($"Missing required env var: {name}");

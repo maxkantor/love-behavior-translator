@@ -97,6 +97,13 @@ export function App() {
   const [result, setResult] = useState<AnalyzeResponse | null>(null);
   const [showCreditModal, setShowCreditModal] = useState(false);
   const [showHelpModal, setShowHelpModal] = useState(false);
+  const [showRestoreModal, setShowRestoreModal] = useState(false);
+  const [restoreEmail, setRestoreEmail] = useState('');
+  const [verificationCode, setVerificationCode] = useState('');
+  const [verificationStep, setVerificationStep] = useState<'email' | 'code'>('email');
+  const [restoreLoading, setRestoreLoading] = useState(false);
+  const [restoreError, setRestoreError] = useState<string | null>(null);
+  const [restoreSuccess, setRestoreSuccess] = useState(false);
 
   const remaining = 2000 - behavior.length;
 
@@ -218,6 +225,97 @@ export function App() {
     setEmotionalState('');
     setMode('gentle');
     setEmailTo('');
+  }
+
+  async function handleSendVerificationCode() {
+    if (!restoreEmail.trim() || !restoreEmail.includes('@')) {
+      setRestoreError('Please enter a valid email address');
+      return;
+    }
+
+    setRestoreLoading(true);
+    setRestoreError(null);
+
+    try {
+      const apiBaseUrl = getApiBaseUrl();
+      const response = await fetch(`${apiBaseUrl}/email/send-verification`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: restoreEmail.trim() }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        setRestoreError(data.error || 'Failed to send verification code');
+        return;
+      }
+
+      setVerificationStep('code');
+      setRestoreError(null);
+    } catch (err: any) {
+      setRestoreError(err?.message || 'Network error');
+    } finally {
+      setRestoreLoading(false);
+    }
+  }
+
+  async function handleVerifyAndRestore() {
+    if (!verificationCode.trim() || verificationCode.length !== 6) {
+      setRestoreError('Please enter the 6-digit verification code');
+      return;
+    }
+
+    setRestoreLoading(true);
+    setRestoreError(null);
+
+    try {
+      const apiBaseUrl = getApiBaseUrl();
+      const response = await fetch(`${apiBaseUrl}/email/verify`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-user-id': userId,
+        },
+        body: JSON.stringify({ 
+          email: restoreEmail.trim(),
+          code: verificationCode.trim()
+        }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        setRestoreError(data.error || 'Invalid verification code');
+        return;
+      }
+
+      // Success - credits restored
+      setRestoreSuccess(true);
+      await refreshCredits();
+      
+      // Close modal after 2 seconds
+      setTimeout(() => {
+        setShowRestoreModal(false);
+        setRestoreEmail('');
+        setVerificationCode('');
+        setVerificationStep('email');
+        setRestoreSuccess(false);
+      }, 2000);
+    } catch (err: any) {
+      setRestoreError(err?.message || 'Network error');
+    } finally {
+      setRestoreLoading(false);
+    }
+  }
+
+  function handleCloseRestoreModal() {
+    setShowRestoreModal(false);
+    setRestoreEmail('');
+    setVerificationCode('');
+    setVerificationStep('email');
+    setRestoreError(null);
+    setRestoreSuccess(false);
   }
 
   function handleQuickAction(text: string) {
@@ -533,6 +631,22 @@ export function App() {
             >
               ❓ Need Help?
             </button>
+            <button 
+              className="footer-btn restore-credits"
+              onClick={() => setShowRestoreModal(true)}
+              style={{ 
+                backgroundColor: '#6c757d',
+                color: 'white',
+                border: 'none',
+                padding: '10px 20px',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontWeight: '500'
+              }}
+            >
+              🔄 Restore Credits
+            </button>
           </div>
           <div className="footer-links">
             <Link to="/admin/login" className="admin-link-footer">Admin</Link>
@@ -555,6 +669,178 @@ export function App() {
         isOpen={showHelpModal}
         onClose={() => setShowHelpModal(false)}
       />
+
+      {/* Restore Credits Modal */}
+      {showRestoreModal && (
+        <div className="modal-overlay" onClick={handleCloseRestoreModal}>
+          <div className="credit-modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '500px' }}>
+            <div className="credit-modal-header">
+              <h1>Restore Credits</h1>
+              <p className="credit-subtitle">
+                Enter the email you used when purchasing credits to restore them on this device.
+              </p>
+            </div>
+
+            {restoreSuccess ? (
+              <div style={{ padding: '20px', textAlign: 'center' }}>
+                <div style={{ fontSize: '48px', marginBottom: '10px' }}>✅</div>
+                <h2 style={{ color: '#28a745', marginBottom: '10px' }}>Credits Restored!</h2>
+                <p>Your credits have been successfully restored. This window will close automatically.</p>
+              </div>
+            ) : (
+              <div style={{ padding: '20px' }}>
+                {verificationStep === 'email' ? (
+                  <>
+                    <div style={{ marginBottom: '20px' }}>
+                      <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>
+                        Email Address
+                      </label>
+                      <input
+                        type="email"
+                        value={restoreEmail}
+                        onChange={(e) => setRestoreEmail(e.target.value)}
+                        placeholder="your@email.com"
+                        style={{
+                          width: '100%',
+                          padding: '12px',
+                          border: '1px solid #ddd',
+                          borderRadius: '6px',
+                          fontSize: '14px'
+                        }}
+                        onKeyPress={(e) => {
+                          if (e.key === 'Enter') {
+                            handleSendVerificationCode();
+                          }
+                        }}
+                      />
+                    </div>
+                    {restoreError && (
+                      <div style={{ 
+                        padding: '10px', 
+                        backgroundColor: '#fee', 
+                        color: '#c33', 
+                        borderRadius: '4px',
+                        marginBottom: '15px'
+                      }}>
+                        {restoreError}
+                      </div>
+                    )}
+                    <button
+                      onClick={handleSendVerificationCode}
+                      disabled={restoreLoading || !restoreEmail.trim()}
+                      style={{
+                        width: '100%',
+                        padding: '12px',
+                        backgroundColor: restoreLoading ? '#ccc' : '#007bff',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '6px',
+                        fontSize: '16px',
+                        fontWeight: '500',
+                        cursor: restoreLoading ? 'not-allowed' : 'pointer'
+                      }}
+                    >
+                      {restoreLoading ? 'Sending...' : 'Send Verification Code'}
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <div style={{ marginBottom: '20px' }}>
+                      <p style={{ marginBottom: '10px', color: '#666' }}>
+                        We sent a 6-digit verification code to <strong>{restoreEmail}</strong>
+                      </p>
+                      <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>
+                        Verification Code
+                      </label>
+                      <input
+                        type="text"
+                        value={verificationCode}
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/\D/g, '').slice(0, 6);
+                          setVerificationCode(value);
+                        }}
+                        placeholder="000000"
+                        maxLength={6}
+                        style={{
+                          width: '100%',
+                          padding: '12px',
+                          border: '1px solid #ddd',
+                          borderRadius: '6px',
+                          fontSize: '18px',
+                          textAlign: 'center',
+                          letterSpacing: '4px'
+                        }}
+                        onKeyPress={(e) => {
+                          if (e.key === 'Enter') {
+                            handleVerifyAndRestore();
+                          }
+                        }}
+                        autoFocus
+                      />
+                    </div>
+                    {restoreError && (
+                      <div style={{ 
+                        padding: '10px', 
+                        backgroundColor: '#fee', 
+                        color: '#c33', 
+                        borderRadius: '4px',
+                        marginBottom: '15px'
+                      }}>
+                        {restoreError}
+                      </div>
+                    )}
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                      <button
+                        onClick={() => {
+                          setVerificationStep('email');
+                          setVerificationCode('');
+                          setRestoreError(null);
+                        }}
+                        style={{
+                          flex: 1,
+                          padding: '12px',
+                          backgroundColor: '#6c757d',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '6px',
+                          fontSize: '16px',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        Back
+                      </button>
+                      <button
+                        onClick={handleVerifyAndRestore}
+                        disabled={restoreLoading || verificationCode.length !== 6}
+                        style={{
+                          flex: 2,
+                          padding: '12px',
+                          backgroundColor: restoreLoading ? '#ccc' : '#28a745',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '6px',
+                          fontSize: '16px',
+                          fontWeight: '500',
+                          cursor: restoreLoading ? 'not-allowed' : 'pointer'
+                        }}
+                      >
+                        {restoreLoading ? 'Verifying...' : 'Verify & Restore Credits'}
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
+
+            <div className="credit-footer">
+              <button className="back-button" onClick={handleCloseRestoreModal}>
+                <span className="back-icon">↻</span>
+                {restoreSuccess ? 'Close' : 'Cancel'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
