@@ -1,0 +1,44 @@
+{
+	"Version": "2012-10-17",
+	"Statement": [
+		{
+			"Sid": "DynamoRW",
+			"Effect": "Allow",
+			"Action": [
+				"dynamodb:PutItem",
+				"dynamodb:UpdateItem",
+				"dynamodb:GetItem",
+				"dynamodb:DeleteItem",
+				"dynamodb:Query",
+				"dynamodb:Scan"
+			],
+			"Resource": "*"
+		},
+		{
+			"Sid": "S3RW",
+			"Effect": "Allow",
+			"Action": [
+				"s3:PutObject",
+				"s3:GetObject"
+			],
+			"Resource": "*"
+		},
+		{
+			"Sid": "SecretsRead",
+			"Effect": "Allow",
+			"Action": [
+				"secretsmanager:GetSecretValue"
+			],
+			"Resource": "*"
+		},
+		{
+			"Sid": "SesSend",
+			"Effect": "Allow",
+			"Action": [
+				"ses:SendEmail",
+				"ses:SendRawEmail"
+			],
+			"Resource": "*"
+		}
+	]
+}
