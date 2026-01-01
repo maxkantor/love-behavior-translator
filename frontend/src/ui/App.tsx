@@ -647,7 +647,7 @@ export function App() {
               🔄 Restore Credits
             </button>
           </div>
-          <p className="copyright">© 2025 Love Behavior Translator. All rights reserved.</p>
+          <p className="copyright">© {new Date().getFullYear()} Love Behavior Translator. All rights reserved.</p>
           <p className="made-with">Made with ❤️ for couples</p>
           <p className="disclaimer-text">
             This app provides general relationship insights and is not professional therapy or counseling.
