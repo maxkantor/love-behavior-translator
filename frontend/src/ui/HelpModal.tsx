@@ -271,7 +271,7 @@ export function HelpModal({ isOpen, onClose }: HelpModalProps) {
 
         <div className="help-modal-footer">
           <button className="back-button support-back" onClick={onClose}>
-            <span className="heart-icon-back">💕</span>
+            <span className="back-icon">💕</span>
             Back to Translator
           </button>
         </div>

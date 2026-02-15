@@ -232,7 +232,7 @@ export function CreditModal({ isOpen, onClose, currentCredits }: CreditModalProp
             Secure payment powered by Stripe
           </div>
           <button className="back-button" onClick={onClose}>
-            <span className="back-icon">↻</span>
+            <span className="back-icon">💕</span>
             Back to Translator
           </button>
         </div>

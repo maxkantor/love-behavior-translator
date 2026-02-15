@@ -1,4 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useCredits } from './CreditContext';
 import { CreditModal } from './CreditModal';
 import { HelpModal } from './HelpModal';
@@ -646,6 +647,9 @@ export function App() {
             >
               🔄 Restore Credits
             </button>
+          </div>
+          <div className="footer-links">
+            <Link to="/platform" className="footer-link">Platform</Link>
           </div>
           <p className="copyright">© {new Date().getFullYear()} Love Behavior Translator. All rights reserved.</p>
           <p className="made-with">Made with ❤️ for couples</p>
