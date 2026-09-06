@@ -1152,6 +1152,8 @@ Reassurance:
                 CancelUrl = input.CancelUrl ?? "https://lovebehaviortranslator.com/?payment=cancelled",
                 Metadata = new Dictionary<string, string>
                 {
+                    ["app"] = "lovebehaviortranslator",
+                    ["product"] = "lovebehaviortranslator",
                     ["userId"] = userId,
                     ["credits"] = input.Credits.ToString(),
                     ["price"] = input.Price.ToString("F2")
@@ -1284,6 +1286,33 @@ Reassurance:
             {
                 var session = stripeEvent.Data.Object as Session;
                 context.Logger.LogInformation($"Checkout session completed: {session?.Id}, Payment status: {session?.PaymentStatus}");
+
+                // Shared Stripe account: ignore checkouts that belong to Lucky Numbers Lab or other apps
+                if (session?.Metadata != null)
+                {
+                    if (session.Metadata.TryGetValue("app", out var appMeta) &&
+                        !string.Equals(appMeta, "lovebehaviortranslator", StringComparison.OrdinalIgnoreCase))
+                    {
+                        context.Logger.LogInformation($"Ignoring foreign app session {session.Id} (app={appMeta})");
+                        return JsonResponse(200, new { received = true, ignored = true, reason = "foreign_app" });
+                    }
+                    if (session.Metadata.TryGetValue("product", out var productMeta) &&
+                        !string.Equals(productMeta, "lovebehaviortranslator", StringComparison.OrdinalIgnoreCase))
+                    {
+                        context.Logger.LogInformation($"Ignoring foreign product session {session.Id} (product={productMeta})");
+                        return JsonResponse(200, new { received = true, ignored = true, reason = "foreign_product" });
+                    }
+                }
+
+                var successUrl = session?.SuccessUrl ?? "";
+                var cancelUrl = session?.CancelUrl ?? "";
+                var combinedUrls = $"{successUrl}\n{cancelUrl}".ToLowerInvariant();
+                var foreignUrlMarkers = new[] { "luckynumberslab", "hybridrace", "jobcompass", "youtubebooster", "gohyrox", "ywux87cqah" };
+                if (foreignUrlMarkers.Any(m => combinedUrls.Contains(m)))
+                {
+                    context.Logger.LogInformation($"Ignoring foreign URL session {session?.Id} (url={successUrl})");
+                    return JsonResponse(200, new { received = true, ignored = true, reason = "foreign_url" });
+                }
                 
                 if (session?.Metadata != null)
                 {
